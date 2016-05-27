@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.5.12)  27 MAY 2016 15:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.5.12)  27 MAY 2016 16:36
 entering extended mode
 **"C:/Users/liziy/Developer/Papers & Thesis/Thesis_MikTex/Thesis_SenLi.tex"
 ("C:/Users/liziy/Developer/Papers & Thesis/Thesis_MikTex/Thesis_SenLi.tex"
@@ -1699,7 +1699,7 @@ Package logreq Info: Writing requests to 'Thesis_SenLi.run.xml'.
 Here is how much of TeX's memory you used:
  31079 strings out of 493634
  634957 string characters out of 3141314
- 817075 words of memory out of 3000000
+ 817095 words of memory out of 3000000
  34161 multiletter control sequences out of 15000+200000
  52637 words of font info for 62 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
@@ -1708,7 +1708,7 @@ Here is how much of TeX's memory you used:
 m Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files (x8
 6)/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files (x86)/MiKTeX 2
 .9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Thesis_SenLi.pdf (3 pages, 45374 bytes).
+Output written on Thesis_SenLi.pdf (3 pages, 45401 bytes).
 PDF statistics:
  62 PDF objects out of 1000 (max. 8388607)
  10 named destinations out of 1000 (max. 500000)
