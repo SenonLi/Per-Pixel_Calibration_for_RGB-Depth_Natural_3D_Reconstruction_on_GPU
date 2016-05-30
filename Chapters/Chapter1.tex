@@ -2,15 +2,104 @@
 
 \chapter{Introduction} % Main chapter title
 \label{sens_introduction} % For referencing the chapter elsewhere, use \ref{sens_introduction} 
-introduction to the first chapter goes here.
 
-\section{3D imaging}
-\section{Universal 3D camera calibration} % (specially with cheap low quality lenses)
-1. What is universal RGBD camera\\
-2. principles to get D for Z.(structured light illumination; Time of Flight; comparison)\\
+
+3D reconstruction aims to reproduce the 3D profile of real objects as accurate as possible, which require accurate X/Y/Z coordinate values in three dimensional space for every single point of a profile. Since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D sensing technology as the core depth determination principle for its first generation, great interest has been invigorated into RGB-D sensors. In the mean time, optical and perspective distortion become a problem that stops from getting a good view. On most wide angle prime lenses and many zoom lenses with relatively short focal lengths,  especially cheap low quality lenses, barrel distortion would typically be present.
+\\\\In this research, a novel method is proposed for accurate real-time rectification and 3D reconstruction of universal RGB-D cameras. 
+
+\section{3D Reconstruction}
+Three dimensional (3D) profile measurement technologies have been developed by various means, as summarized by Curless and Seitz [1], % B. Curless and S. Seitz, \3d photography," ACM Siggraph '00 Course Notes, Course No. 19 (2000).
+among which the non-contact optical methods are widely applied into reality as consumer RGB-D camera. Within the non-contact optical category, as well as 3D reconstruction using multiple images, there are two levels of distinctions[2],
+% 3D Reconstruction from Multiple Images.pdf
+ as shown in the 3D profile acquisition taxonomy diagram is given in Figure 1.1.% the branch tree diagram
+ \\\\Figure 1.1
+\\\\The first: active methods and passive methods. Their classifications are decided by the control of light sources. Active methods need special light sources control as part of the strategy to get 3D information, while on the other hand, passive techniques could work with whichever reasonable available ambient light. With a special known illumination offering more information to simplify some of the steps for 3D information acquiring process, active methods tend to be computationally less demanding. Both of the famous consumer PrimeSense and Kinect V2 3D cameras, which are calibrated by the new proposed approach, are using active methods.
+\\\\The second: single-vantage points methods and multi-vantage points methods. The second distinction is determined by the number of vantage points. With a single vantage system, reconstruction is done based on single view point. In the case that there are multiple viewing or illumination components, all of them would be positioned very close to each other so that they could ideally coincide. For multi-vantage points methods, several viewpoints, with possible controlled illumination source positions, are involved. As contrast with the single-vantage points methods, the multi-vantage systems need the different components to be positioned far enough from each other. 
+\\ \\
+Among those non-contact optical methods, structured-light and time-of-flight methods are of the most practical importance.
+As will be discussed shortly, the PrimeSense technology and SeikowaveLCG camera use Stuctured light methods, and the Kniect V2 camera uses Time-of Flight. 
+\\
+\\\textbf{Structured Light}\\\\
+Structured light (SL) based techniques are famous for its fast speed. It is composed of one camera and one light pattern projector[3]. %Real-time 3-D Reconstruction by Means of Structured Light Illumination
+The projector projects a series of special known patterns onto a target, and the camera captures the corresponding images, which contain special information corresponded to the patterns from the projector. A decoding algorithm would be used to extract world coordinate information of the target object from the captured images, by analyzing the relationship among the camera, the projector and the target object using triangulation.\\
+\\
+Being after accuracy, the most important issue for structured light method comes to the question of, how to design the projected patterns. In other words, how to design the coding algorithm and its corresponding decoding strategy will decide the final quality of the reconstructed 3D profile. Various classified SL pattern strategies have been proposed, and are still being studied.
+\\
+\\\textbf{PrimeSense SL speckle pattern}\\\\
+The PrimeSense 3D camera uses an infrared projector to project an infrared speckle pattern onto a target 
+% RGBD-intro.pdf/   Consumer RGBD Cameras and their Applications
+, as shown in figure 1.2,%Figure1 in the pdf named above
+\\\\Figure 1.2\\\\
+and an infrared camera to capture images of the target. By comparing part by part to reference patterns, that were captured previously at known depths and stored in the device, the per-pixel depth could be looked up based on the reference pattern that the projected pattern matches best. 
+\\\\
+After the per-pixel depth data determined from the infrared sensor, the next step would be to correlate to a calibrated RGB data, which will generate a popular unified representation of target's profile: point cloud, a collection of points with XYZ 3D coordinates and RGB color data. What's more, the surface normals of the target's profile are also stored in every single point of the point cloud data. 
+\\
+\\\textbf{Seikowave SL Phase Measuring Profilometry pattern}\\\\%triangulation
+SeikowaveLCG 3D camera consists of a Charge-Coupled Device (CCD) camera and a Digital Micro-mirror Device (DMD) projector. 2D image pattern strategies are always preferred for a fast scan if a is involved. 
+[4]%J. Salvi, J. Pages, and J. Batlle, \Pattern codication strategies in structured light systems," Pattern Recognition 37, 827{849 (2004).
+ [5] %  ''Novel method for structured light system calibration'' SongZhang
+And the multi-shot pattern Phase Measuring Profilometry (PMP) strategy was used for its properties of robust and accuracy.
+With PMP information encoded in the structured light pattern projected onto the target, the CCD camera could capture a series of images that contains PMP informatio. Triangulation analyzing could be used to extract the 3D world coordinates for each points of the target profile, by a determination of the relationships among CCD camera, DMD projector, and the target object. A system configuration of PMP application is given in figure 1.3.
+ \\\\Figure 1.3\\%Fig. 8 Structured light system configuration/  in paper [5]
+ \\
+ PMP  method uses either vertical or horizontal sinusoid patterns, which could be described as:\\
+ (Projector) In(x, y) = A + B*Cos(2pi*f*y - 2pi*n/N)	   (1.1)% equiation 1.1 in Kai's paper
+ \\where (xp, yp) denotes the coordinates of every single pixel in the projector, In denotes the intensity of the corresponding pixels, Ap and Bp are constants, f is the frequency of sine wave. The subscript n represents the index of phase shift, while capital N is the total number of phase shift. \\
+\\
+\\
+\\\textbf {Time of Flight}\\
+ 
+ \section{Universal RGB-D camera calibration} % (specially with cheap low quality lenses)
+
+
+
+2. principles to get D for Z.(structured light illumination; Time of Flight; comparison)\\\\
 3. From Z to X/Y
 
 \section{Contributions of this thesis}
 \section{Summation}
-\section{Welcome and Thank You}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
