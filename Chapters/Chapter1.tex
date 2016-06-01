@@ -1,10 +1,7 @@
 % Chapter 1
-
-\chapter{Introduction} % Main chapter title
 \label{sens_introduction} % For referencing the chapter elsewhere, use \ref{sens_introduction} 
-
-
-3D reconstruction aims to reproduce the 3D profile of real objects as accurate as possible, which require accurate world X/Y/Z (noted as \(X_{w}\) /\(Y_{w}\) /\(Z_{w}\)  henceforth) coordinate values in three dimensional space for every single point of a profile. Ever since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D sensing technology as the core depth determination principle for its first generation, great interest has been invigorated into RGB-D sensors. Camera calibration is a necessary part in 3D reconstruction in order to extract metric information from 3D images, i.e., to determine a translation from \(Z_{w}\)  to \(X_{w}\) /\(Y_{w}\)  for every pixel based on its row and column. In the mean time, optical and perspective distortion become a problem that stops from getting a good view. On most wide angle prime lenses and many zoom lenses with relatively short focal lengths,  especially cheap low quality lenses, barrel distortion would typically be present.
+\chapter{Introduction} % Main chapter title
+3D reconstruction aims to reproduce the 3D profile of real objects as accurate as possible, which require accurate world \(X\)/\(Y\)/\(Z\) (noted as \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\)  henceforth) coordinate values in three dimensional space for every single point of a profile. Ever since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D sensing technology as the core depth determination principle for its first generation, great interest has been invigorated into RGB-D sensors. Camera calibration is a necessary part in 3D reconstruction in order to extract metric information from 3D images, i.e., to determine a translation from \(Z^{w}\)  to \(X^{w}\) /\(Y^{w}\)  for every pixel based on its row and column. In the mean time, optical and perspective distortion become a problem that stops from getting a good view. On most wide angle prime lenses and many zoom lenses with relatively short focal lengths,  especially cheap low quality lenses, barrel distortion would typically be present.
 \\
 \\In this research, a more accurate novel method with precise calibration system is brought in for real-time rectification and 3D reconstruction of universal RGB-D cameras. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,19 +10,26 @@
 %%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{3D Reconstruction}
-Three dimensional (3D) profile measurement technologies have been developed by various means, as summarized by Curless and Seitz [1], % B. Curless and S. Seitz, \3d photography," ACM Siggraph '00 Course Notes, Course No. 19 (2000).
-among which the non-contact optical methods are widely applied into reality as consumer RGB-D camera. Traditionally, with Pinhole camera model, as the basics of camera calibration, to supply the translation from \(Z_{w}\)  to \(X_{w}\) /\(Y_{w}\) , the core procedure of 3D Reconstruction falls on the determination of per-pixel depth to serve as \(Z_{w}\) .
 %
- \\\\Figure 1.1\\\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{3DImagingBranchTree}
+\caption{ 3D profile acquisition Taxonomy}
+\label{3DImagingTaxonomy}
+\end{figure}%
+\par%
+Three dimensional (3D) profile measurement technologies have been developed by various means, as summarized by Curless and Seitz [1], % B. Curless and S. Seitz, \3d photography," ACM Siggraph '00 Course Notes, Course No. 19 (2000).
+among which the non-contact optical methods are widely applied into reality as consumer RGB-D camera. Traditionally, with Pinhole camera model, as the basics of camera calibration, to supply the translation from \(Z^{w}\)  to \(X^{w}\) /\(Y^{w}\) , the core procedure of 3D Reconstruction falls on the determination of per-pixel depth to serve as \(Z^{w}\) .\par%
+%
 Within the non-contact optical category, as well as 3D reconstruction using multiple images, there are two levels of distinctions[2],
 % 3D Reconstruction from Multiple Images.pdf
- as shown in the 3D profile acquisition taxonomy diagram is given in Figure 1.1.% the branch tree diagram
+ as shown in the 3D profile acquisition taxonomy diagram is given in Figure \ref{3DImagingTaxonomy}.
  %
- \\\\The first distinction: active methods and passive methods. Their classifications are decided by the control of light sources. Active methods need special light sources control as part of the strategy to get 3D information, while on the other hand, passive techniques could work with whichever reasonable available ambient light. With a special known illumination offering more information to simplify some of the steps for 3D information acquiring process, active methods tend to be computationally less demanding. Both of the famous consumer PrimeSense and Kinect V2 3D cameras, which are calibrated by the new proposed approach, are using active methods.
+ \\\\The first distinction: active methods and passive methods. Their classifications are decided by the control of light sources. Active methods need special light sources control as part of the strategy to get 3D information, while on the other hand, passive techniques could work with whichever reasonable available ambient light. With a special known illumination offering more information to simplify some of the steps for 3D information acquiring process, active methods tend to be computationally less demanding. Both of the famous consumer PrimeSense and KinectV2 3D cameras, which are calibrated by the new proposed approach, are using active methods.
 \\\\The second distinction: single-vantage points methods and multi-vantage points methods. The second distinction is determined by the number of vantage points. With a single vantage system, reconstruction is done based on single view point. In the case that there are multiple viewing or illumination components, all of them would be positioned very close to each other so that they could ideally coincide. For multi-vantage points methods, several viewpoints, with possible controlled illumination source positions, are involved. As contrast with the single-vantage points methods, the multi-vantage systems need the different components to be positioned far enough from each other. 
 \\ \\
 Among the above non-contact optical methods, structured-light and time-of-flight methods are of the most practical importance.
-As will be discussed shortly, the PrimeSense technology and SeikowaveLCG camera use Stuctured light methods, and the Kniect V2 camera uses Time-of Flight. 
+As will be discussed shortly, the PrimeSense technology and SeikowaveLCG camera use Stuctured light methods, and the KniectV2 camera uses Time-of Flight. 
 \\
 \\\textbf{Structured Light}\\\\
 Structured light (SL) based techniques are famous for its fast speed. It is composed of one camera and one light pattern projector[3]. %Real-time 3-D Reconstruction by Means of Structured Light Illumination
@@ -33,59 +37,209 @@ The projector projects a series of special known patterns onto a target, and the
 \\
 Being after accuracy, the most important issue for structured light method comes to the question of, how to design the projected patterns. In other words, how to design the coding algorithm and its corresponding decoding strategy will decide the final quality of the reconstructed 3D profile. Various classified SL pattern strategies have been proposed, and are still being studied.
 \\
-\\\textbf{PrimeSense SL speckle pattern}\\\\
+\subsection{PrimeSense Structured Light}
 The PrimeSense 3D camera uses an infrared projector to project an infrared speckle pattern onto a target 
 % RGBD-intro.pdf/   Consumer RGBD Cameras and their Applications
-, as shown in figure 1.2,%Figure1 in the pdf named above
-\\\\Figure 1.2\\\\
+, as shown in figure \ref{PrimeSenseInfraredPattern},\par%Figure1 in the pdf named above
+%
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{PrimeSenseInfraredPattern}
+\caption{PrimeSense SL Infrared Pattern}
+\label{PrimeSenseInfraredPattern}
+\end{figure}%
+%
 and an infrared camera to capture images of the target. By comparing part by part to reference patterns, that were captured previously at known depths and stored in the device, the per-pixel depth could be looked up based on the reference pattern that the projected pattern matches best. 
 \\\\
-After the per-pixel depth data determined from the infrared sensor, the next step would be to correlate to a calibrated RGB data, which will generate a popular unified representation of target's profile: point cloud, a collection of points with XYZ 3D coordinates and RGB color data. What's more, the surface normals of the target's profile are also stored in every single point of the point cloud data. 
+After the per-pixel depth data determined from the infrared sensor, the next step would be to correlate to a calibrated RGB data, which will generate a popular unified representation of target's profile: point cloud, a collection of points with \(XYZ\) 3D coordinates and RGB color data. What's more, the surface normals of the target's profile are also stored in every single point of the point cloud data. 
 \\
-\\\textbf{Seikowave SL Phase Measuring Profilometry pattern}\\\\%triangulation
+\subsection{SeikowaveLCG SL Phase Measuring Profilometry}
 SeikowaveLCG 3D camera consists of a Charge-Coupled Device (CCD) camera and a Digital Micro-mirror Device (DMD) projector. 2D image pattern strategies are always preferred for a fast scan if a is involved. 
 [4]%J. Salvi, J. Pages, and J. Batlle, \Pattern codication strategies in structured light systems," Pattern Recognition 37, 827{849 (2004).
  [5] %  ''Novel method for structured light system calibration'' SongZhang
 And the multi-shot pattern Phase Measuring Profilometry (PMP) strategy was used for its properties of robust and accuracy.
-With PMP information encoded in the structured light pattern projected onto the target, the CCD camera could capture a series of images that contains PMP informatio. Triangulation analyzing could be used to extract the 3D world coordinates for each points of the target profile, by a determination of the relationships among CCD camera, DMD projector, and the target object. A system configuration of PMP application is given in figure 1.3.
- \\\\Figure 1.3\\%Fig. 8 Structured light system configuration/  in paper [5]
- \\
- PMP  method uses either vertical or horizontal sinusoid patterns, which could be described as:\\
- (Projector) In(x, y) = A + B*Cos(2pi*f*y - 2pi*n/N)	   (1.1)% equation 1.1 in Kai's paper
- \\where (xp, yp) denotes the coordinates of every single pixel in the projector, In denotes the intensity of the corresponding pixels, Ap and Bp are constants, f is the frequency of sine wave. The subscript n represents the index of phase shift, while capital N is the total number of phase shift. Figure 1.4 below shows a group of sine wave patterns, where the number of total phase shift N = 4 and frequency f = 1.\\
- \\Figure 1.4\\%Figure 1 : PMP base frequency patterns/ in paper [6]
-\\
-From viewpoint of the camera, the sinusoid patterns is distorted by the target surface topology, so that the captured images could be expressed as 
-(Camera)    In(x, y) = A + B*Cos(Phi(xc,yc) - 2pi*n/N)    (1.2)%equation 1.2 in Kai's paper
-\\where (xc, yc) denotes the coordinates of every single pixel in the camera, and the term Phi(xc, yc) represents the corresponding phase value, which could be computed as follows [6]\\
+With PMP information encoded in the structured light pattern projected onto the target, the CCD camera could capture a series of images that contains PMP informatio. Triangulation analyzing could be used to extract the 3D world coordinates for each points of the target profile, by a determination of the relationships among CCD camera, DMD projector, and the target object. A system configuration of PMP application is given in figure \ref{SLPMPConfiguration}.\par%
+%
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{SLPMPConfiguration}
+\caption{SL PMP based Configuration Diagram}
+\label{SLPMPConfiguration}
+\end{figure}%
+%
+PMP method uses either vertical or horizontal sinusoid patterns, which could be described as:
+
+ \begin{equation}
+%
+I^p_n(x^p, \, y^p) %
+= A^p(x^p, \, y^p) + B^p(x^p, \, y^p)Cos(2\pi fy^p - \frac{2\pi n}{N})
+%
+\end{equation}%
+%
+where \((x^p, \, y^p)\) denotes the coordinates of every single pixel in the projector, \(I^p_n\) denotes the intensity of the corresponding pixels, \(A^p\) and \(B^p\) are constants, \(f\) is the frequency of sine wave. The subscript \(n\) represents the index of phase shift, while capital \(N\) is the total number of phase shift.\par%
+%
+%
+ \begin{figure}[h]
+%\centering
+\hspace*{-2cm} 
+\subfloat[Pattern 0][1]{
+\includegraphics[width=0.3\textwidth]{Pattern0}
+\label{fig:subfig1}}
+\subfloat[Pattern 1][2]{
+\includegraphics[width=0.3\textwidth]{Pattern1}
+\label{fig:subfig2}}
+\subfloat[Pattern 2][3]{
+\includegraphics[width=0.3\textwidth]{Pattern2}
+\label{fig:subfig3}}
+%\qquad
+\subfloat[Pattern 3][4]{
+\includegraphics[width=0.3\textwidth]{Pattern3}
+\label{fig:subfig4}}
+\caption{PMP base frequency patterns}
+\label{PMPFrequencyPatterns}
+\end{figure}%
+%
+%
+Figure \ref{PMPFrequencyPatterns} shows a group of sine wave patterns, where the number of total phase shift \(N = 4\) and frequency \(f = 1\). From viewpoint of the camera, the sinusoid patterns is distorted by the target surface topology, so that the captured images could be expressed as 
+
+ \begin{equation}
+%
+I^c_n(x^c, \, y^c) %
+= A^c(x^c, \, y^c) + B^c(x^c, \, y^c)Cos[\phi(x^c,\, y^c) - \frac{2\pi n}{N}]
+%
+\end{equation}%
+%
+where\((x^c, \, y^c)\) denotes the coordinates of every single pixel in the camera, and the term \(\phi(x^c,\, y^c)\) represents the corresponding phase value, which could be computed as follows [6]\par
  % Very High Resolution 3-D surface Scanning Using Multi-Frequency Phase Measuring Profilometry
-Phi(xc, yc) =arctan[]		(1.3) % equation 3 in paper [6]
-\\After the camera term phi(xc, yc) for every single pixel is computed, the corresponding projector coordinate yp could be derived through equation\\
-yp = phi/2pi*f		(1.4)%equation 4 in paper [6]
-\\With the knowledge of yp, the perspective information between camera and projector is the last step to go for applying triangulation analysis to extract world coordinates. Based on pinhole camera model, the perspective matrices for camera and projector are [7]\\
+ \begin{equation}
+%
+\phi(x^c,\, y^c) %
+= arctan\Bigg[\frac{\sum^N_{n=1}I(x^c,\,y^c)Sin(2\pi n / N)}{\sum^N_{n=1}I(x^c,\,y^c)Cos(2\pi n / N)} \Bigg]
+%
+\end{equation}
+%
+%
+After the camera term  \(\phi(x^c,\, y^c)\)  for every single pixel is computed, the corresponding projector coordinate \(y^p\) could be derived through equation\par
+
+\begin{equation}
+%
+y^p %
+= \phi(x^c,\, y^c) / (2\pi f)
+%
+\end{equation}%
+%
+With the knowledge of \(y^p\), the perspective information between camera and projector is the last step to go for applying triangulation analysis to extract world coordinates. Based on pinhole camera model, the perspective matrices for both of the CCD camera and DMD projector, as will be derived later in section \ref{sectionPinholeCamera} equation \ref{genericPerspectivePinholeMatrix}, are written as [7]\par
 % J. Li, L. G. Hassebrook, and C. Guan, \Optimized two-frequency phasemeasuring-prolometry light-sensor temporal-noise sensitivity," Journal of the Optical Society of America A 20, 106{115 (2003).
-Mc = () 		(1.5) %equation 1.9 in Kai's paper
-\\and \\
-Mp = ()		(1.6)%equation 1.10 in Kai's paper
-\\The transforms from 3D world coordinates to 2D camera coordinates are given by\\
-xc = \textendash		(1.7)\\%equation 1.11 in Kai's paper
-yc = \textendash\ 	(1.8)\\%equation 1.12 in Kai's paper
-\\Likewise, the map from 3D world coordinates to 2D projector coordinates are given by\\
-xp = \textendash		(1.9)\\%equation 1.13 in Kai's paper
-yp = \textendash\ 	(1.10)\\%equation 1.14 in Kai's paper
-\\
-Since three out of four equations (1.7 \~{} 1.10) are enough to solve \(X_{w}\) , \(Y_{w}\) , and \(Z_{w}\) , and yp is already calculated, the 3D world coordinates \(X_{w}\) /\(Y_{w}\) /\(Z_{w}\)  could be derived from Eqs 1.7, 1.8, 1.10\\
-() = () ()			(1.15)%equation 1.15 
-\\
-\\
-\\\textbf {Time of Flight}\\
- Based on known speed of light, Time-of-Flight (ToF) camera resolves distance by measuring the time cost of a special light signal traveling between the camera and target for every single point. Kinect V2 is one of the practical consumer 3D camera that applied the technology of ToF. Using the active modulated infrared source light together with a low-cost CMOS pixel array, Kinect V2 realize its an attractive solution that owns compact construction, high accuracy and up to 30 fps frame-rate. \\
-  \\\\Figure 1.5\\\\%Fig. 1: 3D time-of-flight camera operation /  in paper [8]
- The variable that ToF camera measures is the phase shift between the illumination and reflection, which will be translated to distance [8]. % Texas Instruments Time-of-Flight Camera -An Introduction    Larray Li
+
+\begin{equation}
+%
+M^c %
+= \begin{bmatrix} 
+m^c_{11} & m^c_{12} & m^c_{13} & m^c_{14} \\
+m^c_{21} & m^c_{22} & m^c_{23} & m^c_{24} \\
+m^c_{31} & m^c_{32} & m^c_{33} & m^c_{34} \\
+\end{bmatrix}%
+%
+%\label{genericPerspectivePinholeMatrix}
+\end{equation}%
+%
+and 
+
+\begin{equation}
+%
+M^p %
+= \begin{bmatrix} 
+m^p_{11} & m^p_{12} & m^p_{13} & m^p_{14} \\
+m^p_{21} & m^p_{22} & m^p_{23} & m^p_{24} \\
+m^p_{31} & m^p_{32} & m^p_{33} & m^p_{34} \\
+\end{bmatrix}%
+%
+%\label{genericPerspectivePinholeMatrix}
+\end{equation}%
+%
+The mapping from 3D world coordinates to 2D camera coordinates are given by\par
+
+\begin{equation}
+%
+x^c %
+= \frac%
+{m^c_{11}X^w + m^c_{12}Y^w + m^c_{13}Z^w + m^c_{14}}%
+{m^c_{31}X^w + m^c_{32}Y^w + m^c_{33}Z^w + m^c_{34}}
+%
+\label{cameraXmapping}
+\end{equation}%
+%
+%
+\begin{equation}
+%
+y^c %
+= \frac%
+{m^c_{21}X^w + m^c_{22}Y^w + m^c_{23}Z^w + m^c_{24}}%
+{m^c_{31}X^w + m^c_{32}Y^w + m^c_{33}Z^w + m^c_{34}}
+%
+\label{cameraYmapping}
+\end{equation}%
+%
+%
+Likewise, the translation from 3D world coordinates to 2D projector coordinates are given by\par
+\begin{equation}
+%
+x^p %
+= \frac%
+{m^p_{11}X^w + m^p_{12}Y^w + m^p_{13}Z^w + m^p_{14}}%
+{m^p_{31}X^w + m^p_{32}Y^w + m^p_{33}Z^w + m^p_{34}}
+%
+\label{projectorXmapping}
+\end{equation}%
+%
+\begin{equation}
+%
+y^p %
+= \frac%
+{m^p_{21}X^w + m^p_{22}Y^w + m^p_{23}Z^w + m^p_{24}}%
+{m^p_{31}X^w + m^p_{32}Y^w + m^p_{33}Z^w + m^p_{34}}
+%
+\label{projectorYmapping}
+\end{equation}%
+%
+%
+Since three out of four equations \ref{cameraXmapping} \texttildelow \,\ref{projectorYmapping} are enough to solve \(X^{w}\),  \(Y^{w}\),  and \(Z^{w}\), and \(y^p\) is already calculated, the 3D world coordinates \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\)  could be derived from Eqs  \ref{cameraXmapping},  \ref{cameraYmapping}, and \ref{projectorYmapping}\par%
+%
+\begin{equation}
+\hspace*{-0.3cm} 
+%
+\left[ \begin{array}{c} X^w\\ Y^w\\ Z^w\end{array} \right] %
+= %
+\begin{bmatrix} %
+m^c_{11} - m^c_{31}x^c, &m^c_{12} - m^c_{32}x^c, &m^c_{13} - m^c_{33}x^c \\%
+m^c_{21} - m^c_{31}y^c, &m^c_{22} - m^c_{32}y^c, &m^c_{23} - m^c_{33}y^c \\%
+m^p_{21} - m^p_{31}y^p, &m^p_{22} - m^p_{32}y^p, &m^p_{23} - m^p_{33}y^p %
+\end{bmatrix} ^{-1} %
+\left[ \begin{array}{c}%
+m^c_{34}y^c - m^c_{14}\\%
+m^c_{34}y^c - m^c_{24}\\%
+m^p_{34}y^p - m^p_{24}%
+\end{array} \right]
+%
+\end{equation}%
+\\\\%
+%
+\subsection{Time of Flight (KinectV2)}
+Based on known speed of light, Time-of-Flight (ToF) camera resolves distance by measuring the time cost of a special light signal traveling between the camera and target for every single point. KinectV2 is one of the practical consumer 3D camera that applied the technology of ToF. Using the active modulated infrared source light together with a low-cost CMOS pixel array, KinectV2 realize its an attractive solution that owns compact construction, high accuracy and up to 30 fps frame-rate.\par%
+%
+%
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{timeOfFlight}
+\caption{3D time-of-flight camera operation}
+\label{timeOfFlight}
+\end{figure}%
+%
+The variable that ToF camera measures is the phase shift between the illumination and reflection, which will be translated to distance [8]. % Texas Instruments Time-of-Flight Camera -An Introduction    Larray Li
 To detect the phase shifts, light source is pulsed or modulated by a continuous wave, typically a sinusoid or square wave.
-As figure 1.5 shows, the ToF camera illumination is typically from a LED or a solid-state laser operating in the near-infrared range invisible to human eyes. A camera working in the same spectrum captures the reflected light and converts photonic energy to electrical signal, which contains distance (depth) information.
+As figure \ref{timeOfFlight} shows, the ToF camera illumination is typically from a LED or a solid-state laser operating in the near-infrared range invisible to human eyes. A camera working in the same spectrum captures the reflected light and converts photonic energy to electrical signal, which contains distance (depth) information.
 \\\\
-The distance measured for every single pixel is saved into a 2D addressable array, which results in a depth map. Kinect V2 has a depth map of 512 * 424 unsigned short data collections, which could be finally rendered, together with corresponded RGB stream,  into a tree dimensional space point cloud.
+The distance measured for every single pixel is saved into a 2D addressable array, which results in a depth map. KinectV2 has a depth map of 512 * 424 unsigned short data collections, which could be finally rendered, together with corresponded RGB stream,  into a tree dimensional space point cloud.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%  1.2   Traditional RGB-D camera calibration                   %%%%%%%%%%%%%%%%%%%%%%%%
@@ -93,9 +247,10 @@ The distance measured for every single pixel is saved into a 2D addressable arra
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Traditional RGB-D camera calibration} % (specially with cheap low quality lenses)
 \label{sens_TraditionalCalibration} % For referencing the chapter elsewhere, use \ref{sens_TraditionalCalibration} 
-Traditionally, camera calibration consists of two parts: ideal pinhole camera model calibration, and lens distortion correction. The pinhole camera model works as an simple algorithm in 3D computer vision to describe a mapping from the 3D world coordinates to camera image row and column, thereby giving a translation method from \(Z_{w}\) to \(X_{w}\)  and \(Y_{w}\)  for every single pixel. It works decently only for ideal pinhole cameras that have no lens, whereas real cameras need extra modifications and supplementations. In order to accurately solve the non-linear distortions problem for a real camera, the second part radial and tangential lens distortion must be considered.\\\par
+Traditionally, camera calibration consists of two parts: ideal pinhole camera model calibration, and lens distortion correction. The pinhole camera model works as an simple algorithm in 3D computer vision to describe a mapping from the 3D world coordinates to camera image row and column, thereby giving a translation method from \(Z^{w}\) to \(X^{w}\)  and \(Y^{w}\)  for every single pixel. It works decently only for ideal pinhole cameras that have no lens, whereas real cameras need extra modifications and supplementations. In order to accurately solve the non-linear distortions problem for a real camera, the second part radial and tangential lens distortion must be considered.\\\par
 
 \subsection{Pinhole Camera Model}
+\label{sectionPinholeCamera}
 %%
 Figure \ref{PinholeCameraModel} shows the basic diagram of a pinhole camera model with a reflected image plane for friendly intuition
 [9].% Short on camera geometry and camera calibration/ Maria Magnusson
@@ -115,7 +270,7 @@ Without any camera parameters, the extrinsic calibration formula could be writte
 %
 \left[ \begin{array}{c} U \\ V \\ W \\ 1 \end{array} \right] %
 = %
-\begin{bmatrix} R & T \\ 0 & 1 \end{bmatrix} \times \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \\ 1 \end{array} \right]
+\begin{bmatrix} R & T \\ 0 & 1 \end{bmatrix} \times \left[ \begin{array}{c} X^w \\ Y^w \\ Z^w \\ 1 \end{array} \right]
 %
 \end{equation}%
 %
@@ -124,7 +279,7 @@ or for simplicity,
 %
 \left[ \begin{array}{c} U \\ V \\ W \end{array} \right] %
 = %
-\begin{bmatrix} R & T \end{bmatrix} \cdot \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \end{array} \right]
+\begin{bmatrix} R & T \end{bmatrix} \cdot \left[ \begin{array}{c} X^w \\ Y^w \\ Z^w \end{array} \right]
 \label{extrinsicTransform}
 %
 \end{equation}%
@@ -201,8 +356,8 @@ After both of the extrinsic and intrinsic transformation matrices have been deri
 %
 k \left[ \begin{array}{c} u_r \\ v_r \\ 1 \end{array} \right] %
 =  \begin{bmatrix} f_u & s & u_0 \\ 0 & f_v & v_0 \\ 0 & 0 & 1 \end{bmatrix} \cdot%
-\begin{bmatrix} R & T \end{bmatrix} \cdot \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \end{array} \right]%
-=  C \cdot \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \end{array} \right]%
+\begin{bmatrix} R & T \end{bmatrix} \cdot \left[ \begin{array}{c} X^w \\ Y^w \\ Z^w \end{array} \right]%
+=  C \cdot \left[ \begin{array}{c} X^w \\ Y^w \\ Z^w \end{array} \right]%
 %
 \end{equation}%
 %
@@ -218,6 +373,7 @@ m_{21} & m_{22} & m_{23} & m_{24} \\
 m_{31} & m_{32} & m_{33} & m_{34} \\
 \end{bmatrix}%
 %
+\label{genericPerspectivePinholeMatrix}
 \end{equation}%
 %
 The final 3-by-4 matrix C is considered as the generic perspective transformation matrix of a pinhole camera model, which gives a mapping between the 3D world coordinates and 2D real image coordinates.\par
@@ -255,14 +411,14 @@ where higher order parameters are omitted for being negligible; \((x_{distorted}
 %	****  Real-Time Reconstruction  ******\\
 %	****  accurate calibration system *******\\\\\par
 	
-For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X_{w}\) /\(Y_{w}\)  correlated single pixel-pair, Depth steam offers the additional voxel world coordinates \(Z_{w}\) , while RGB steam offers the additive color property.
+For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X^{w}\) /\(Y^{w}\)  correlated single pixel-pair, Depth steam offers the additional voxel world coordinates \(Z^{w}\) , while RGB steam offers the additive color property.
 \\
-\\As described in section \ref{sens_TraditionalCalibration}, the traditional way to reconstruct 3D point cloud not only has the time-cost problem, but also makes \(Z_{w}\) accuracy unguaranteed. First of all, the lens distortions correction is separated from pinhole camera model calibration. Even though same pixel-pair's of world coordinates and image plan coordinates could be reused to solve radial dominated lens distortions, the calculation of the separated step brings a second-time translation cost for every single pixel of every frame. This is not a good way to do real-time reconstruction. What's worse, the depth resolution deteriorates notably with depth in practical [11],
+\\As described in section \ref{sens_TraditionalCalibration}, the traditional way to reconstruct 3D point cloud not only has the time-cost problem, but also makes \(Z^{w}\) accuracy unguaranteed. First of all, the lens distortions correction is separated from pinhole camera model calibration. Even though same pixel-pair's of world coordinates and image plan coordinates could be reused to solve radial dominated lens distortions, the calculation of the separated step brings a second-time translation cost for every single pixel of every frame. This is not a good way to do real-time reconstruction. What's worse, the depth resolution deteriorates notably with depth in practical [11],
 %Consumer RGB-D Cameras and their Applications, by Krystof Litomisky
  and noises among depth data vary randomly, camera by camera and pixel by pixel; which means a rough point-cloud plane full of bumps and hollows will be reconstructed even though the camera is observing a wall. Like figure 1.8 shows%
 \\\\Figure 1.8: side face of a sags and crests RGB plane 
 \\\\
-\\In General, a rectification of 3D coordinates \(X_{w}\) /\(Y_{w}\) /\(Z_{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. In this thesis, instead of using model based traditional method, an accurate data based  \(X_{w}\) /\(Y_{w}\) /\(Z_{w}\) rectified real-time reconstruction method is proposed. In Chapter 2, \(X_{w}\) and \(Y_{w}\) are rectified separately through a fourth order surface fitting translation from image plane row and column to directly solve the lens distortion problem in equation \ref{lensDistortion}, considering that the parameters in that equation with power level larger than 4 are negligible. Then, \(Z_{w}\) values are totally supported from external BLE optical-flow sensor, which accurately tracks camera movements along Z-axis. Finally, a XYZWRGB-D model based lookup table will be generated for real-time reconstruction. Whole calibration system will be introduced in detail in Chapter 3. Results will be shown in Chapter 4.
+\\In General, a rectification of 3D coordinates \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. In this thesis, instead of using model based traditional method, an accurate data based  \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\) rectified real-time reconstruction method is proposed. In Chapter 2, \(X^{w}\) and \(Y^{w}\) are rectified separately through a fourth order surface fitting translation from image plane row and column to directly solve the lens distortion problem in equation \ref{lensDistortion}, considering that the parameters in that equation with power level larger than 4 are negligible. Then, \(Z^{w}\) values are totally supported from external BLE optical-flow sensor, which accurately tracks camera movements along Z-axis. Finally, a XYZWRGB-D model based lookup table will be generated for real-time reconstruction. Whole calibration system will be introduced in detail in Chapter 3. Results will be shown in Chapter 4.
 
 
 
