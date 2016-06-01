@@ -10,28 +10,49 @@
 %with what we are doing)
 \chapter{Real-Time 3D Rectification} % Main chapter title
 \label{sens_Rectification} % For referencing the chapter elsewhere, use \ref{sens_Rectification} 
-What is real-time:
-solving inverse problem and arctangent
 
-\section{From Depth to Z-coordinate}
+\section{\(X_{w}\) /\(Y_{w}\) Rectifications}
 
+2.1.1 simple explaination of Xw/Yw extraction (details in section 3.2)\\
+2.1.2 coordiantes pairs of clusters' center\\
+2.1.3 High order polynomial surface fitting
+2.1.4 Mathematical tools
+a. singular value decomposition (SVD)\\
+b. least square solution with pseudo-inverse method
 
+\section{\(Z_{w}\) Rectification}
 
-
-\section{From Z to X/Y}
-
-
-
-
-\section{ 3D Reconstructions}
-
-
+2.2.1 Accumulated Z-axis data calibration\\
+2.2.2 Zw polynomial fitting
 
 
 
+\section{XYZWRGB-D Model Based Lookup Table}
+2.3.1  D based Z polynomial equation\\
+2.3.2 per-pixel beam equation in 3D space
 
 
 
+\section{Real-time analysis}
+from Kai's SL based beam expansion to data based per-pixel beam in 3D space
+
+
+\section{3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}
+shader comparison
+%
+%
+%
+%
+%
+%
+%
+\\\\Chpater 3: System for RGBD Camera Calibration(experiment, collecting data)\\
+3.1 Rail System\\
+3.2 Round Grid for Radial X/Y Distortion Correction (DIP process to extract cluster's center)\\
+3.3 Optical-Flow Sensor for Z Tracking\\
+3.4 Bluetooth Low Energy for wireless communication\\
+\\Chapter 4: results for 3 types of RGB-D cameras.\\
+Chapter 5: conclusion\\
 
 
 

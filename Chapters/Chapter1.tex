@@ -14,14 +14,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{3D Reconstruction}
 Three dimensional (3D) profile measurement technologies have been developed by various means, as summarized by Curless and Seitz [1], % B. Curless and S. Seitz, \3d photography," ACM Siggraph '00 Course Notes, Course No. 19 (2000).
-among which the non-contact optical methods are widely applied into reality as consumer RGB-D camera. Pinhole camera model, as the basics of camera calibration, can supply the translation from \(Z_{w}\)  to \(X_{w}\) /\(Y_{w}\) , which means the core part of 3D Reconstruction falls on the determination of depth for every single pixel.
-
- Within the non-contact optical category, as well as 3D reconstruction using multiple images, there are two levels of distinctions[2],
+among which the non-contact optical methods are widely applied into reality as consumer RGB-D camera. Traditionally, with Pinhole camera model, as the basics of camera calibration, to supply the translation from \(Z_{w}\)  to \(X_{w}\) /\(Y_{w}\) , the core procedure of 3D Reconstruction falls on the determination of per-pixel depth to serve as \(Z_{w}\) .
+%
+ \\\\Figure 1.1\\\\
+Within the non-contact optical category, as well as 3D reconstruction using multiple images, there are two levels of distinctions[2],
 % 3D Reconstruction from Multiple Images.pdf
  as shown in the 3D profile acquisition taxonomy diagram is given in Figure 1.1.% the branch tree diagram
- \\\\Figure 1.1
-\\\\The first: active methods and passive methods. Their classifications are decided by the control of light sources. Active methods need special light sources control as part of the strategy to get 3D information, while on the other hand, passive techniques could work with whichever reasonable available ambient light. With a special known illumination offering more information to simplify some of the steps for 3D information acquiring process, active methods tend to be computationally less demanding. Both of the famous consumer PrimeSense and Kinect V2 3D cameras, which are calibrated by the new proposed approach, are using active methods.
-\\\\The second: single-vantage points methods and multi-vantage points methods. The second distinction is determined by the number of vantage points. With a single vantage system, reconstruction is done based on single view point. In the case that there are multiple viewing or illumination components, all of them would be positioned very close to each other so that they could ideally coincide. For multi-vantage points methods, several viewpoints, with possible controlled illumination source positions, are involved. As contrast with the single-vantage points methods, the multi-vantage systems need the different components to be positioned far enough from each other. 
+ %
+ \\\\The first distinction: active methods and passive methods. Their classifications are decided by the control of light sources. Active methods need special light sources control as part of the strategy to get 3D information, while on the other hand, passive techniques could work with whichever reasonable available ambient light. With a special known illumination offering more information to simplify some of the steps for 3D information acquiring process, active methods tend to be computationally less demanding. Both of the famous consumer PrimeSense and Kinect V2 3D cameras, which are calibrated by the new proposed approach, are using active methods.
+\\\\The second distinction: single-vantage points methods and multi-vantage points methods. The second distinction is determined by the number of vantage points. With a single vantage system, reconstruction is done based on single view point. In the case that there are multiple viewing or illumination components, all of them would be positioned very close to each other so that they could ideally coincide. For multi-vantage points methods, several viewpoints, with possible controlled illumination source positions, are involved. As contrast with the single-vantage points methods, the multi-vantage systems need the different components to be positioned far enough from each other. 
 \\ \\
 Among the above non-contact optical methods, structured-light and time-of-flight methods are of the most practical importance.
 As will be discussed shortly, the PrimeSense technology and SeikowaveLCG camera use Stuctured light methods, and the Kniect V2 camera uses Time-of Flight. 
@@ -87,11 +88,12 @@ As figure 1.5 shows, the ToF camera illumination is typically from a LED or a so
 The distance measured for every single pixel is saved into a 2D addressable array, which results in a depth map. Kinect V2 has a depth map of 512 * 424 unsigned short data collections, which could be finally rendered, together with corresponded RGB stream,  into a tree dimensional space point cloud.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%  1.2   Traditional camera calibration                   %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%  1.2   Traditional RGB-D camera calibration                   %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Traditional camera calibration} % (specially with cheap low quality lenses)
-Traditionally, camera calibration consists of two parts: ideal pinhole camera model calibration, and lens distortion correction. The pinhole camera model works as an simple algorithm in 3D computer vision to describe a mapping from the 3D world coordinates to camera image row and column, thereby giving a translation method from \(Z_{w}\) to \(X_{w}\)  and \(Y_{w}\)  for every single pixel. It works decently only for ideal pinhole cameras that have no lens, whereas real cameras need extra modifications and supplementations. In order to accurately solve distortions problem for a real camera, the second part radial and tangential lens distortion must be considered.\\\par
+\section{Traditional RGB-D camera calibration} % (specially with cheap low quality lenses)
+\label{sens_TraditionalCalibration} % For referencing the chapter elsewhere, use \ref{sens_TraditionalCalibration} 
+Traditionally, camera calibration consists of two parts: ideal pinhole camera model calibration, and lens distortion correction. The pinhole camera model works as an simple algorithm in 3D computer vision to describe a mapping from the 3D world coordinates to camera image row and column, thereby giving a translation method from \(Z_{w}\) to \(X_{w}\)  and \(Y_{w}\)  for every single pixel. It works decently only for ideal pinhole cameras that have no lens, whereas real cameras need extra modifications and supplementations. In order to accurately solve the non-linear distortions problem for a real camera, the second part radial and tangential lens distortion must be considered.\\\par
 
 \subsection{Pinhole Camera Model}
 %%
@@ -235,6 +237,7 @@ x_{distorted} =  x (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_1 (r^2 + 2 x^2) + 2 p_
 \\%
 y_{distorted} =  y (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_2 (r^2 + 2 y^2) + 2 p_1 xy]
 \end{aligned}
+\label{lensDistortion}
 %
 \end{equation}%
 
@@ -246,18 +249,25 @@ where higher order parameters are omitted for being negligible; \((x_{distorted}
 %%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Contributions of this thesis}
-	****  Real-Time Analysis  ******\\
-	****  high order (abandon pinhole camera model) **********\\
-	****  Depth Rectification ************\\
-	****  accurate calibration system *******\\\\\par
+
+%	****  Fourth order (abandon pinhole camera model) **********\\
+%	****  Depth Rectification ************\\
+%	****  Real-Time Reconstruction  ******\\
+%	****  accurate calibration system *******\\\\\par
 	
-For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X_{w}\) /\(Y_{w}\)  correlated single pixel-pair, depth steam offers the additional voxel world coordinates \(Z_{w}\) , while RGB steam offers the additive color property.
+For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X_{w}\) /\(Y_{w}\)  correlated single pixel-pair, Depth steam offers the additional voxel world coordinates \(Z_{w}\) , while RGB steam offers the additive color property.
 \\
-\\ The common method to reconstruct 3D point cloud directly with RGB and Depth steams, which leads to a distorted image, is to take depth value as \(Z_{w}\)  and determine \(X_{w}\) /\(Y_{w}\)  based on the pinhole camera model transformation from column and row. In this way, at least three defects directly lead to the distortions of reconstructed 3D point cloud. First of all, the pinhole camera model is too ideal, especially when applied on the edge signals where lights are affected by various factors. What's worse,  typically short focal lengths and commonly used wide-angle lenses will lead to more distorted \(X_{w}\) /\(Y_{w}\)  values. Last but not least, noises among depth data vary randomly, camera by camera and pixel by pixel, which means a rough point-cloud plane full of bumps and hollows will be reconstructed even though the camera is observing a wall. 
-\\
-\\In General, a rectification of 3D coordinates \(X_{w}\) /\(Y_{w}\) /\(Z_{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. 
- On most wide angle prime lenses and many zoom lenses with relatively short focal lengths,  especially cheap low quality lenses, barrel distortion would typically be present.
- 
+\\As described in section \ref{sens_TraditionalCalibration}, the traditional way to reconstruct 3D point cloud not only has the time-cost problem, but also makes \(Z_{w}\) accuracy unguaranteed. First of all, the lens distortions correction is separated from pinhole camera model calibration. Even though same pixel-pair's of world coordinates and image plan coordinates could be reused to solve radial dominated lens distortions, the calculation of the separated step brings a second-time translation cost for every single pixel of every frame. This is not a good way to do real-time reconstruction. What's worse, the depth resolution deteriorates notably with depth in practical [11],
+%Consumer RGB-D Cameras and their Applications, by Krystof Litomisky
+ and noises among depth data vary randomly, camera by camera and pixel by pixel; which means a rough point-cloud plane full of bumps and hollows will be reconstructed even though the camera is observing a wall. Like figure 1.8 shows%
+\\\\Figure 1.8: side face of a sags and crests RGB plane 
+\\\\
+\\In General, a rectification of 3D coordinates \(X_{w}\) /\(Y_{w}\) /\(Z_{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. In this thesis, instead of using model based traditional method, an accurate data based  \(X_{w}\) /\(Y_{w}\) /\(Z_{w}\) rectified real-time reconstruction method is proposed. In Chapter 2, \(X_{w}\) and \(Y_{w}\) are rectified separately through a fourth order surface fitting translation from image plane row and column to directly solve the lens distortion problem in equation \ref{lensDistortion}, considering that the parameters in that equation with power level larger than 4 are negligible. Then, \(Z_{w}\) values are totally supported from external BLE optical-flow sensor, which accurately tracks camera movements along Z-axis. Finally, a XYZWRGB-D model based lookup table will be generated for real-time reconstruction. Whole calibration system will be introduced in detail in Chapter 3. Results will be shown in Chapter 4.
+
+
+
+
+
 \section{Summation}
 
 
