@@ -107,7 +107,7 @@ From this model, the mapping between 3D space world coordinate and the image pla
 \end{figure}%
 %
 \textbf{Extrinsic Calibration}\\
-With out camera parameters, the extrinsic calibration formula could be written as
+Without any camera parameters, the extrinsic calibration formula could be written, through homogeneous coordinates, as
 
 \begin{equation}
 %
@@ -115,7 +115,17 @@ With out camera parameters, the extrinsic calibration formula could be written a
 = %
 \begin{bmatrix} R & T \\ 0 & 1 \end{bmatrix} \times \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \\ 1 \end{array} \right]
 %
-\end{equation}
+\end{equation}%
+%
+or for simplicity,
+\begin{equation}
+%
+\left[ \begin{array}{c} U \\ V \\ W \end{array} \right] %
+= %
+\begin{bmatrix} R & T \end{bmatrix} \cdot \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \end{array} \right]
+\label{extrinsicTransform}
+%
+\end{equation}%
 %
 where \((U, V, W)^T\) are the camera coordinates, and the transformation matrix component \([R\)  \(T]\), which is part of the 4-by-4 perspective matrix, is modelling rotation and translation , written as
 
@@ -177,27 +187,70 @@ W \left[ \begin{array}{c} u_r \\ v_r \\ 1 \end{array} \right] %
 =  \begin{bmatrix} f_u & s & u_0 \\ 0 & f_v & v_0 \\ 0 & 0 & 1 \end{bmatrix} \cdot%
 \left[ \begin{array}{c} U \\ V \\ W \end{array} \right]%
 %
+\label{intrinsicTransform}
 \end{equation}%
 %
-where \([f_u,\, f_v]\) denote focal lengths in pixels along \(u\) and \(v\) after skewing, and \(s\) is a new skew coefficient after combination.
+where \([f_u,\, f_v]\) denote focal lengths in pixels along \(u\) and \(v\) after skewing, and \(s\) is a new skew coefficient after combination.\\\par%
+%
+\textbf{Generic Perspective Matrix of the Pinhole Camera Model}\par%
+After both of the extrinsic and intrinsic transformation matrices have been derived, the generalization formula of the pinhole camera model could be derived, combining equation \ref{extrinsicTransform} and \ref{intrinsicTransform}, as
 
-With camera focal, skew coefficient and optical center (also known as the principal point), the intrinsic calibration formula could be written as
+\begin{equation}
+%
+k \left[ \begin{array}{c} u_r \\ v_r \\ 1 \end{array} \right] %
+=  \begin{bmatrix} f_u & s & u_0 \\ 0 & f_v & v_0 \\ 0 & 0 & 1 \end{bmatrix} \cdot%
+\begin{bmatrix} R & T \end{bmatrix} \cdot \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \end{array} \right]%
+=  C \cdot \left[ \begin{array}{c} X_w \\ Y_w \\ Z_w \end{array} \right]%
+%
+\end{equation}%
+%
+where \(W\) on the left side has been replaced by \(k\) to be a more general proportion coefficient, and a combined matrix can be expressed as
+\begin{equation}
+%
+C %
+=  \begin{bmatrix} f_u & s & u_0 \\ 0 & f_v & v_0 \\ 0 & 0 & 1 \end{bmatrix} \cdot%
+\begin{bmatrix} R & T \end{bmatrix}%
+= \begin{bmatrix} 
+m_{11} & m_{12} & m_{13} & m_{14} \\
+m_{21} & m_{22} & m_{23} & m_{24} \\
+m_{31} & m_{32} & m_{33} & m_{34} \\
+\end{bmatrix}%
+%
+\end{equation}%
+%
+The final 3-by-4 matrix C is considered as the generic perspective transformation matrix of a pinhole camera model, which gives a mapping between the 3D world coordinates and 2D real image coordinates.\par
 
+\subsection{Lens distortion}
+Lens distortion could be classified into two groups [10] : radial distortion, and tangential distortion.\par
+%Z. Zhang, "Camera Calibration",   Chapter 2, pages 4-43, in G. Medioni and S.B. Kang, eds., Emergin Topics in Computer Vision, Prentice Hall Professional Technical Reference, 2004. .\par
+%
+Imperfect lens shape causes light rays bending more near the edges of a lens than they do at its optical center. The smaller the lens, the greater the distortion. Barrel distortions happen commonly on wide angle lenses, where the field of view of the lens is much wider than the size of the image sensor.\par%
+Improper lens assembly will lead to tangential distortion, which occurs when the lens and the image plane are not parallel.\\\par
+%
+The lens distortion can be expressed as power series in radial distance \(r = \sqrt{x^2 + y^2}\):
+\begin{equation}
+%
+\begin{aligned}
+x_{distorted} =  x (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_1 (r^2 + 2 x^2) + 2 p_2 xy] %
+\\%
+y_{distorted} =  y (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_2 (r^2 + 2 y^2) + 2 p_1 xy]
+\end{aligned}
+%
+\end{equation}%
 
-
-\subsection{Radial and Tangential Lens distortion}
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+where higher order parameters are omitted for being negligible; \((x_{distorted}, \, y_{distorted})\) denote the distorted points, \((x, \, y)\) denote the undistorted pixel locations, \(k_i\)'s are coefficients of radial distortion, and \(p_j\)'s are coefficients of tangential distortion.\par
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%  1.3   Contributions of this thesis             %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                     %%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Contributions of this thesis}
-
+	****  Real-Time Analysis  ******\\
+	****  high order (abandon pinhole camera model) **********\\
+	****  Depth Rectification ************\\
+	****  accurate calibration system *******\\\\\par
+	
 For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X_{w}\) /\(Y_{w}\)  correlated single pixel-pair, depth steam offers the additional voxel world coordinates \(Z_{w}\) , while RGB steam offers the additive color property.
 \\
 \\ The common method to reconstruct 3D point cloud directly with RGB and Depth steams, which leads to a distorted image, is to take depth value as \(Z_{w}\)  and determine \(X_{w}\) /\(Y_{w}\)  based on the pinhole camera model transformation from column and row. In this way, at least three defects directly lead to the distortions of reconstructed 3D point cloud. First of all, the pinhole camera model is too ideal, especially when applied on the edge signals where lights are affected by various factors. What's worse,  typically short focal lengths and commonly used wide-angle lenses will lead to more distorted \(X_{w}\) /\(Y_{w}\)  values. Last but not least, noises among depth data vary randomly, camera by camera and pixel by pixel, which means a rough point-cloud plane full of bumps and hollows will be reconstructed even though the camera is observing a wall. 
