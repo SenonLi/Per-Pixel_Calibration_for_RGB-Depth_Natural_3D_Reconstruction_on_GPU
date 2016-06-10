@@ -10,17 +10,166 @@
 %with what we are doing)
 \chapter{Real-Time 3D Rectification} % Main chapter title
 \label{sens_Rectification} % For referencing the chapter elsewhere, use \ref{sens_Rectification} 
+As analyzed in chapter \ref{sens_introduction}, traditional camera calibration based on pinhole camera model is not able to supply RGB-D cameras a satisfying real-time solution for lens and depth distortions. In this chapter, instead of using any models, a data based method is used, which will not only suit for both of NearIR steams and RGB steams, but also for all of the universal RGB-D cameras. Rectifications of 3D world coordinates \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\) will be separated into two parts. 
+\\\\%
+Above all, \(X^{w}\) and \(Y^{w}\) will be separately translated though two different transformation matrices that contains radial dominated lens distortions information. The transformation matrices are determined by pixels' coordinates-pairs, world coordinates and corresponding image plan Row and Column, that are extracted from captured uniform round dot grid pattern. Then, for each frame, external calibrated data from optical-flow sensor will be added as fixed \(Z^{w}\) for every pixel in the frame. After both of RGB stream and NearIR stream pixels find a match with world coordinate \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\), depth data will be finally added for each pixel to generate a table of XYZWRGBD.
 
-\section{\(X_{w}\) /\(Y_{w}\) Rectifications}
+\section{\(X^{w}\)/\(Y^{w}\) Rectifications}
+The uniform round grid captured by RGB/NearIR steams contains radial dominated distortions information, which will be used for \(X^{w}\)/\(Y^{w}\) rectifications, to generate transform matrices to translate image plane rows and columns to world coordinates \(X^{w}\)/\(Y^{w}\). In order to appropriately make use of the distortions information, the core mission is to locate the coordinates-pairs  (pair of rows/columns and corresponding \(X^{w}\)/\(Y^{w}\)) of each round dot. \\\\
+%
+The whole process of transformation matrices generation could be separated into three steps. %
+The first step is to track the \((row, column)\) of each round dot cluster's center captured by RGB/NearIR steams, and the second step is to determine the corresponding world coordinates \((X^w, \,Y^w)\) for every \((row, column)\). After the coordinates-pairs are determined for every round dot cluster's center captured by RGB/NearIR steams, the last step is to use them to train high-order polynomial surface fitting models to generate transformation matrices, which could map from \((row, column)\) to \((X^w, \,Y^w)\) for every single pixel of a frame.
+%
+\subsection{Round Dot Center \((row, column)\) extraction}
+The round dot pattern consists of black dots and white background. As the simplest way to segment black dots from background, which is not 100\% white in the captured image, thresholding is applied as pre-processing of the uniform grid's tracking, using Digital Image Processing (DIP) technologies. After an adaptive binarizing of a frame, a ''sniffer'' (edge modification) will be applied for captured clusters' centers determination, i.e., the extraction of (row, column) as clusters' centers.\par
+%
+\subsubsection{Digital Image Processings}
+In this section, DIP technologies are used for the goal of RGB/NearIR steams' binarizing. Considering that the many steps of processing will be applied on every single pixel of every frame, using GPU (parallel processing) has more advantages on handling this kind of mission than using CPU. OpenGL is selected as image processing language, and the default data type of steams saved on GPU during processing will be Single-Floating type, with a range from 0 (balck) to 1 (white). For both of RGB steam and NearIR steam, steam data need to be saved onto GPU first, during which progress gray-scale converting is also done.\\%
+\\\par%
+ \qquad \textbf{Converting RGB/NearIR to Gray-Scale}\\%
+In order to suit for both of the RGB and the NearIR steams, the first step of binarizing is to do gray-scaling. For NearIR steam, its data contains only color gray. There is no need to consider gray-scale problem, and data will be saved on GPU as single-floating automatically. Whereas for RGB steam, a conversion from RGB to gray value is needed. Typically, there are three converting methods: lightness, average, and luminosity. The luminosity method is finally chosen as a human-friendly way for gray-scaling, because it uses a weighted average value to account for human perception, which could be written as
 
-2.1.1 simple explaination of Xw/Yw extraction (details in section 3.2)\\
-2.1.2 coordiantes pairs of clusters' center\\
-2.1.3 High order polynomial surface fitting
-2.1.4 Mathematical tools
-a. singular value decomposition (SVD)\\
-b. least square solution with pseudo-inverse method
+\begin{equation}
+%
+Intensity_{\text{\_gray}} =  0.21 Red\,  + \, 0.72 Green \, + \, 0.07 Blue
+%\label{lensDistortion}
+%
+\end{equation}%
+%
+\\\par%
+ \qquad \textbf{Histogram Equalization}\\%
+As values saved on GPU, all of the pixel intensity values are within the range of [0, 1], where ''0'' means 100\% black and ''1''  means 100\% white. In practical, NearIR steam image is always very dark, with their intensity values every close to zero.  In order to enhance the contrast of NearIR image for a better binarizing, rescaling is necessary. In this section, histogram equalization technique is used maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB steam.\\
+\\%
+Commonly, Probability Mass Function (PMF) and Cumulative Distributive Function (CDF) will be calculated to determine the minimum valid intensity value (\(floor\)) and maximum valid value (\(ceiling\)) for rescaling, whereas tricks could be used by taking advantage of the GPU drawing properties.\\%
+\\%
+PMF means the frequency of every valid intensity value for all of the pixels in an image. Dividing all of the pixels in terms of their intensity values into \(N\) levels, every pixel belongs to one level of them, which is called gray level. With an proper selection of \(N\) to make sure a good accuracy, the intensity value of a pixel could be expressed based on its gray level \(n\), as\par%
 
-\section{\(Z_{w}\) Rectification}
+\begin{equation}
+%
+Intensity = n/N * (1 - 0) + 0 = n/N
+%\label{lensDistortion}
+%
+\end{equation}%
+%
+where \(n\) and \(N\) are integers and \(1 \leqslant n \leqslant N\).\\\\%
+%
+PMF calculation is very similar with the points-drawing process in terms of GPU that, both of them share the properties of pixel-by-pixel calculation. For the GPU points-drawing process onto a customer framebuffer, the single-floating ''color'' value could go beyond the normal range [0, 1], with a maximum value of a signed 32-bit integer (\(2^{31}\) - 1). And different ''color'' values will be added together to form a ''summational-color''' in the case that some pixels are drawn onto the same position coordinates. \textbf{Taking} the range of pixel intensity values [0, 1] \textbf{as} a segment on x-axis waiting to be drawn, the intensity frequency \textbf{as} the ''summational-color'' of multiple pixels with different intensity drawn at the same position, and the counting process of intensity frequency \textbf{as} a points-drawing process, PMF could be calculated by drawing all of the pixels onto the x-axis within the normal intensity range [0, 1], with every single pixel's position coordinates re-assigned as (\(pixel \, intensity\), \(0\)) and its ''color'' value constantly being equal to one. Given the width (range of x-axis) of customer framebuffer being [-1, 1] in OpenGL, which is twice the range of pixel intensity [0, 1], the half-width of the customer framebuffer is same with the total number \(N\) of gray levels, which determines the precision of \(floor\) / \(ceiling\) intensity selection. 
+\\\\%
+With PMF calculated and each intensity frequency that mapped to its corresponding gray level saved in the customer framebuffer, CDF could be easily calculated as
+%
+\begin{equation}
+%
+CDF(n) = \frac{sum}{N_{\text{\_Total Pixels/Image}}} 
+%\label{lensDistortion}
+%
+\end{equation}%
+%
+where the gray level \(n\) is counted from the middle of the framebuffer's width to the end (1 \texttildelow \, \(N\)). And \(sum\) is the summation of customer framebuffer's values added up consecutively from 1 till \(n\).\\\\%
+%
+Then, at appropriate CDFs, e.g., \(CDF(n_{\text{\_floor}}) = 0.01\) and \(CDF(n_{\text{\_ceiling}}) = 0.99\), the intensities \(floor\) and \(ceiling\) could be written as
+%
+\begin{equation}
+%
+\begin{aligned}
+floor &=  n_{\text{\_floor}} / N%
+\\%
+ceiling &=  n_{\text{\_ceiling}} / N
+\end{aligned}
+\label{intensityFloorCeilingDetermination}
+%
+\end{equation}%
+%
+Finally, a new intensity value of every single pixel in an image could be rescaled as
+%
+\begin{equation}
+%
+\begin{aligned}
+Intensity_{\text{\_new}} &= \frac{Intensity_{\text{\_original}} - floor}{ceiling - floor} 
+\end{aligned}
+%
+\end{equation}%
+%
+%
+\\\par%
+ \qquad \textbf{Adaptive Thresholding}\\%
+Affected by radial dominated lens distortions, the intensity value tend to decrease as the position of a pixel moves from the center of an image to the borders, in the case of observing a singular color view. Therefore, using fixed thresholding will generate too much noise around borders, and an adaptive thresholding process is needed. To segment the black dots from white background, we could simply subtract an image's background from an textured image. And an image's background comes from a blurring process on that image. \\\\%
+%
+There are three common types of blurring filters: mean filter, weighted average filter, and gaussian filter. Mean filter is selected for this background-aimed blurring process, because it has the smallest calculation and also a better effect of averaging than the others. After the blurred image containing background information is obtained, the binarizing (subtraction) process for every single pixel could be written as
+
+\begin{equation}
+%
+Intensity_{\text{\_binarized}} = %
+%
+\begin{cases}
+\,\, 1 , \quad \quad I_{\text{\_textured}} - I_{\text{\_background}}  -  C_{\text{\_offset}} \,\, > \,\,0 %
+\\%
+\,\, 0 , \quad \quad \quad \quad else%
+\end{cases}
+%
+\end{equation}%
+%
+where \(I\) is short for \(Intensity\) of every single pixel, and \(C_{\text{\_offset}}\) is a small constant that could be adjusted depending on various thresholding situations. In this project, \(C_{\text{\_offset}}\) is around 0.1.%
+\\\\%
+To sharpen the edge of the binarized image for a better ''circle'' shape detection, a median filter is added as the last step of adaptive thresholding.
+%
+%
+%
+\subsubsection{Sniffer for Round Dot Center}
+After the adaptive thresholding, image data saved on GPU is now composed of circle-shaped ''0''s within a background of ''1''s. In order to locate the center of those ''0''s circle, which is the center of captured round dot, it is necessary to know the edge of those circles. A trick is used to turn all of the edge data into markers that could lead a pathfinder to retrieve circle information.%
+\\\\%
+The idea that helps to mark edge data is to reassign pixels' values (intensity values) based on their surroundings. Using letter \(O\) to represent one single pixel in the center of a 3x3 pixels environment, and letters from \(A\)\texttildelow \(H\) to represent surroundings, a mask of 9 cells for pixel value reassignment could be expressed as below.
+
+\begin{center}
+  \begin{tabular}{ | c | c | c | }
+    \hline
+    \(E\) & \(A\) & \(F\) \\ \hline
+    \(B\) & \(O\) & \(C\) \\ \hline
+    \(G\) & \(D\) & \(H\) \\
+    \hline
+  \end{tabular}
+\end{center}
+%
+To turn the surroundings \(A\)\texttildelow \(H\) into marks, different weights will be assigned to them. Those markers with different weights have to be non-zero data, and should be counted as the edge-part of circles. Therefore, the first step is to inverse the binary image, generating an image that consists of circle-shaped ''1''s distributed in a background of ''0''s.%
+\\\\%
+After reversing, the next step is to assign weight to the surroundings. OpenGL offers convenient automatic data type conversion, which means the intensity values from ''0'' to ''1'' of single-floating data type save on GPU could be retrieved to CPU as unsigned-byte data type from ''0'' to ''255''. Considering a bitwise employment of markers, a binary calculation related weight assignment is used in the shader process for pixels. The intensity reassignment for every single pixel is expressed as the equation below.
+%
+\begin{equation}
+\hspace*{-0.1cm}%
+%
+I_{\text{\_Path Marked}} = I_{\text{\_Original}} * \frac{(128I_{\text{A}} + 64I_{\text{B}} + 32I_{\text{C}} + 16I_{\text{D}} + 8I_{\text{E}} +  4I_{\text{F}} +  2I_{\text{G}}+I_{\text{H}})}{ 255 }
+%
+\end{equation}%
+\\%
+After this reassignment, the image is not binary any more. Every non-zero intensity value contains marked information of its surroundings, data at the edge of circles are now turned into fractions. In other words, the image data saved on GPU at the moment is composed of ''0''s as background and ''non-zero''s circles, which contains fractions at the edge and ''1''s in the center.%
+\\\\%
+Now, it is time to discover dots through an inspection over the whole path-marked image, row by row and pixel by pixel. Considering the number of pixels of a dot's area varies, it is necessary to process this step on CPU. The single-floating image data will be retrieved from GPU to a buffer on CPU as unsigned-byte data, waiting for inspection. And correspondingly the new CPU image will have its ''non-zero''s circles composed of at the edge and ''1''s in the center. Whenever a non-zero value is traced, a dot-circle is discovered and a singular-dot analysis could start. During the singular-dot analysis, a ''stop-address'' queue buffer is used to save addresses of the following pixels waiting to be visited. %
+\\\\%
+On very visit of a pixel, two things will be done. The first thing is to sniff, looking for possible non-zero pixels around for the following stops. And the second thing is to colonize this pixel, concretely, changing the non-zero intensity value to zero. Base on the distribution table of \(A\)\texttildelow \(H\) that has been discussed above, %
+%
+%
+Every non-zero pixel may be checked 1\texttidlelow4 times, but will only be sniffed once.
+%
+%
+\subsection{Location of Corresponding World Coordinates \((X^w, \,Y^w)\)}
+%
+%
+%
+%
+\subsection{High Order Polynomial Surface Fitting}
+%
+%
+%
+%
+%
+\subsection{Mathematical tools}
+\subsubsection{Singular Value Decomposition (SVD)}
+\subsubsection{Least Square with Pseudo-Inverse}
+%
+%
+%
+%
+%
+\section{\(Z^{w}\) Rectification}
 
 2.2.1 Accumulated Z-axis data calibration\\
 2.2.2 Zw polynomial fitting
@@ -35,7 +184,8 @@ b. least square solution with pseudo-inverse method
 
 \section{Real-time analysis}
 from Kai's SL based beam expansion to data based per-pixel beam in 3D space
-
+%X= ExZ + Fx
+%Y= EyZ + Fy
 
 \section{3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}
 shader comparison
@@ -46,19 +196,6 @@ shader comparison
 %
 %
 %
-\\\\Chpater 3: System for RGBD Camera Calibration(experiment, collecting data)\\
-3.1 Rail System\\
-3.2 Round Grid for Radial X/Y Distortion Correction (DIP process to extract cluster's center)\\
-3.3 Optical-Flow Sensor for Z Tracking\\
-3.4 Bluetooth Low Energy for wireless communication\\
-\\Chapter 4: results for 3 types of RGB-D cameras.\\
-Chapter 5: conclusion\\
-
-
-
-
-
-
 
 
 

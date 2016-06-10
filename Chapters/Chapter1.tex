@@ -1,6 +1,6 @@
 % Chapter 1
-\label{sens_introduction} % For referencing the chapter elsewhere, use \ref{sens_introduction} 
 \chapter{Introduction} % Main chapter title
+\label{sens_introduction} % For referencing the chapter elsewhere, use \ref{sens_introduction} 
 3D reconstruction aims to reproduce the 3D profile of real objects as accurate as possible, which require accurate world \(X\)/\(Y\)/\(Z\) (noted as \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\)  henceforth) coordinate values in three dimensional space for every single point of a profile. Ever since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D sensing technology as the core depth determination principle for its first generation, great interest has been invigorated into RGB-D sensors. Camera calibration is a necessary part in 3D reconstruction in order to extract metric information from 3D images, i.e., to determine a translation from \(Z^{w}\)  to \(X^{w}\) /\(Y^{w}\)  for every pixel based on its row and column. In the mean time, optical and perspective distortion become a problem that stops from getting a good view. On most wide angle prime lenses and many zoom lenses with relatively short focal lengths,  especially cheap low quality lenses, barrel distortion would typically be present.
 \\
 \\In this research, a more accurate novel method with precise calibration system is brought in for real-time rectification and 3D reconstruction of universal RGB-D cameras. 
@@ -254,7 +254,7 @@ Traditionally, camera calibration consists of two parts: ideal pinhole camera mo
 %%
 Figure \ref{PinholeCameraModel} shows the basic diagram of a pinhole camera model with a reflected image plane for friendly intuition
 [9].% Short on camera geometry and camera calibration/ Maria Magnusson
-From this model, the mapping between 3D space world coordinate and the image plane row and column could be separated into two parts of transformations. The first part is the transformation between world coordinates system \(X\)/\(Y\)/\(Z\) and camera coordinate system \(U\)/\(V\)/\(W\) , which forms a 4-by-4 perspective transformation matrix (\textbf{extrinsic calibration}) that works for 3D rotation and translation. And the second part is the mapping between 3D camera coordinates system \(U\)/\(V\)/\(W\) and 2D image plane coordinates  \(u\)/\(v\), which forms a 3-by-3 perspective transformation matrix (\textbf{intrinsic calibration}) that works for not only the rescaling between camera coordinates and virtual ideal image coordinates, but also for translating and skewing between the virtual ideal image plane and real image plane.  \\\\\par
+From this model, the mapping between 3D space world coordinate and the image plane row and column could be separated into two parts of transformations. The first part is the transformation between world coordinates system \(X\)/\(Y\)/\(Z\) and camera coordinate system \(U\)/\(V\)/\(W\) , which forms a 4x4 perspective transformation matrix (\textbf{extrinsic calibration}) that works for 3D rotation and translation. And the second part is the mapping between 3D camera coordinates system \(U\)/\(V\)/\(W\) and 2D image plane coordinates  \(u\)/\(v\), which forms a 3x3 perspective transformation matrix (\textbf{intrinsic calibration}) that works for not only the rescaling between camera coordinates and virtual ideal image coordinates, but also for translating and skewing between the virtual ideal image plane and real image plane.  \\\\\par
 
 \begin{figure}[h]
 \centering
@@ -284,7 +284,7 @@ or for simplicity,
 %
 \end{equation}%
 %
-where \((U, V, W)^T\) are the camera coordinates, and the transformation matrix component \([R\)  \(T]\), which is part of the 4-by-4 perspective matrix, is modelling rotation and translation , written as
+where \((U, V, W)^T\) are the camera coordinates, and the transformation matrix component \([R\)  \(T]\), which is part of the 4x4 perspective matrix, is modelling rotation and translation , written as
 
 \begin{equation}
 %
@@ -376,7 +376,7 @@ m_{31} & m_{32} & m_{33} & m_{34} \\
 \label{genericPerspectivePinholeMatrix}
 \end{equation}%
 %
-The final 3-by-4 matrix C is considered as the generic perspective transformation matrix of a pinhole camera model, which gives a mapping between the 3D world coordinates and 2D real image coordinates.\par
+The final 3x4 matrix C is considered as the generic perspective transformation matrix of a pinhole camera model, which gives a mapping between the 3D world coordinates and 2D real image coordinates.\par
 
 \subsection{Lens distortion}
 Lens distortion could be classified into two groups [10] : radial distortion, and tangential distortion.\par
@@ -413,12 +413,21 @@ where higher order parameters are omitted for being negligible; \((x_{distorted}
 	
 For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X^{w}\) /\(Y^{w}\)  correlated single pixel-pair, Depth steam offers the additional voxel world coordinates \(Z^{w}\) , while RGB steam offers the additive color property.
 \\
-\\As described in section \ref{sens_TraditionalCalibration}, the traditional way to reconstruct 3D point cloud not only has the time-cost problem, but also makes \(Z^{w}\) accuracy unguaranteed. First of all, the lens distortions correction is separated from pinhole camera model calibration. Even though same pixel-pair's of world coordinates and image plan coordinates could be reused to solve radial dominated lens distortions, the calculation of the separated step brings a second-time translation cost for every single pixel of every frame. This is not a good way to do real-time reconstruction. What's worse, the depth resolution deteriorates notably with depth in practical [11],
+\\As described in section \ref{sens_TraditionalCalibration}, the traditional way to reconstruct 3D point cloud not only has the time-cost problem, but also makes \(Z^{w}\) accuracy unguaranteed. First of all, the lens distortions correction is separated from pinhole camera model calibration. Even though same pixel-pair's of world coordinates and image plane coordinates could be reused to solve radial dominated lens distortions, the calculation of the separated step brings a second-time translation cost for every single pixel of every frame. This is not a good way to do real-time reconstruction. What's worse, the depth resolution deteriorates notably with depth in practical [11],
 %Consumer RGB-D Cameras and their Applications, by Krystof Litomisky
  and noises among depth data vary randomly, camera by camera and pixel by pixel; which means a rough point-cloud plane full of bumps and hollows will be reconstructed even though the camera is observing a wall. Like figure 1.8 shows%
 \\\\Figure 1.8: side face of a sags and crests RGB plane 
 \\\\
-\\In General, a rectification of 3D coordinates \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. In this thesis, instead of using model based traditional method, an accurate data based  \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\) rectified real-time reconstruction method is proposed. In Chapter 2, \(X^{w}\) and \(Y^{w}\) are rectified separately through a fourth order surface fitting translation from image plane row and column to directly solve the lens distortion problem in equation \ref{lensDistortion}, considering that the parameters in that equation with power level larger than 4 are negligible. Then, \(Z^{w}\) values are totally supported from external BLE optical-flow sensor, which accurately tracks camera movements along Z-axis. Finally, a XYZWRGB-D model based lookup table will be generated for real-time reconstruction. Whole calibration system will be introduced in detail in Chapter 3. Results will be shown in Chapter 4.
+\\In General, a rectification of 3D coordinates \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. In this thesis, instead of using model based traditional method, an accurate data based  \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\) rectified real-time reconstruction method is proposed.\par
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{trackingModuleOnKinectV2CalibrationSystem}
+\caption{KinectV2 Calibration System}
+\label{trackingModuleOnKinectV2CalibrationSystem}
+\end{figure}%
+
+As shown in figure \ref{trackingModuleOnKinectV2CalibrationSystem}, the RGB-D camera KinectV2 is mounted on the slider of the rail, which is perpendicular to the uniform round dot pattern as \(Z^{w}\) axis. With the round dot patten plane as the plane \(X^wY^w\) where \(Z^{w}\) being assumed as zero, the center point of each round dot maps to a fixed DD world coordinates. In Chapter 2, \(X^{w}\) and \(Y^{w}\) are rectified separately through a fourth order surface fitting translation from image plane row and column to directly solve the lens distortion problem in equation \ref{lensDistortion}, considering that the parameters in that equation with power level larger than 4 are negligible. Then, \(Z^{w}\) values are totally supported from external BLE optical-flow sensor, which accurately tracks camera movements along Z-axis. Finally, a XYZWRGB-D model based lookup table will be generated for real-time reconstruction. Whole calibration system will be introduced in detail in Chapter 3. Results will be shown in Chapter 4.
 
 
 
