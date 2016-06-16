@@ -396,7 +396,7 @@ y_{distorted} =  y (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_2 (r^2 + 2 y^2) + 2 p_
 \label{lensDistortion}
 %
 \end{equation}%
-
+%
 where higher order parameters are omitted for being negligible; \((x_{distorted}, \, y_{distorted})\) denote the distorted points, \((x, \, y)\) denote the undistorted pixel locations, \(k_i\)'s are coefficients of radial distortion, and \(p_j\)'s are coefficients of tangential distortion.\par
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -411,14 +411,14 @@ where higher order parameters are omitted for being negligible; \((x_{distorted}
 %	****  Real-Time Reconstruction  ******\\
 %	****  accurate calibration system *******\\\\\par
 	
-For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X^{w}\) /\(Y^{w}\)  correlated single pixel-pair, Depth steam offers the additional voxel world coordinates \(Z^{w}\) , while RGB steam offers the additive color property.
+For RGB-D cameras, RGB steam and Depth steam are two steams that independent but correlated with each other. With respect to every \(X^{w}\)/\(Y^{w}\)  correlated single pixel-pair, Depth steam offers the additional voxel world coordinates \(Z^{w}\) , while RGB steam offers the additive color property.
 \\
 \\As described in section \ref{sens_TraditionalCalibration}, the traditional way to reconstruct 3D point cloud not only has the time-cost problem, but also makes \(Z^{w}\) accuracy unguaranteed. First of all, the lens distortions correction is separated from pinhole camera model calibration. Even though same pixel-pair's of world coordinates and image plane coordinates could be reused to solve radial dominated lens distortions, the calculation of the separated step brings a second-time translation cost for every single pixel of every frame. This is not a good way to do real-time reconstruction. What's worse, the depth resolution deteriorates notably with depth in practical [11],
 %Consumer RGB-D Cameras and their Applications, by Krystof Litomisky
  and noises among depth data vary randomly, camera by camera and pixel by pixel; which means a rough point-cloud plane full of bumps and hollows will be reconstructed even though the camera is observing a wall. Like figure 1.8 shows%
 \\\\Figure 1.8: side face of a sags and crests RGB plane 
 \\\\
-\\In General, a rectification of 3D coordinates \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. In this thesis, instead of using model based traditional method, an accurate data based  \(X^{w}\) /\(Y^{w}\) /\(Z^{w}\) rectified real-time reconstruction method is proposed.\par
+\\In General, a rectification of 3D coordinates \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\)  for every single pixel is needed to get a better view of a target's 3D profile. In this thesis, instead of using model based traditional method, an accurate data based  \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\) rectified real-time reconstruction method is proposed.\par
 
 \begin{figure}[h]
 \centering
