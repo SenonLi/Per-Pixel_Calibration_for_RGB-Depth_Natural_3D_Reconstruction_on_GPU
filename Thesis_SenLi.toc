@@ -9,23 +9,20 @@
 \contentsline {section}{\numberline {1.2}Traditional RGB-D camera calibration}{7}{section.27}
 \contentsline {subsection}{\numberline {1.2.1}Pinhole Camera Model}{7}{subsection.28}
 \contentsline {subsection}{\numberline {1.2.2}Lens distortion}{9}{subsection.39}
-\contentsline {section}{\numberline {1.3}Contributions of this thesis}{9}{section.41}
-\contentsline {section}{\numberline {1.4}Summation}{11}{section.43}
-\contentsline {chapter}{\numberline {2}Real-Time 3D Rectification}{13}{chapter.44}
-\contentsline {section}{\numberline {2.1}\(X^{w}\)/\(Y^{w}\) Rectifications}{13}{section.45}
-\contentsline {subsection}{\numberline {2.1.1}Round Dot Center \((column, row)\) extraction}{14}{subsection.46}
-\contentsline {subsubsection}{Digital Image Processings}{14}{section*.47}
-\contentsline {subsubsection}{Sniffer for Round Dot Center}{16}{section*.54}
-\contentsline {subsection}{\numberline {2.1.2}\((X^w, \tmspace +\thinmuskip {.1667em}Y^w)\) Fitting based on Uniform Grid}{18}{subsection.57}
-\contentsline {subsection}{\numberline {2.1.3}High Order Polynomial Surface Mapping}{19}{subsection.61}
-\contentsline {subsection}{\numberline {2.1.4}Mathematical tools}{19}{subsection.63}
-\contentsline {subsubsection}{Singular Value Decomposition (SVD)}{19}{section*.64}
-\contentsline {subsubsection}{Least Square with Pseudo-Inverse}{19}{section*.65}
-\contentsline {section}{\numberline {2.2}\(Z^{w}\) Rectification}{19}{section.66}
-\contentsline {section}{\numberline {2.3}XYZWRGB-D Model Based Lookup Table}{20}{section.67}
-\contentsline {section}{\numberline {2.4}Real-time analysis}{20}{section.68}
-\contentsline {section}{\numberline {2.5}3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}{20}{section.69}
-\contentsline {chapter}{\numberline {3}Calibration System for RGBD Cameras}{21}{chapter.70}
-\contentsline {section}{\numberline {3.1}Rail System}{21}{section.71}
-\contentsline {section}{\numberline {3.2}Optical-Flow Sensor for Z Tracking}{22}{section.74}
-\contentsline {section}{\numberline {3.3}Bluetooth Low Energy for wireless communication}{22}{section.75}
+\contentsline {section}{\numberline {1.3}Contributions of this thesis}{10}{section.44}
+\contentsline {section}{\numberline {1.4}Summation}{11}{section.46}
+\contentsline {chapter}{\numberline {2}Real-Time 3D Rectification}{13}{chapter.47}
+\contentsline {section}{\numberline {2.1}\(X^{w}\)/\(Y^{w}\) Rectifications}{13}{section.48}
+\contentsline {subsection}{\numberline {2.1.1}Round Dot Center \((column, row)\) extraction}{14}{subsection.49}
+\contentsline {subsubsection}{Digital Image Processings}{14}{section*.50}
+\contentsline {subsubsection}{Sniffer for Round Dot Center}{17}{section*.63}
+\contentsline {subsection}{\numberline {2.1.2}\((X^w, \tmspace +\thinmuskip {.1667em}Y^w)\) Fitting based on Uniform Grid}{19}{subsection.69}
+\contentsline {subsection}{\numberline {2.1.3}High Order Polynomial Surface Mapping}{20}{subsection.76}
+\contentsline {section}{\numberline {2.2}\(Z^{w}\) Rectification}{22}{section.86}
+\contentsline {section}{\numberline {2.3}XYZWRGB-D Model Based Lookup Table}{22}{section.87}
+\contentsline {section}{\numberline {2.4}Real-time analysis}{22}{section.88}
+\contentsline {section}{\numberline {2.5}3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}{23}{section.89}
+\contentsline {chapter}{\numberline {3}Calibration System for RGBD Cameras}{25}{chapter.90}
+\contentsline {section}{\numberline {3.1}Rail System}{25}{section.91}
+\contentsline {section}{\numberline {3.2}Optical-Flow Sensor for Z Tracking}{26}{section.94}
+\contentsline {section}{\numberline {3.3}Bluetooth Low Energy for wireless communication}{26}{section.95}

@@ -12,17 +12,17 @@
 \label{sens_Rectification} % For referencing the chapter elsewhere, use \ref{sens_Rectification} 
 As analyzed in chapter \ref{sens_introduction}, traditional camera calibration based on pinhole camera model is not able to supply RGB-D cameras a satisfying real-time solution for lens and depth distortions. In this chapter, instead of using any models, a data based method is used, which will not only suit for both of NearIR steams and RGB steams, but also for all of the universal RGB-D cameras. Rectifications of 3D world coordinates \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\) will be separated into two parts. 
 \\\\%
-Above all, \(X^{w}\) and \(Y^{w}\) will be separately translated though two different transformation matrices that contains radial dominated lens distortions information. The transformation matrices are determined by pixels' coordinates-pairs, world coordinates and corresponding image plan Row and Column, that are extracted from captured uniform round dot grid pattern. Then, for each frame, external calibrated data from optical-flow sensor will be added as fixed \(Z^{w}\) for every pixel in the frame. After both of RGB stream and NearIR stream pixels find a match with world coordinate \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\), depth data will be finally added for each pixel to generate a table of XYZWRGBD.
+Above all, \(X^{w}\) and \(Y^{w}\) will be separately translated though two different transformation matrices that contains radial dominated lens distortions information. The transformation matrices are determined by pixels' coordinates-pairs ( image plan coordinates \(row\) / \(column\) and corresponding world coordinates \(X^{w}\)/\(Y^{w}\) ) that are extracted from captured uniform round dot grid pattern. Then, for each frame, external calibrated data from optical-flow sensor will be added as fixed \(Z^{w}\) for every pixel in the frame. After both of RGB stream and NearIR stream pixels find a match with world coordinate \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\), depth data will be finally added for each pixel to generate a table of XYZWRGBD.
 
 \section{\(X^{w}\)/\(Y^{w}\) Rectifications}
-The uniform round grid captured by RGB/NearIR steams contains radial dominated distortions information, which will be used for \(X^{w}\)/\(Y^{w}\) rectifications, to generate transform matrices to translate image plane rows and columns to world coordinates \(X^{w}\)/\(Y^{w}\). In order to appropriately make use of the distortions information, the core mission is to locate the coordinates-pairs  (pair of rows/columns and corresponding \(X^{w}\)/\(Y^{w}\)) of each round dot. \\\\
+The uniform round grid captured by RGB/NearIR steams contains radial dominated distortions information, which will be used for \(X^{w}\)/\(Y^{w}\) rectifications, to generate transform matrices to translate image plane rows and columns to world coordinates \(X^{w}\)/\(Y^{w}\). In order to appropriately make use of the distortions information, the core mission is to locate the coordinates-pairs of each round dot. \\\\
 %
 The whole process of transformation matrices generation could be separated into three steps. %
 The first step is to track the \((column, row)\) of each round dot cluster's center captured by RGB/NearIR steams, and the second step is to determine the corresponding world coordinates \((X^w, \,Y^w)\) for every \((column, row)\). After the coordinates-pairs are determined for every round dot cluster's center captured by RGB/NearIR steams, the last step is to use them to train high-order polynomial surface fitting models to generate transformation matrices, which could map from \((column, row)\) to \((X^w, \,Y^w)\) for every single pixel of a frame.
 %
 \subsection{Round Dot Center \((column, row)\) extraction}
 \label{RowColumnExtraction}
-The round dot pattern consists of black dots and white background. As the simplest way to segment black dots from background, which is not 100\% white in the captured image, thresholding is applied as pre-processing of the uniform grid's tracking, using Digital Image Processing (DIP) technologies. After an adaptive binarizing of a frame, a \enquote{sniffer} (edge modification) will be applied for captured clusters' centers determination, i.e., the extraction of (column, row) as clusters' centers.\par
+The round dot pattern consists of black dots and white background. As the simplest way to segment black dots from background, which is not 100\% white in the captured image, thresholding (binarizing) is applied as pre-processing of the uniform grid's tracking, using Digital Image Processing (DIP) technologies. After an adaptive binarizing of a frame, a \enquote{sniffer} (edge modification) will be applied for captured clusters' centers determination, i.e., the extraction of (column, row) as clusters' centers.\par
 %
 \subsubsection{Digital Image Processings}
 In this section, DIP technologies are used for the goal of RGB/NearIR steams' binarizing. Considering that the many steps of processing will be applied on every single pixel of every frame, using GPU (parallel processing) has more advantages on handling this kind of mission than using CPU. OpenGL is selected as image processing language, and the default data type of steams saved on GPU during processing will be Single-Floating type, with a range from 0 (balck) to 1 (white). For both of RGB steam and NearIR steam, steam data need to be saved onto GPU first, during which progress gray-scale converting is also done.\\%
@@ -39,8 +39,22 @@ Intensity_{\text{\_gray}} =  0.21 Red\,  + \, 0.72 Green \, + \, 0.07 Blue
 %
 \\\par%
  \qquad \textbf{Histogram Equalization}\\%
-As values saved on GPU, all of the pixel intensity values are within the range of [0, 1], where \enquote{0} means 100\% black and \enquote{1}  means 100\% white. In practical, NearIR steam image is always very dark, with their intensity values every close to zero.  In order to enhance the contrast of NearIR image for a better binarizing, rescaling is necessary. In this section, histogram equalization technique is used maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB steam.\\
-\\%
+As values saved on GPU, all of the pixel intensity values are within the range of [0, 1], where \enquote{0} means 100\% black and \enquote{1}  means 100\% white. In practical, NearIR steam image is always very dark, as shown in figure \ref{Raw_Single_NIR} (with their intensity values every close to zero).  In order to enhance the contrast of NearIR image for a better binarizing, rescaling is necessary. In this section, histogram equalization technique is used maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB steam.\\\\
+%
+ \begin{figure}[h]
+\hspace*{-0.5cm}
+\centering
+\subfloat[Raw NearIR][Raw]{
+\includegraphics[width=0.5\textwidth]{Raw_Single_NIR}
+\label{Raw_Single_NIR}}
+\subfloat[Histogram Equalized NearIR][Histogram Equalized]{
+\includegraphics[width = 0.5\textwidth]{NIR_After_HistogramEqualization}
+\label{NIR_After_HistogramEqualization}}
+%\qquad
+\caption{NearIR Streams before / after Histogram Equalization}
+\label{Histogram_Equalization}
+\end{figure}%
+%
 Commonly, Probability Mass Function (PMF) and Cumulative Distributive Function (CDF) will be calculated to determine the minimum valid intensity value (\(floor\)) and maximum valid value (\(ceiling\)) for rescaling, whereas tricks could be used by taking advantage of the GPU drawing properties.\\%
 \\%
 PMF means the frequency of every valid intensity value for all of the pixels in an image. Dividing all of the pixels in terms of their intensity values into \(N\) levels, every pixel belongs to one level of them, which is called gray level. With an proper selection of \(N\) to make sure a good accuracy, the intensity value of a pixel could be expressed based on its gray level \(n\), as\par%
@@ -90,10 +104,24 @@ Intensity_{\text{\_new}} &= \frac{Intensity_{\text{\_original}} - floor}{ceiling
 %
 \end{equation}%
 %
-%
+After this final rescaling step of Histogram Equalization, the new image gets better contrast effect, as shown in figure \ref{NIR_After_HistogramEqualization}%
 \\\par%
  \qquad \textbf{Adaptive Thresholding}\\%
-Affected by radial dominated lens distortions, the intensity value tend to decrease as the position of a pixel moves from the center of an image to the borders, in the case of observing a singular color view. Therefore, using fixed thresholding will generate too much noise around borders, and an adaptive thresholding process is needed. To segment the black dots from white background, we could simply subtract an image's background from an textured image. And an image's background comes from a blurring process on that image. \\\\%
+Affected by radial dominated lens distortions, the intensity value tend to decrease as the position of a pixel moves from the center of an image to the borders, in the case of observing a singular color view. Therefore, using fixed thresholding will generate too much noise around borders, and an adaptive thresholding process is needed. To segment the black dots from white background, we could simply subtract an image's background from an textured image. And an image's background comes from a blurring process on that image. \par%
+%
+ \begin{figure}[h]
+\hspace*{-0.5cm}
+\centering
+\subfloat[Histogram Equalized NearIR][Histogram Equalized]{
+\includegraphics[width = 0.5\textwidth]{NIR_After_HistogramEqualization}
+\label{NIR_After_HistogramEqualization}}
+\subfloat[After Adaptive Thresholding][Binarized]{
+\includegraphics[width=0.5\textwidth]{Binarized_Single_NIR}
+\label{Binarized_Single_NIR}}%\qquad
+\caption{NearIR Streams before / after Adaptive Thresholding}
+\label{Adaptive_Thresholding}
+\end{figure}%
+\par%
 %
 There are three common types of blurring filters: mean filter, weighted average filter, and gaussian filter. Mean filter is selected for this background-aimed blurring process, because it has the smallest calculation and also a better effect of averaging than the others. After the blurred image containing background information is obtained, the binarizing (subtraction) process for every single pixel could be written as
 
@@ -111,8 +139,7 @@ Intensity_{\text{\_binarized}} = %
 %
 where \(I\) is short for \(Intensity\) of every single pixel, and \(C_{\text{\_offset}}\) is a small constant that could be adjusted depending on various thresholding situations. In this project, \(C_{\text{\_offset}}\) is around 0.1.%
 \\\\%
-To sharpen the edge of the binarized image for a better \enquote{circle} shape detection, a median filter is added as the last step of adaptive thresholding.
-%
+To sharpen the edge of the binarized image for a better \enquote{circle} shape detection, a median filter could be added as the last step of adaptive thresholding. As shown in figure \ref{Adaptive_Thresholding}, background is removed in the binarized image after adaptive thresholding.
 %
 %
 \subsubsection{Sniffer for Round Dot Center}
@@ -166,14 +193,31 @@ if \,\, ( I_{\text{O}} \,\, \& \,\, \text{0x10}  == 1 ),\quad &then,\quad \text{
 \end{equation}%
 %
 Once a valid marker is found, its address \((column, row)\) will be saved into the \enquote{stops-address} queue. One pixel's address might be saved for up to 4 times, but \enquote{colonizing} procedure will only happen once at the first time, so that the sniffing will stop once all of the connected valid pixels in a singular dot-cluster are colonized as zeros.%
-\\\\%
+\par%
+%
+ \begin{figure}[h]
+\hspace*{-0.5cm}
+\centering
+\subfloat[After Adaptive Thresholding][before Extraction]{
+\includegraphics[width=0.5\textwidth]{Binarized_Single_NIR}
+\label{Binarized_Single_NIR}}
+%\qquad
+\subfloat[Dot Centers Extraction][Extracted and Marked]{
+\includegraphics[width = 0.5\textwidth]{Dots_Extracted_Single_NIR}
+\label{Dots_Extracted_Single_NIR}}
+%
+\caption{Valid Dot-Clusters Extracted in NearIR}
+\label{DotCentersExtraction}
+\end{figure}
+%
 In the second step \enquote{colonizing},  \(I_{\text{O}}\) is changed to zero, variable \(area\) of this dot-cluster pluses one, and bounding data \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\) are also updated.%
-\\\\%
-Finally, the Round Dot Centers \((column, row)\) could be determined as the center of bounding boxes with their borders \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\). Noises could be removed based on their corresponding \(area\) and ratio of width and height.
+\\\\%%
+Finally, the Round Dot Centers \((column, row)\) could be determined as the center of bounding boxes with their borders \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\). After potential noises being removed based on their corresponding \(area\) and shape (ratio of width and height), the data left are taken as valid dot-clusters. As shown in figure \ref{Dots_Extracted_Single_NIR}, the centers of valid dot-clusters are marked within their corresponding homocentric circles.
+%
 %
 \subsection{\((X^w, \,Y^w)\) Fitting based on Uniform Grid}
 %
-The list of round dot centers \((column, row)\)s is extracted through section \ref{RowColumnExtraction}. The following is to map every dot center's \((column, row)\) to its corresponding world coordinates \((X^w, \,Y^w)\). As shown in \ref{trackingModuleOnKinectV2CalibrationSystem}, world coordinates are from the uniform grid. Taking the side of unit-square (distance between two adjacent dots) as \enquote{Unit One} in the world coordinates and one dot as the origin of plan \(X^wY^w\), every dot cluster's center \(column\) / \(row\) will be mapped to integer values \(X^w\)/\(Y^w\). %
+The list of round dot centers \((column, row)\)s is extracted through section \ref{RowColumnExtraction}. The following is to map every dot center's \((column, row)\) to its corresponding world coordinates \((X^w, \,Y^w)\). As shown in figure \ref{trackingModuleOnKinectV2CalibrationSystem}, world coordinates are from the uniform grid. Taking the side of unit-square (distance between two adjacent dots) as \enquote{Unit One} in the world coordinates and one dot as the origin of plan \(X^wY^w\), every dot cluster's center \(column\) / \(row\) will be mapped to integer values \(X^w\)/\(Y^w\). %
 \\\\%
 Ideally, a 3x3 perspective transformation matrix could help set a linear mapping between two plane coordinates, and 3 dot centers with know coordinates pair of \((column, row)\) and \((X^w, \,Y^w)\) are enough to determine the transformation matrix. Once four points with a squared-shape \(column\)/\(row\) distribution is found, a 3x3 perspective transformation matrix \(A\) could be determined by solving%
 %
@@ -228,44 +272,106 @@ C_{\text{\_center}} \\ R_{\text{\_center}} \\ 1 \end{array} \right] %
 %
 \end{equation}%
 %
-Then, the refined transformation matrix eventually generates a list of world coordinate points \((X^w, \, Y^w)\)s that correspond to image coordinates \((column, row)\)s.
+Eventually, the refined transformation matrix eventually generates a list of world coordinate points \((X^w, \, Y^w)\)s that correspond to image coordinates \((column, row)\)s. As shown in figure \ref{XY_GridFitting_Matlab}, world coordinates are integers and the origin (blue circle) is chosen as where the center-closest dot-cluster is sitting.\par%
+%
+ \begin{figure}[h]
+\hspace*{-0.3cm}
+\centering
+\subfloat[Image Plane Coordinates][ImagePlane Coordinate]{
+\includegraphics[width=0.54\textwidth]{Grid_Centered_Single_NIR}
+\label{Grid_Centered_Single_NIR}}
+%\qquad
+\subfloat[World Coordinates][World Coordinate]{
+\includegraphics[width = 0.47\textwidth]{XY_GridFitting_Matlab}
+\label{XY_GridFitting_Matlab}}
+%
+\caption{Coordinates-Pairs: (Row, Column)s and (\(X^w\), \(Y^w\))s}
+\label{Grid_Fitting}
+\end{figure}%
 %
 %
 \subsection{High Order Polynomial Surface Mapping}
 %
-The 3x3 transformation matrix can only help to find the integer value list of  world coordinate \(X^w\)/\(Y^w\). It is not able to handle non-linear distorted mapping. Based on the lens distortion equation \ref{lensDistortion}, a higher (even number) order polynomial transformation matrix is needed for both of \(x\) and \(y\). Both of the second order and fourth order polynomial mapping are prototyped in Matlab and realized in real-time.\\\\
+The 3x3 transformation matrix can only help to find the integer value list of  world coordinate \(X^w\)/\(Y^w\). It is not able to handle non-linear distorted mapping. Based on the lens distortion equation \ref{lensDistortion}, a higher order two-dimensional polynomial transformation matrix is needed for both of \(x\) and \(y\) rectification. Considering that the parameters in that equation, which means a surface mapping polynomial function, with power level larger than four are practically negligible, both of the second order and fourth order polynomial mapping are discussed below (prototyped in Matlab and realized in real-time image plane rectification).\\\\%
 %
-%
-Second order To prototype equation \ref{fourthOrderPolynomial} in Matlab with obtained coordinates-pair of dot clusters centers, \\\\
-%
-%
-%
-%
-%
-%
-Considering that the parameters in that equation, which means a high order polynomial surface mapping, with power level larger than four are practically negligible, the un-distortion transformation matrix is determined on the fourth order, written as%
+The second order polynomial mapping has 2x6=12 parameters, written as %
 %
 \begin{equation}
 %
 \begin{aligned}
-X^w =  x (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_1 (r^2 + 2 x^2) + 2 p_2 xy] %
+X^w &=  a_{11}C^2 + a_{12}CR + a_{13}R^2 + a_{14}C + a_{15}R + a_{16}
 \\%
-y_{distorted} =  y (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_2 (r^2 + 2 y^2) + 2 p_1 xy]
+Y^w &=  a_{21}C^2 + a_{22}CR + a_{23}R^2 + a_{24}C + a_{25}R + a_{26}
+\end{aligned}
+\label{secondOrderPolynomial}
+%
+\end{equation}%
+%
+similarly, the fourth order polynomial mapping has 2x15=30 parameters,\par%
+%
+\begin{equation}
+%
+\hspace*{-0.3cm}%
+\begin{aligned}
+X^w &=  a_{11}C^4 + a_{12}C^3R + a_{13}C^2R^2 + a_{14}CR^3 + a_{15}R^4 + a_{16}C^3 + a_{17}C^2R \\%
+&\,\,\,\,\,\,+ a_{18}CR^2 + a_{19}R^3 + a_{110}C^2 + a_{111}CR + a_{112}R^2 + a_{113}C + a_{114}R + a_{115}
+\\\\%
+Y^w &=  a_{21}C^4 + a_{22}C^3R + a_{23}C^2R^2 + a_{24}CR^3 + a_{25}R^4 + a_{26}C^3 + a_{27}C^2R \\%
+&\,\,\,\,\,\,+ a_{28}CR^2 + a_{29}R^3 + a_{210}C^2 + a_{211}CR + a_{212}R^2 + a_{213}C + a_{214}R + a_{215}
 \end{aligned}
 \label{fourthOrderPolynomial}
 %
 \end{equation}%
+\\\par%
 %
-
+where \(C\) and \(R\) are shorted for \(Column\) and \(Row\).
+\\\\%
+To prototype equation \ref{secondOrderPolynomial} and \ref{fourthOrderPolynomial} in Matlab, \enquote{Curve Fitting Toolbox} is used to obtain the 2x6 and 2x15 parameters. Once those two set of parameters are obtained, the rectified image could also be determined, as shown in figure \ref{MatlabPrototpyeOfHighOrder},\par%
 %
+\begin{figure}[h]
+\hspace*{-0.3cm}
+\centering
+\subfloat[\(2^{nd}\) Order][\(2^{nd}\) Order]{
+\includegraphics[width=0.5\textwidth]{Second_MatlabPrototype}
+\label{Second_MatlabPrototype}}
+%\qquad
+\subfloat[\(4^{th}\) Order][\(4^{th}\) Order]{
+\includegraphics[width = 0.5\textwidth]{Fourth_MatlabPrototype}
+\label{Fourth_MatlabPrototype}}
 %
+\caption{\(X^w\)/\(Y^w\) Matlab Prototype, \(2^{nd}\) / \(4^{th}\) Order Polynomial}
+\label{MatlabPrototpyeOfHighOrder}
+\end{figure}%
 %
-\subsection{Mathematical tools}
-\subsubsection{Singular Value Decomposition (SVD)}
-\subsubsection{Least Square with Pseudo-Inverse}
+where based on \enquote{Goodness of fit} from Matlab, the Root-Mean-Square Error (RMSE) of (\(X^w\), \(Y^w\)) is (0.06796, 0.05638) for the \(2^{nd}\) order polynomial, and (0.02854, 0.02343) for the \(4^{th}\) order polynomial.
+\\\\%
 %
+ \begin{figure}[h]
+\centering
+\subfloat[Before Rectification][Before Rectification]{
+\includegraphics[height=0.42\textwidth, width=0.5\textwidth]{BeforeRectification_Single_NIR}
+\label{BeforeRectification_Single_NIR}}
+\\%\qquad
+\hspace*{-0.3cm}
+\subfloat[\(2^{nd}\) Order][\(2^{nd}\) Order]{
+\includegraphics[width = 0.5\textwidth, height = 0.425\textwidth]{Second_QtScreenShot}
+\label{Second_QtScreenShot}}
 %
+\subfloat[\(4^{th}\) Order][\(4^{th}\) Order]{
+\includegraphics[width = 0.5\textwidth, height = 0.425\textwidth]{Fourth_QtScreenShot}
+\label{Fourth_QtScreenShot}}
 %
+\caption{NearIR Stream High Order Polynomial Rectification}
+\label{HighOrderNearIRRectification}
+\end{figure}%
+%
+Then, apply those polynomial surface mappings into real-time steams rectification. We can see the rectified steam image from figure \ref{Second_QtScreenShot} and figure \ref{Fourth_QtScreenShot}, whose image-outline are same with Matlab prototypes, figure \ref{Second_MatlabPrototype} and figure \ref{Fourth_MatlabPrototype}. Gradually, from figure \ref{BeforeRectification_Single_NIR} to figure \ref{Fourth_QtScreenShot}, the dot-clusters on the outmost layer are more and more close to being sitting on the blue rectangle, which means less and less distortion.%
+\\\\%
+Not only from the comparison of RMSE, but more intuitively from figure \ref{HighOrderNearIRRectification}, we can tell that the \(4^{th}\) order polynomial surface mapping is much better than the second order. However, that more accurate process also cost more calculations, and requires more data (coordinate-pairs) to train the transformation model. Limited by the static dot pattern, fewer and fewer dot-clusters could be observed by the camera as the camera getting closer to the dot pattern. Practically, \(4^{th}\) order rectification is replaced by  \(2^{nd}\) order when the number of dot-clusters is too few to train its transformation model.
+%
+%\subsection{Mathematical tools}
+%\subsubsection{Singular Value Decomposition (SVD)}
+%\subsubsection{Least Square with Pseudo-Inverse}
 %
 %
 \section{\(Z^{w}\) Rectification}
