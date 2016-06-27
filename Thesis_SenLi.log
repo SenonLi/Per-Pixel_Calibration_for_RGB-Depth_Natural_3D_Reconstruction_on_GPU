@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.5.12)  23 JUN 2016 23:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.5.12)  27 JUN 2016 12:03
 entering extended mode
 **"C:/Users/liziy/Developer/Papers & Thesis/ThesisNewBackup/Thesis_SenLi.tex"
 ("C:/Users/liziy/Developer/Papers & Thesis/ThesisNewBackup/Thesis_SenLi.tex"
@@ -2331,12 +2331,12 @@ co-or-di-nates pair of $\OT1/ztmcm/m/n/10.95 (\OML/ztmcm/m/it/10.95 column; row
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 242--250
+Underfull \hbox (badness 10000) in paragraph at lines 243--251
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 242--250
+Underfull \hbox (badness 10000) in paragraph at lines 243--251
 
  []
 
@@ -2345,104 +2345,116 @@ File: Figures/Grid_Centered_Single_NIR.png Graphic file (type png)
 
 <use Figures/Grid_Centered_Single_NIR.png>
 Package pdftex.def Info: Figures/Grid_Centered_Single_NIR.png used on input lin
-e 284.
-(pdftex.def)             Requested size: 204.19147pt x 143.08955pt.
+e 285.
+(pdftex.def)             Requested size: 204.18622pt x 160.7063pt.
 
 <Figures/XY_GridFitting_Matlab.png, id=381, 591.71063pt x 489.32813pt>
 File: Figures/XY_GridFitting_Matlab.png Graphic file (type png)
 
 <use Figures/XY_GridFitting_Matlab.png>
 Package pdftex.def Info: Figures/XY_GridFitting_Matlab.png used on input line 2
-88.
-(pdftex.def)             Requested size: 177.72488pt x 146.9713pt.
+89.
+(pdftex.def)             Requested size: 177.72221pt x 160.70972pt.
 
-Overfull \hbox (8.27383pt too wide) in paragraph at lines 280--290
+Overfull \hbox (8.26591pt too wide) in paragraph at lines 281--291
  []|  [][][][] 
  []
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 290.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 291.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 290.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 291.
 
-Underfull \hbox (badness 10000) in paragraph at lines 297--301
+Underfull \hbox (badness 10000) in paragraph at lines 298--302
 
  []
 
 [20 <./Figures/Grid_Centered_Single_NIR.png> <./Figures/XY_GridFitting_Matlab.p
 ng>]
-Underfull \hbox (badness 10000) in paragraph at lines 326--327
+Underfull \hbox (badness 10000) in paragraph at lines 327--328
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 329--331
+Underfull \hbox (badness 10000) in paragraph at lines 330--332
 
  []
 
-<Figures/Second_MatlabPrototype.png, id=397, 569.12625pt x 472.01344pt>
+<Figures/Second_MatlabPrototype.png, id=399, 569.12625pt x 472.01344pt>
 File: Figures/Second_MatlabPrototype.png Graphic file (type png)
 
 <use Figures/Second_MatlabPrototype.png>
 Package pdftex.def Info: Figures/Second_MatlabPrototype.png used on input line 
-338.
+339.
 (pdftex.def)             Requested size: 189.06853pt x 156.80925pt.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 338.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 339.
 
-<Figures/Fourth_MatlabPrototype.png, id=398, 563.10374pt x 469.755pt>
+<Figures/Fourth_MatlabPrototype.png, id=400, 563.10374pt x 469.755pt>
 File: Figures/Fourth_MatlabPrototype.png Graphic file (type png)
 
 <use Figures/Fourth_MatlabPrototype.png>
 Package pdftex.def Info: Figures/Fourth_MatlabPrototype.png used on input line 
-342.
+343.
 (pdftex.def)             Requested size: 189.06853pt x 157.72191pt.
 
-Overfull \hbox (4.49454pt too wide) in paragraph at lines 334--344
+Overfull \hbox (4.49454pt too wide) in paragraph at lines 335--345
  []|  [][][][] 
  []
 
-<Figures/BeforeRectification_Single_NIR.png, id=399, 773.13844pt x 542.025pt>
-File: Figures/BeforeRectification_Single_NIR.png Graphic file (type png)
 
+<Figures/BeforeRectification_Single_NIR.png, id=401, 789.70032pt x 618.81187pt>
+File: Figures/BeforeRectification_Single_NIR.png Graphic file (type png)
 <use Figures/BeforeRectification_Single_NIR.png>
 Package pdftex.def Info: Figures/BeforeRectification_Single_NIR.png used on inp
-ut line 355.
-(pdftex.def)             Requested size: 189.06076pt x 158.81253pt.
+ut line 357.
+(pdftex.def)             Requested size: 189.062pt x 160.70789pt.
 
-<Figures/Second_QtScreenShot.png, id=400, 688.82344pt x 567.62062pt>
+<Figures/Perspective_QtScreenShot.png, id=402, 653.44125pt x 539.01375pt>
+File: Figures/Perspective_QtScreenShot.png Graphic file (type png)
+
+<use Figures/Perspective_QtScreenShot.png>
+Package pdftex.def Info: Figures/Perspective_QtScreenShot.png used on input lin
+e 361.
+(pdftex.def)             Requested size: 189.06436pt x 160.71017pt.
+
+Overfull \hbox (4.48384pt too wide) in paragraph at lines 354--363
+ []|  [][][][] 
+ []
+
+<Figures/Second_QtScreenShot.png, id=403, 688.82344pt x 569.12625pt>
 File: Figures/Second_QtScreenShot.png Graphic file (type png)
 
 <use Figures/Second_QtScreenShot.png>
-Package pdftex.def Info: Figures/Second_QtScreenShot.png used on input line 360
+Package pdftex.def Info: Figures/Second_QtScreenShot.png used on input line 367
 .
-(pdftex.def)             Requested size: 189.0644pt x 160.70822pt.
+(pdftex.def)             Requested size: 189.0644pt x 160.70898pt.
 
-<Figures/Fourth_QtScreenShot.png, id=401, 720.44156pt x 592.46344pt>
+<Figures/Fourth_QtScreenShot.png, id=404, 720.44156pt x 592.46344pt>
 File: Figures/Fourth_QtScreenShot.png Graphic file (type png)
 
 <use Figures/Fourth_QtScreenShot.png>
-Package pdftex.def Info: Figures/Fourth_QtScreenShot.png used on input line 364
+Package pdftex.def Info: Figures/Fourth_QtScreenShot.png used on input line 371
 .
 (pdftex.def)             Requested size: 189.05827pt x 160.70856pt.
 
-Overfull \hbox (4.48016pt too wide) in paragraph at lines 357--366
+Overfull \hbox (4.48016pt too wide) in paragraph at lines 364--373
  []|  [][][][] 
  []
 
 
-Overfull \hbox (8.24655pt too wide) in paragraph at lines 348--379
+Overfull \hbox (8.24655pt too wide) in paragraph at lines 349--386
 []\T1/ptm/m/n/10.95 where based on   Good-ness of fit from Mat-lab, the Root-
 Mean-Square Er-ror (RMSE)
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 348--379
+Underfull \hbox (badness 10000) in paragraph at lines 349--386
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 348--379
+Underfull \hbox (badness 10000) in paragraph at lines 349--386
 
  []
 
@@ -2453,80 +2465,84 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 g>]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 379.
+(hyperref)                removing `math shift' on input line 386.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `superscript' on input line 379.
+(hyperref)                removing `superscript' on input line 386.
 
-<Figures/OneFrameXYZ_Rectified.png, id=427, 855.195pt x 705.38531pt>
+<Figures/OneFrameXYZ_Rectified.png, id=429, 855.195pt x 705.38531pt>
 File: Figures/OneFrameXYZ_Rectified.png Graphic file (type png)
 
 <use Figures/OneFrameXYZ_Rectified.png>
 Package pdftex.def Info: Figures/OneFrameXYZ_Rectified.png used on input line 3
-88.
+95.
 (pdftex.def)             Requested size: 264.69014pt x 189.06812pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 381--393
+Underfull \hbox (badness 10000) in paragraph at lines 388--400
 
  []
 
-[22 <./Figures/BeforeRectification_Single_NIR.png> <./Figures/Second_QtScreenSh
-ot.png> <./Figures/Fourth_QtScreenShot.png>]
-<Figures/ZD_CurveFitting.png, id=434, 740.0147pt x 324.46219pt>
+[22 <./Figures/BeforeRectification_Single_NIR.png> <./Figures/Perspective_QtScr
+eenShot.png> <./Figures/Second_QtScreenShot.png> <./Figures/Fourth_QtScreenShot
+.png>] <Figures/ZD_CurveFitting.png, id=436, 740.0147pt x 324.46219pt>
 File: Figures/ZD_CurveFitting.png Graphic file (type png)
 
 <use Figures/ZD_CurveFitting.png>
-Package pdftex.def Info: Figures/ZD_CurveFitting.png used on input line 398.
+Package pdftex.def Info: Figures/ZD_CurveFitting.png used on input line 405.
 (pdftex.def)             Requested size: 302.5108pt x 132.63922pt.
 
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 405.
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 405.
-
-[23 <./Figures/OneFrameXYZ_Rectified.png> <./Figures/ZD_CurveFitting.png>]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 417.
+(hyperref)                removing `math shift' on input line 412.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 417.
+(hyperref)                removing `math shift' on input line 412.
+
+[23 <./Figures/OneFrameXYZ_Rectified.png>]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 424.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 417.
+(hyperref)                removing `math shift' on input line 424.
 
-<Figures/Data63FranesForLUT.png, id=443, 682.80093pt x 703.87968pt>
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 424.
+
+<Figures/Data63FranesForLUT.png, id=445, 682.80093pt x 703.87968pt>
 File: Figures/Data63FranesForLUT.png Graphic file (type png)
 
 <use Figures/Data63FranesForLUT.png>
-Package pdftex.def Info: Figures/Data63FranesForLUT.png used on input line 422.
+Package pdftex.def Info: Figures/Data63FranesForLUT.png used on input line 429.
 
 (pdftex.def)             Requested size: 264.69722pt x 207.97565pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 418--429
+Underfull \hbox (badness 10000) in paragraph at lines 425--436
 
  []
 
-<Figures/SampleBeams_NearIR.png, id=446, 603.75563pt x 398.99063pt>
+[24 <./Figures/ZD_CurveFitting.png> <./Figures/Data63FranesForLUT.png>]
+<Figures/SampleBeams_NearIR.png, id=454, 603.75563pt x 398.99063pt>
 File: Figures/SampleBeams_NearIR.png Graphic file (type png)
 
 <use Figures/SampleBeams_NearIR.png>
-Package pdftex.def Info: Figures/SampleBeams_NearIR.png used on input line 446.
+Package pdftex.def Info: Figures/SampleBeams_NearIR.png used on input line 453.
 
 (pdftex.def)             Requested size: 291.16714pt x 192.41437pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 438--453
+Underfull \hbox (badness 10000) in paragraph at lines 445--460
 
  []
 
-[24 <./Figures/Data63FranesForLUT.png>]
-Overfull \hbox (1.81654pt too wide) in paragraph at lines 458--458
+
+Overfull \hbox (1.81654pt too wide) in paragraph at lines 465--465
 []\T1/ptm/b/n/14.4 3D Re-con-struc-tion dif-fer-ences for Prime-Sense, KinectV2
 ,
  []
@@ -2540,7 +2556,7 @@ Overfull \hbox (1.81654pt too wide) in paragraph at lines 458--458
 
 ]
 Chapter 3.
-<Figures/cameraFieldOfView.png, id=468, 364.36125pt x 218.31563pt>
+<Figures/cameraFieldOfView.png, id=470, 364.36125pt x 218.31563pt>
 File: Figures/cameraFieldOfView.png Graphic file (type png)
 
 <use Figures/cameraFieldOfView.png>
@@ -2554,7 +2570,7 @@ pdfTeX warning: pdflatex.EXE (file ./Figures/MountedTrackingModuleObservingRail
 .pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowe
 d
 
-<Figures/MountedTrackingModuleObservingRail.pdf, id=476, 3276.24pt x 2457.18pt>
+<Figures/MountedTrackingModuleObservingRail.pdf, id=478, 3276.24pt x 2457.18pt>
 File: Figures/MountedTrackingModuleObservingRail.pdf Graphic file (type pdf)
 <use Figures/MountedTrackingModuleObservingRail.pdf>
 Package pdftex.def Info: Figures/MountedTrackingModuleObservingRail.pdf used on
@@ -2578,7 +2594,7 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 136.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 136.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 136.
 Package rerunfilecheck Info: File `Thesis_SenLi.out' has not changed.
-(rerunfilecheck)             Checksum: CB18ABDBF6EE5AB9459D58472C171790;5659.
+(rerunfilecheck)             Checksum: 7D4691999EEC156A7D7830465B758A2C;5660.
 
 
 LaTeX Warning: There were multiply-defined labels.
@@ -2588,10 +2604,10 @@ Package logreq Info: Writing requests to 'Thesis_SenLi.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 32990 strings out of 493634
- 663857 string characters out of 3141314
+ 32999 strings out of 493634
+ 664159 string characters out of 3141314
  844743 words of memory out of 3000000
- 35815 multiletter control sequences out of 15000+200000
+ 35822 multiletter control sequences out of 15000+200000
  123951 words of font info for 190 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
  57i,22n,81p,10444b,1774s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -2606,9 +2622,9 @@ eX 2.9/fonts/type1/urw/symbol/usyr.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts
 /type1/urw/times/utmb8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/
 times/utmr8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmr8
 a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Thesis_SenLi.pdf (32 pages, 5120613 bytes).
+Output written on Thesis_SenLi.pdf (32 pages, 5318798 bytes).
 PDF statistics:
- 553 PDF objects out of 1000 (max. 8388607)
- 137 named destinations out of 1000 (max. 500000)
- 370 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 555 PDF objects out of 1000 (max. 8388607)
+ 138 named destinations out of 1000 (max. 500000)
+ 375 words of extra memory for PDF output out of 10000 (max. 10000000)
 

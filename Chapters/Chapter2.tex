@@ -239,6 +239,7 @@ a_{31} & a_{32} & a_{33} \\
 \cdot \left[ \begin{array}{c} %
 C \\ R \\ 1 \end{array} \right] %
 %
+\label{perspectiveDistortionCorrectionEquation}
 \end{equation}%
 %
 where \(C\) and \(R\) are vectors consist of \((column, row)\)s of four squared-shape distributed points; \(X^w\) and \(Y^w\) are vectors consist of four points \((0, 0)\), \((0, 1)\), \((1, 1)\), and \((1, 0)\); \(z\) denotes the third axis in the homogenous system connecting two planes. %
@@ -280,11 +281,11 @@ Eventually, the refined transformation matrix eventually generates a list of wor
 \hspace*{-0.3cm}
 \centering
 \subfloat[Image Plane Coordinates][ImagePlane Coordinate]{
-\includegraphics[width=0.54\textwidth]{Grid_Centered_Single_NIR}
+\includegraphics[width=0.54\textwidth, height = 0.425\textwidth]{Grid_Centered_Single_NIR}
 \label{Grid_Centered_Single_NIR}}
 %\qquad
 \subfloat[World Coordinates][World Coordinate]{
-\includegraphics[width = 0.47\textwidth]{XY_GridFitting_Matlab}
+\includegraphics[width = 0.47\textwidth, height = 0.425\textwidth]{XY_GridFitting_Matlab}
 \label{XY_GridFitting_Matlab}}
 %
 \caption{Coordinates-Pairs: (Row, Column)s and (\(X^w\), \(Y^w\))s}
@@ -294,7 +295,7 @@ Eventually, the refined transformation matrix eventually generates a list of wor
 %
 \subsection{High Order Polynomial Surface Mapping}
 %
-The 3x3 transformation matrix can only help to find the integer value list of  world coordinate \(X^w\)/\(Y^w\). It is not able to handle non-linear distorted mapping. Based on the lens distortion equation \ref{lensDistortion}, a higher order two-dimensional polynomial transformation matrix is needed for both of \(x\) and \(y\) rectification. Considering that the parameters in that equation, which means a surface mapping polynomial function, with power level larger than four are practically negligible, both of the second order and fourth order polynomial mapping are discussed below (prototyped in Matlab and realized in real-time image plane rectification).\\\\%
+Using four squared-shape distributed dots, the 3x3 transformation matrix can help to find the integer value list of  world coordinate \(X^w\)/\(Y^w\). Further with all extracted dots' coordinate-pairs, a perspective distortion correction (\(1^{st}\) order polynomial with \(z\) bound) could be applied using equation \ref{perspectiveDistortionCorrectionEquation}. As shown in figure \ref{Perspective_QtScreenShot}, the \(1^{st}\) order polynomial correction is not able to handle non-linear distorted mapping. Based on the lens distortion equation \ref{lensDistortion}, a higher order two-dimensional polynomial transformation matrix is needed for both of \(x\) and \(y\) rectification. Considering that the parameters in that equation, which means a surface mapping polynomial function, with power level larger than four are practically negligible, both of the second order and fourth order polynomial mapping are discussed below (prototyped in Matlab and realized in real-time image plane rectification).\\\\%
 %
 The second order polynomial mapping has 2x6=12 parameters, written as %
 %
@@ -350,9 +351,15 @@ where based on \enquote{Goodness of fit} from Matlab, the Root-Mean-Square Error
 %
  \begin{figure}[h]
 \centering
+\hspace*{-0.3cm}
 \subfloat[Before Rectification][Before Rectification]{
-\includegraphics[height=0.42\textwidth, width=0.5\textwidth]{BeforeRectification_Single_NIR}
+\includegraphics[width=0.5\textwidth, height = 0.425\textwidth]{BeforeRectification_Single_NIR}
 \label{BeforeRectification_Single_NIR}}
+%
+\subfloat[Perspective Correction][Perspective (\(1^{st}\))]{
+\includegraphics[width = 0.5\textwidth, height = 0.425\textwidth]{Perspective_QtScreenShot}
+\label{Perspective_QtScreenShot}}
+%
 \\%\qquad
 \hspace*{-0.3cm}
 \subfloat[\(2^{nd}\) Order][\(2^{nd}\) Order]{
@@ -367,9 +374,9 @@ where based on \enquote{Goodness of fit} from Matlab, the Root-Mean-Square Error
 \label{HighOrderNearIRRectification}
 \end{figure}%
 %
-Then, apply those polynomial surface mappings into real-time steams rectification. We can see the rectified steam image from figure \ref{Second_QtScreenShot} and figure \ref{Fourth_QtScreenShot}, whose image-outline are same with Matlab prototypes, figure \ref{Second_MatlabPrototype} and figure \ref{Fourth_MatlabPrototype}. Gradually, from figure \ref{BeforeRectification_Single_NIR} to figure \ref{Fourth_QtScreenShot}, the dot-clusters on the outmost layer are more and more close to being sitting on the blue rectangle, which means less and less distortion.%
+Then, apply those polynomial surface mappings into real-time steams rectification. We can see the rectified steam image (figure \ref{Second_QtScreenShot} and figure \ref{Fourth_QtScreenShot}), whose image-outline are same with Matlab prototypes (figure \ref{Second_MatlabPrototype} and figure \ref{Fourth_MatlabPrototype}). Comparing among the four results shown in figure \ref{HighOrderNearIRRectification}, the more dot-clusters sitting on the blue rectangle, the less distortion an image has.%
 \\\\%
-Not only from the comparison of RMSE, but more intuitively from figure \ref{HighOrderNearIRRectification}, we can tell that the \(4^{th}\) order polynomial surface mapping is much better than the second order. However, that more accurate process also cost more calculations, and requires more data (coordinate-pairs) to train the transformation model. Limited by the static dot pattern, fewer and fewer dot-clusters could be observed by the camera as the camera getting closer to the dot pattern. Practically, \(4^{th}\) order rectification is replaced by \(2^{nd}\) order when the number of dot-clusters is too few to train its transformation model.
+Not only from the comparison of RMSE, but more intuitively from figure \ref{HighOrderNearIRRectification}, we can tell that the \(4^{th}\) order polynomial surface mapping is much better than the second order (which is similar to the perspective correction). However, that more accurate process also cost more calculations, and requires more data (coordinate-pairs) to train the transformation model. Limited by the static dot pattern, fewer and fewer dot-clusters could be observed by the camera as the camera getting closer to the dot pattern. Practically, \(4^{th}\) order rectification is replaced by \(2^{nd}\) order when the number of dot-clusters is too few to train its transformation model.
 %
 %\subsection{Mathematical tools}
 %\subsubsection{Singular Value Decomposition (SVD)}

@@ -18,14 +18,14 @@
 \contentsline {subsubsection}{Sniffer for Round Dot Center}{17}{section*.63}
 \contentsline {subsection}{\numberline {2.1.2}\((X^w, \tmspace +\thinmuskip {.1667em}Y^w)\) Fitting based on Uniform Grid}{19}{subsection.69}
 \contentsline {subsection}{\numberline {2.1.3}High Order Polynomial Surface Mapping}{20}{subsection.76}
-\contentsline {section}{\numberline {2.2}\(Z^{w}\) Rectification}{22}{section.86}
-\contentsline {section}{\numberline {2.3}Data-Based XYZWRGB-D Look-Up Table}{23}{section.88}
-\contentsline {subsection}{\numberline {2.3.1}From \(D\) to \(Z\)}{24}{subsection.90}
-\contentsline {subsection}{\numberline {2.3.2}From \(Z\) to \(X\)/\(Y\)}{24}{subsection.92}
-\contentsline {section}{\numberline {2.4}Real-time analysis}{25}{section.96}
-\contentsline {section}{\numberline {2.5}3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}{25}{section.97}
-\contentsline {chapter}{\numberline {3}Calibration System for RGBD Cameras}{27}{chapter.98}
-\contentsline {section}{\numberline {3.1}Rail System}{27}{section.99}
-\contentsline {section}{\numberline {3.2}BLE Optical-Flow Tracking Module}{28}{section.102}
-\contentsline {subsection}{\numberline {3.2.1}Optical-Flow Sensor for Z Tracking}{28}{subsection.103}
-\contentsline {subsection}{\numberline {3.2.2}Bluetooth Low Energy for wireless communication}{28}{subsection.104}
+\contentsline {section}{\numberline {2.2}\(Z^{w}\) Rectification}{22}{section.87}
+\contentsline {section}{\numberline {2.3}Data-Based XYZWRGB-D Look-Up Table}{23}{section.89}
+\contentsline {subsection}{\numberline {2.3.1}From \(D\) to \(Z\)}{23}{subsection.91}
+\contentsline {subsection}{\numberline {2.3.2}From \(Z\) to \(X\)/\(Y\)}{24}{subsection.93}
+\contentsline {section}{\numberline {2.4}Real-time analysis}{25}{section.97}
+\contentsline {section}{\numberline {2.5}3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}{25}{section.98}
+\contentsline {chapter}{\numberline {3}Calibration System for RGBD Cameras}{27}{chapter.99}
+\contentsline {section}{\numberline {3.1}Rail System}{27}{section.100}
+\contentsline {section}{\numberline {3.2}BLE Optical-Flow Tracking Module}{28}{section.103}
+\contentsline {subsection}{\numberline {3.2.1}Optical-Flow Sensor for Z Tracking}{28}{subsection.104}
+\contentsline {subsection}{\numberline {3.2.2}Bluetooth Low Energy for wireless communication}{28}{subsection.105}
