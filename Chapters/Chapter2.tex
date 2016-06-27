@@ -12,7 +12,7 @@
 \label{sens_Rectification} % For referencing the chapter elsewhere, use \ref{sens_Rectification} 
 As analyzed in chapter \ref{sens_introduction}, traditional camera calibration based on pinhole camera model is not able to supply RGB-D cameras a satisfying real-time solution for lens and depth distortions. In this chapter, instead of using any models, a data based look-up table (LUT) method is used, which will not only suit for both of NearIR steams and RGB steams, but also for all of the universal RGB-D cameras. Rectifications of 3D world coordinates \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\) will be separated into two parts. 
 \\\\%
-Above all, \(X^{w}\) and \(Y^{w}\) will be separately translated though two different transformation matrices that contains radial dominated lens distortions information. The transformation matrices are determined by pixels' coordinates-pairs ( image plan coordinates \(row\) / \(column\) and corresponding world coordinates \(X^{w}\)/\(Y^{w}\) ) that are extracted from captured uniform round dot grid pattern. Then, for each frame, external calibrated data from optical-flow sensor will be added as fixed \(Z^{w}\) for every pixel in the frame. After both of RGB stream and NearIR stream pixels find a match with world coordinate \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\), depth data will be finally added for each pixel to generate a table of XYZWRGBD.
+Above all, \(X^{w}\) and \(Y^{w}\) will be separately translated though two different transformation matrices that contains radial dominated lens distortions information. The transformation matrices are determined by pixels' coordinates-pairs ( image plan coordinates \(row\) / \(column\) and corresponding world coordinates \(X^{w}\)/\(Y^{w}\) ) that are extracted from captured uniform round dot grid pattern. Then, for each frame, external calibrated data from optical-flow sensor will be added as fixed \(Z^{w}\) for every pixel in the frame. After both of RGB stream and NearIR stream pixels find a match with world coordinate \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\), depth data will be finally added for each pixel to generate a table of XYZWRGB-D.
 
 \section{\(X^{w}\)/\(Y^{w}\) Rectifications}
 \label{sectionXY_rectification}
@@ -387,7 +387,7 @@ Not only from the comparison of RMSE, but more intuitively from figure \ref{High
 %
 Instead of from Depth steam, \(Z^{w}\) values will be determined directly from external real-world data. With the help of BLE Optical-Flow tracking module, as will be discussed later in section \ref{BLE_OF_TrackingModule}, \(Z^{w}\) values will be supported for every frame in real-time based on the camera's distance to the pattern. All of the pixels in one frame share the same \(Z^{w}\) in world coordinate.%
 \\\\%
-As well as the determination of \(X^{w}\)/\(Y^{w}\), which has been discussed in section \ref{uniformGridFittingXY},  \(Z^{w}\) value is also based on the uniform-grid's \enquote{Unit One},  the side of unit-square of the grid pattern. Concretely, the distance between every two adjacent dots' centers in real-world is 228mm. Therefore, \(Z^{w}\) = -\(|Z|\)(mm)/ 228(mm), where \(Z\) is the camera's working distance from the camera to dots pattern in reality offered by the BEL Optical-Flow tracking module. Choosing the origin to be where the camera is sitting, and the positives of \(X^{w}\)\(Y^{w}\) to be right and up, the \(Z^{w}\) values are always negative. Figure \ref{OneFrameXYZ_Rectified} shows one frame of 3D reconstruction in world coordinates based on rectified \(X^{w}\)/\(Y^{w}\) and \(Z^{w}\), where both of the origin and Z-axis are high-lighted as blue.%
+As well as the determination of \(X^{w}\)/\(Y^{w}\), which has been discussed in section \ref{uniformGridFittingXY},  \(Z^{w}\) value is also based on the uniform-grid's \enquote{Unit One},  the side of unit-square of the grid pattern. Concretely, the distance between every two adjacent dots' centers in real-world is 228mm. Therefore, \(Z^{w}\) = -\(|Z|\)(mm)/ 228(mm), where \(Z\) is the camera's working distance from the camera to dots pattern in reality offered by the BEL Optical-Flow tracking module. Choosing the origin to be where the camera is sitting, and the positives of \(X^{w}\)\(Y^{w}\) to be right and up, the \(Z^{w}\) values are always negative. Figure \ref{OneFrameXYZ_Rectified} shows one frame of 3D reconstruction in world coordinates based on rectified \(X^{w}\)/\(Y^{w}\) and \(Z^{w}\), where both of the origin and \(Z\)-axis are high-lighted as blue.%
 %
 \begin{figure}[h]
 \centering
@@ -457,13 +457,26 @@ Figure \ref{SampleBeams_NearIR} shows some sample beams composed of coefficients
 \\%
 To combine equation \ref{fromD_To_Z} and \ref{fromZ_To_XY}, a rectified 3D coordinate (\(X\), \(Y\), \(Z\)) for every single pixel could be looked up based on \(D\). With enough data generating a  \(column\)-by-\(row\)-by-\(6\)  look-up table that contains 6 coefficients (\(a\),\(b\),\(c\),\(d\),\(e\),\(f\)) for every single pixel, a rectified real-time 3D reconstruction could be displayed.
 %
-\section{Real-time analysis}
-from Kai's SL based beam expansion to data based per-pixel beam in 3D space
+\section{Real-Time analysis}
+Real-time analysis is in contrast with off-line process. In terms of camera steams process, real-time means to display the first processed frame before the second frame processing starts. In this thesis, \enquote{real-time} could be used to describe both of the 3D rectification procedure for Look-Up Table (LUT) generation and the live show of calibrated observation using LUT.
+\subsection{Real-Time in Rectification}
+In the process of 3D (\(X^{w}\),\,\(Y^{w}\),\,\(Z^{w}\)) rectification using an uniform grid dots pattern, \enquote{real-time} means being able to show a rectified frame, as well as to record its rectified \(XYZWRGBD\) steams data, before the start of second frame processing. The recored frames (\(XYZWRGBD\)s) will be used to generating LUT.%
+\\\\%
+With the help of the BLE Optical-Flow tracking module, which will be discussed in section \ref{BLE_OF_TrackingModule}, this rectification step could really be called \enquote{real-time}: not only \(X^{w}\) and \(Y^{w}\) are rectified before the coming of the next frame, but also \(Z^{w}\) is updated (at a rate of 100Hz, maximum 5KHz) as the slider moving along the rail (along \(Z\)-axis). After an appropriate setting, a group (concretely, 63 frames) of rectified \(XYZWRGBD\) steams data could be recorded automatically as the slider moving (record one rectified frame at every 25mm) from the head of the rail to the tail, as already shown in figure \ref{Data63FranesForLUT}.%
+\\\\%
+The processing speed depends on the number of detected dot-clusters. The further where the camera is observing the dots pattern, the more dot-clusters are detected, the slower processing speed will be. In practical, the real-time rectification speed 4 fps at the head of the rail (working distance 1.05m), and 0.4 fps at the end of the rail (working distance 2.7m).
+%
+\subsection{Real-Time Observing after Rectification}
+%
+For the live-show of observed steams after rectification, the camera's view is no longer limited by the uniform grid pattern. At that time, \enquote{real-time} means to look up the rectified (\(X^{w}\),\, \(Y^{w}\),\, \(Z^{w}\)) based on \(D\) and read its corresponding RGB for every single pixel, and then show the reconstructed 3D image, before the next frame.%
+\\\\%
+Concretely, for every single pixel, 6 coefficients (\(a\),\(b\),\(c\),\(d\),\(e\),\(f\)) will be looked up, and their corresponding \(Z^{w}\) and \(X^{w}\)/\(Y^{w}\) will be determined by equation \ref{fromD_To_Z} and equation \ref{fromZ_To_XY}.
+%
 %X= ExZ + Fx
 %Y= EyZ + Fy
-
+%
 \section{3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}
-shader comparison
+pixels, steams, and shader comparison
 %
 %
 %

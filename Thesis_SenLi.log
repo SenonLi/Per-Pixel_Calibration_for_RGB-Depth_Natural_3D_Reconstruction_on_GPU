@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.5.12)  27 JUN 2016 12:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.5.12)  27 JUN 2016 16:55
 entering extended mode
 **"C:/Users/liziy/Developer/Papers & Thesis/ThesisNewBackup/Thesis_SenLi.tex"
 ("C:/Users/liziy/Developer/Papers & Thesis/ThesisNewBackup/Thesis_SenLi.tex"
@@ -1880,7 +1880,7 @@ se cal-i-bra-tion sys-tem is brought
 
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 12.
-<Figures/3DImagingBranchTree.png, id=169, 1136.74687pt x 556.32843pt>
+<Figures/3DImagingBranchTree.png, id=179, 1136.74687pt x 556.32843pt>
 File: Figures/3DImagingBranchTree.png Graphic file (type png)
 
 <use Figures/3DImagingBranchTree.png>
@@ -1940,7 +1940,7 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/PrimeSenseInfraredPattern.pdf): PD
 F inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<Figures/PrimeSenseInfraredPattern.pdf, id=184, 635.37375pt x 476.78125pt>
+<Figures/PrimeSenseInfraredPattern.pdf, id=194, 635.37375pt x 476.78125pt>
 File: Figures/PrimeSenseInfraredPattern.pdf Graphic file (type pdf)
 
 <use Figures/PrimeSenseInfraredPattern.pdf>
@@ -1961,7 +1961,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 52--56
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/SLPMPConfiguration.pdf): PDF inclu
 sion: found PDF version <1.6>, but at most version <1.5> allowed
-<Figures/SLPMPConfiguration.pdf, id=194, 1028.84375pt x 890.32625pt>
+<Figures/SLPMPConfiguration.pdf, id=204, 1028.84375pt x 890.32625pt>
 File: Figures/SLPMPConfiguration.pdf Graphic file (type pdf)
 
 <use Figures/SLPMPConfiguration.pdf>
@@ -1971,7 +1971,7 @@ Package pdftex.def Info: Figures/SLPMPConfiguration.pdf used on input line 65.
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/Pattern0.pdf): PDF inclusion: foun
 d PDF version <1.6>, but at most version <1.5> allowed
-<Figures/Pattern0.pdf, id=195, 256.96pt x 192.72pt>
+<Figures/Pattern0.pdf, id=205, 256.96pt x 192.72pt>
 File: Figures/Pattern0.pdf Graphic file (type pdf)
  <use Figures/Pattern0.pdf>
 Package pdftex.def Info: Figures/Pattern0.pdf used on input line 87.
@@ -1980,7 +1980,7 @@ Package pdftex.def Info: Figures/Pattern0.pdf used on input line 87.
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/Pattern1.pdf): PDF inclusion: foun
 d PDF version <1.6>, but at most version <1.5> allowed
-<Figures/Pattern1.pdf, id=196, 256.96pt x 192.72pt>
+<Figures/Pattern1.pdf, id=206, 256.96pt x 192.72pt>
 File: Figures/Pattern1.pdf Graphic file (type pdf)
  <use Figures/Pattern1.pdf>
 Package pdftex.def Info: Figures/Pattern1.pdf used on input line 90.
@@ -1989,7 +1989,7 @@ Package pdftex.def Info: Figures/Pattern1.pdf used on input line 90.
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/Pattern2.pdf): PDF inclusion: foun
 d PDF version <1.6>, but at most version <1.5> allowed
-<Figures/Pattern2.pdf, id=197, 256.96pt x 192.72pt>
+<Figures/Pattern2.pdf, id=207, 256.96pt x 192.72pt>
 File: Figures/Pattern2.pdf Graphic file (type pdf)
  <use Figures/Pattern2.pdf>
 Package pdftex.def Info: Figures/Pattern2.pdf used on input line 93.
@@ -1998,7 +1998,7 @@ Package pdftex.def Info: Figures/Pattern2.pdf used on input line 93.
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/Pattern3.pdf): PDF inclusion: foun
 d PDF version <1.6>, but at most version <1.5> allowed
-<Figures/Pattern3.pdf, id=198, 256.96pt x 192.72pt>
+<Figures/Pattern3.pdf, id=208, 256.96pt x 192.72pt>
 File: Figures/Pattern3.pdf Graphic file (type pdf)
  <use Figures/Pattern3.pdf>
 Package pdftex.def Info: Figures/Pattern3.pdf used on input line 97.
@@ -2029,7 +2029,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 251--254
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/timeOfFlight.pdf): PDF inclusion: 
 found PDF version <1.6>, but at most version <1.5> allowed
-<Figures/timeOfFlight.pdf, id=246, 494.84875pt x 368.37625pt>
+<Figures/timeOfFlight.pdf, id=256, 494.84875pt x 368.37625pt>
 File: Figures/timeOfFlight.pdf Graphic file (type pdf)
 
 <use Figures/timeOfFlight.pdf>
@@ -2046,7 +2046,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 277--277
  []
 
 [6 <./Figures/timeOfFlight.pdf>]
-<Figures/PinholeCameraModel.png, id=257, 1226.33156pt x 569.12625pt>
+<Figures/PinholeCameraModel.png, id=267, 1226.33156pt x 569.12625pt>
 File: Figures/PinholeCameraModel.png Graphic file (type png)
 
 <use Figures/PinholeCameraModel.png>
@@ -2068,7 +2068,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 375--377
 
  []
 
-[8] <Figures/NIR_by_Depth_front.png, id=279, 727.21687pt x 584.1825pt>
+[8] <Figures/NIR_by_Depth_front.png, id=289, 727.21687pt x 584.1825pt>
 File: Figures/NIR_by_Depth_front.png Graphic file (type png)
 
 <use Figures/NIR_by_Depth_front.png>
@@ -2076,7 +2076,7 @@ Package pdftex.def Info: Figures/NIR_by_Depth_front.png used on input line 419.
 
 (pdftex.def)             Requested size: 197.70494pt x 158.81686pt.
 
-<Figures/NIR_by_Depth_LeftSide.png, id=280, 447.17062pt x 767.11594pt>
+<Figures/NIR_by_Depth_LeftSide.png, id=290, 447.17062pt x 767.11594pt>
 File: Figures/NIR_by_Depth_LeftSide.png Graphic file (type png)
 
 <use Figures/NIR_by_Depth_LeftSide.png>
@@ -2114,7 +2114,7 @@ pdfTeX warning: pdflatex.EXE (file ./Figures/trackingModuleOnKinectV2Calibratio
 nSystem.pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5>
  allowed
 
-<Figures/trackingModuleOnKinectV2CalibrationSystem.pdf, id=293, 2457.18pt x 327
+<Figures/trackingModuleOnKinectV2CalibrationSystem.pdf, id=303, 2457.18pt x 327
 6.24pt>
 File: Figures/trackingModuleOnKinectV2CalibrationSystem.pdf Graphic file (type 
 pdf)
@@ -2190,14 +2190,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 39--41
 
  []
 
-<Figures/Raw_Single_NIR.png, id=321, 775.39688pt x 543.53062pt>
+<Figures/Raw_Single_NIR.png, id=331, 775.39688pt x 543.53062pt>
 File: Figures/Raw_Single_NIR.png Graphic file (type png)
 
 <use Figures/Raw_Single_NIR.png>
 Package pdftex.def Info: Figures/Raw_Single_NIR.png used on input line 50.
 (pdftex.def)             Requested size: 189.06853pt x 132.5317pt.
 
-<Figures/NIR_After_HistogramEqualization.png, id=322, 773.13844pt x 543.53062pt
+<Figures/NIR_After_HistogramEqualization.png, id=332, 773.13844pt x 543.53062pt
 >
 File: Figures/NIR_After_HistogramEqualization.png Graphic file (type png)
  <use Figures/NIR_After_HistogramEqualization.png>
@@ -2244,7 +2244,7 @@ Package pdftex.def Info: Figures/NIR_After_HistogramEqualization.png used on in
 put line 118.
 (pdftex.def)             Requested size: 189.06853pt x 132.91321pt.
 
-<Figures/Binarized_Single_NIR.png, id=342, 772.38562pt x 542.77782pt>
+<Figures/Binarized_Single_NIR.png, id=352, 772.38562pt x 542.77782pt>
 File: Figures/Binarized_Single_NIR.png Graphic file (type png)
 
 <use Figures/Binarized_Single_NIR.png>
@@ -2288,7 +2288,7 @@ Package pdftex.def Info: Figures/Binarized_Single_NIR.png used on input line 20
 4.
 (pdftex.def)             Requested size: 189.06853pt x 132.86163pt.
 
-<Figures/Dots_Extracted_Single_NIR.png, id=361, 770.88pt x 542.025pt>
+<Figures/Dots_Extracted_Single_NIR.png, id=371, 770.88pt x 542.025pt>
 File: Figures/Dots_Extracted_Single_NIR.png Graphic file (type png)
 
 <use Figures/Dots_Extracted_Single_NIR.png>
@@ -2340,7 +2340,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 243--251
 
  []
 
-[19] <Figures/Grid_Centered_Single_NIR.png, id=380, 772.38562pt x 541.27219pt>
+[19] <Figures/Grid_Centered_Single_NIR.png, id=390, 772.38562pt x 541.27219pt>
 File: Figures/Grid_Centered_Single_NIR.png Graphic file (type png)
 
 <use Figures/Grid_Centered_Single_NIR.png>
@@ -2348,7 +2348,7 @@ Package pdftex.def Info: Figures/Grid_Centered_Single_NIR.png used on input lin
 e 285.
 (pdftex.def)             Requested size: 204.18622pt x 160.7063pt.
 
-<Figures/XY_GridFitting_Matlab.png, id=381, 591.71063pt x 489.32813pt>
+<Figures/XY_GridFitting_Matlab.png, id=391, 591.71063pt x 489.32813pt>
 File: Figures/XY_GridFitting_Matlab.png Graphic file (type png)
 
 <use Figures/XY_GridFitting_Matlab.png>
@@ -2380,7 +2380,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 330--332
 
  []
 
-<Figures/Second_MatlabPrototype.png, id=399, 569.12625pt x 472.01344pt>
+<Figures/Second_MatlabPrototype.png, id=409, 569.12625pt x 472.01344pt>
 File: Figures/Second_MatlabPrototype.png Graphic file (type png)
 
 <use Figures/Second_MatlabPrototype.png>
@@ -2390,7 +2390,7 @@ Package pdftex.def Info: Figures/Second_MatlabPrototype.png used on input line
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 339.
 
-<Figures/Fourth_MatlabPrototype.png, id=400, 563.10374pt x 469.755pt>
+<Figures/Fourth_MatlabPrototype.png, id=410, 563.10374pt x 469.755pt>
 File: Figures/Fourth_MatlabPrototype.png Graphic file (type png)
 
 <use Figures/Fourth_MatlabPrototype.png>
@@ -2403,14 +2403,14 @@ Overfull \hbox (4.49454pt too wide) in paragraph at lines 335--345
  []
 
 
-<Figures/BeforeRectification_Single_NIR.png, id=401, 789.70032pt x 618.81187pt>
+<Figures/BeforeRectification_Single_NIR.png, id=411, 783.67781pt x 616.55344pt>
 File: Figures/BeforeRectification_Single_NIR.png Graphic file (type png)
 <use Figures/BeforeRectification_Single_NIR.png>
 Package pdftex.def Info: Figures/BeforeRectification_Single_NIR.png used on inp
 ut line 357.
-(pdftex.def)             Requested size: 189.062pt x 160.70789pt.
+(pdftex.def)             Requested size: 189.06706pt x 160.70464pt.
 
-<Figures/Perspective_QtScreenShot.png, id=402, 653.44125pt x 539.01375pt>
+<Figures/Perspective_QtScreenShot.png, id=412, 653.44125pt x 539.01375pt>
 File: Figures/Perspective_QtScreenShot.png Graphic file (type png)
 
 <use Figures/Perspective_QtScreenShot.png>
@@ -2418,11 +2418,11 @@ Package pdftex.def Info: Figures/Perspective_QtScreenShot.png used on input lin
 e 361.
 (pdftex.def)             Requested size: 189.06436pt x 160.71017pt.
 
-Overfull \hbox (4.48384pt too wide) in paragraph at lines 354--363
+Overfull \hbox (4.4889pt too wide) in paragraph at lines 354--363
  []|  [][][][] 
  []
 
-<Figures/Second_QtScreenShot.png, id=403, 688.82344pt x 569.12625pt>
+<Figures/Second_QtScreenShot.png, id=413, 688.82344pt x 569.12625pt>
 File: Figures/Second_QtScreenShot.png Graphic file (type png)
 
 <use Figures/Second_QtScreenShot.png>
@@ -2430,7 +2430,7 @@ Package pdftex.def Info: Figures/Second_QtScreenShot.png used on input line 367
 .
 (pdftex.def)             Requested size: 189.0644pt x 160.70898pt.
 
-<Figures/Fourth_QtScreenShot.png, id=404, 720.44156pt x 592.46344pt>
+<Figures/Fourth_QtScreenShot.png, id=414, 720.44156pt x 592.46344pt>
 File: Figures/Fourth_QtScreenShot.png Graphic file (type png)
 
 <use Figures/Fourth_QtScreenShot.png>
@@ -2471,7 +2471,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `superscript' on input line 386.
 
-<Figures/OneFrameXYZ_Rectified.png, id=429, 855.195pt x 705.38531pt>
+<Figures/OneFrameXYZ_Rectified.png, id=439, 855.195pt x 705.38531pt>
 File: Figures/OneFrameXYZ_Rectified.png Graphic file (type png)
 
 <use Figures/OneFrameXYZ_Rectified.png>
@@ -2485,7 +2485,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 388--400
 
 [22 <./Figures/BeforeRectification_Single_NIR.png> <./Figures/Perspective_QtScr
 eenShot.png> <./Figures/Second_QtScreenShot.png> <./Figures/Fourth_QtScreenShot
-.png>] <Figures/ZD_CurveFitting.png, id=436, 740.0147pt x 324.46219pt>
+.png>] <Figures/ZD_CurveFitting.png, id=446, 740.0147pt x 324.46219pt>
 File: Figures/ZD_CurveFitting.png Graphic file (type png)
 
 <use Figures/ZD_CurveFitting.png>
@@ -2516,7 +2516,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 424.
 
-<Figures/Data63FranesForLUT.png, id=445, 682.80093pt x 703.87968pt>
+<Figures/Data63FranesForLUT.png, id=455, 682.80093pt x 703.87968pt>
 File: Figures/Data63FranesForLUT.png Graphic file (type png)
 
 <use Figures/Data63FranesForLUT.png>
@@ -2529,7 +2529,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 425--436
  []
 
 [24 <./Figures/ZD_CurveFitting.png> <./Figures/Data63FranesForLUT.png>]
-<Figures/SampleBeams_NearIR.png, id=454, 603.75563pt x 398.99063pt>
+<Figures/SampleBeams_NearIR.png, id=464, 603.75563pt x 398.99063pt>
 File: Figures/SampleBeams_NearIR.png Graphic file (type png)
 
 <use Figures/SampleBeams_NearIR.png>
@@ -2542,21 +2542,32 @@ Underfull \hbox (badness 10000) in paragraph at lines 445--460
  []
 
 
-Overfull \hbox (1.81654pt too wide) in paragraph at lines 465--465
+Underfull \hbox (badness 10000) in paragraph at lines 463--469
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 463--469
+
+ []
+
+[25 <./Figures/SampleBeams_NearIR.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 471--478
+
+ []
+
+
+Overfull \hbox (1.81654pt too wide) in paragraph at lines 478--478
 []\T1/ptm/b/n/14.4 3D Re-con-struc-tion dif-fer-ences for Prime-Sense, KinectV2
 ,
  []
 
-) [25 <./Figures/SampleBeams_NearIR.png>]
+) [26]
 \openout2 = `Chapters/Chapter3.aux'.
 
- (Chapters/Chapter3.tex [26
-
-
-
-]
+ (Chapters/Chapter3.tex
 Chapter 3.
-<Figures/cameraFieldOfView.png, id=470, 364.36125pt x 218.31563pt>
+<Figures/cameraFieldOfView.png, id=484, 364.36125pt x 218.31563pt>
 File: Figures/cameraFieldOfView.png Graphic file (type png)
 
 <use Figures/cameraFieldOfView.png>
@@ -2564,13 +2575,17 @@ Package pdftex.def Info: Figures/cameraFieldOfView.png used on input line 14.
 (pdftex.def)             Requested size: 378.13707pt x 226.57983pt.
 
 1: section
-[27 <./Figures/cameraFieldOfView.png>]
+[27
+
+
+
+ <./Figures/cameraFieldOfView.png>]
 
 pdfTeX warning: pdflatex.EXE (file ./Figures/MountedTrackingModuleObservingRail
 .pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowe
 d
 
-<Figures/MountedTrackingModuleObservingRail.pdf, id=478, 3276.24pt x 2457.18pt>
+<Figures/MountedTrackingModuleObservingRail.pdf, id=492, 3276.24pt x 2457.18pt>
 File: Figures/MountedTrackingModuleObservingRail.pdf Graphic file (type pdf)
 <use Figures/MountedTrackingModuleObservingRail.pdf>
 Package pdftex.def Info: Figures/MountedTrackingModuleObservingRail.pdf used on
@@ -2594,7 +2609,7 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 136.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 136.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 136.
 Package rerunfilecheck Info: File `Thesis_SenLi.out' has not changed.
-(rerunfilecheck)             Checksum: 7D4691999EEC156A7D7830465B758A2C;5660.
+(rerunfilecheck)             Checksum: 37A10465EF4521CEE67BDDF324E65A17;6122.
 
 
 LaTeX Warning: There were multiply-defined labels.
@@ -2604,10 +2619,10 @@ Package logreq Info: Writing requests to 'Thesis_SenLi.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 32999 strings out of 493634
- 664159 string characters out of 3141314
+ 33003 strings out of 493634
+ 664219 string characters out of 3141314
  844743 words of memory out of 3000000
- 35822 multiletter control sequences out of 15000+200000
+ 35824 multiletter control sequences out of 15000+200000
  123951 words of font info for 190 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
  57i,22n,81p,10444b,1774s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -2622,9 +2637,9 @@ eX 2.9/fonts/type1/urw/symbol/usyr.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts
 /type1/urw/times/utmb8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/
 times/utmr8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmr8
 a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Thesis_SenLi.pdf (32 pages, 5318798 bytes).
+Output written on Thesis_SenLi.pdf (32 pages, 5308634 bytes).
 PDF statistics:
- 555 PDF objects out of 1000 (max. 8388607)
- 138 named destinations out of 1000 (max. 500000)
- 375 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 570 PDF objects out of 1000 (max. 8388607)
+ 140 named destinations out of 1000 (max. 500000)
+ 391 words of extra memory for PDF output out of 10000 (max. 10000000)
 
