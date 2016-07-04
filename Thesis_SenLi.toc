@@ -25,9 +25,12 @@
 \contentsline {section}{\numberline {2.4}Real-Time analysis}{25}{section.97}
 \contentsline {subsection}{\numberline {2.4.1}Real-Time in Rectification}{25}{subsection.98}
 \contentsline {subsection}{\numberline {2.4.2}Real-Time Observing after Rectification}{26}{subsection.99}
-\contentsline {section}{\numberline {2.5}3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}{26}{section.100}
-\contentsline {chapter}{\numberline {3}Calibration System for RGBD Cameras}{27}{chapter.101}
-\contentsline {section}{\numberline {3.1}Rail System}{27}{section.102}
-\contentsline {section}{\numberline {3.2}BLE Optical-Flow Tracking Module}{28}{section.105}
-\contentsline {subsection}{\numberline {3.2.1}Optical-Flow Sensor for Z Tracking}{28}{subsection.106}
-\contentsline {subsection}{\numberline {3.2.2}Bluetooth Low Energy for wireless communication}{28}{subsection.107}
+\contentsline {chapter}{\numberline {3}Calibration System for RGBD Cameras}{27}{chapter.100}
+\contentsline {section}{\numberline {3.1}Rail System}{27}{section.101}
+\contentsline {section}{\numberline {3.2}BLE Optical-Flow Tracking Module}{28}{section.104}
+\contentsline {subsection}{\numberline {3.2.1}Optical-Flow Sensor for Z Tracking}{28}{subsection.105}
+\contentsline {subsubsection}{Optical-Flow Motion Determination}{29}{section*.106}
+\contentsline {subsubsection}{Accumulated \(Z^w\)-axis data calibration}{29}{section*.109}
+\contentsline {subsection}{\numberline {3.2.2}Bluetooth Low Energy for wireless communication}{30}{subsection.111}
+\contentsline {subsubsection}{BLE Programming based on Protocol}{31}{section*.113}
+\contentsline {subsection}{\numberline {3.2.3}PCB Joint, Power Supply and Illumination}{32}{subsection.115}
