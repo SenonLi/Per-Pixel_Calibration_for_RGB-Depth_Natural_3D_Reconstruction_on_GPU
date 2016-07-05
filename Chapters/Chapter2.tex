@@ -294,6 +294,7 @@ Eventually, the refined transformation matrix eventually generates a list of wor
 %
 %
 \subsection{High Order Polynomial Surface Mapping}
+\label{sectionHighOrderPolynomialSurfaceMapping}
 %
 Using four squared-shape distributed dots, the 3x3 transformation matrix can help to find the integer value list of  world coordinate \(X^w\)/\(Y^w\). Further with all extracted dots' coordinate-pairs, a perspective distortion correction (\(1^{st}\) order polynomial with \(z\) bound) could be applied using equation \ref{perspectiveDistortionCorrectionEquation}. As shown in figure \ref{Perspective_QtScreenShot}, the \(1^{st}\) order polynomial correction is not able to handle non-linear distorted mapping. Based on the lens distortion equation \ref{lensDistortion}, a higher order two-dimensional polynomial transformation matrix is needed for both of \(x\) and \(y\) rectification. Considering that the parameters in that equation, which means a surface mapping polynomial function, with power level larger than four are practically negligible, both of the second order and fourth order polynomial mapping are discussed below (prototyped in Matlab and realized in real-time image plane rectification).\\\\%
 %

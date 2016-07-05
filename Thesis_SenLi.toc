@@ -34,3 +34,6 @@
 \contentsline {subsection}{\numberline {3.2.2}Bluetooth Low Energy for wireless communication}{30}{subsection.111}
 \contentsline {subsubsection}{BLE Programming based on Protocol}{31}{section*.113}
 \contentsline {subsection}{\numberline {3.2.3}PCB Joint, Power Supply and Illumination}{32}{subsection.115}
+\contentsline {chapter}{\numberline {4}Conclusion and Future Work}{33}{chapter.120}
+\contentsline {section}{\numberline {4.1}Conclusion}{33}{section.121}
+\contentsline {section}{\numberline {4.2}Future Work}{34}{section.122}
