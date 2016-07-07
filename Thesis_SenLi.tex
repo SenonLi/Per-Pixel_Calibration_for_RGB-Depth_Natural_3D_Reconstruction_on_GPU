@@ -1,122 +1,102 @@
-\documentclass[letterpaper, 11pt, english, twoside]{MastersDoctoralThesis}
+\documentclass[final]{ukthesis}
+%you must include these 2 packages.
+\usepackage[pdfauthor={Sen Li},
+            pdftitle={Universal Real-Time XYZ rectified Reconstruction for RGB-D Cameras},
+            pdfsubject={3D Camera Calibration},
+            pdfkeywords={3D Reconstruction; Camera Calibration; RGBD; Image Processing},
+            pdfproducer={Latex with hyperref},
+            pdfcreator={latex->dvips->ps2pdf},
+            pdfpagemode=UseOutlines,
+            bookmarksopen=true,
+            letterpaper,
+		hidelinks,
+            bookmarksnumbered=true]{hyperref}
+\usepackage{memhfixc}
 
-\usepackage[utf8]{inputenc} % Required for inputting international characters
-\usepackage[T1]{fontenc} % Output font encoding for international characters
-
-%\usepackage{palatino} % Use the Palatino font by default
 \usepackage{mathptmx}% http://ctan.org/pkg/mathptmx
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[lofdepth,lotdepth]{subfig}
-%\usepackage{times}
 \usepackage{textcomp}
 \usepackage{amssymb}
 \usepackage{caption}
 \usepackage{float}
-%\usepackage{subcaption}
-
-\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
-
-\addbibresource{SenResource.bib} % The filename of the bibliography
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+\graphicspath{{Figures/}{./}} % Specifies where to look for included images
 
-%----------------------------------------------------------------------------------------
-%	MARGIN SETTINGS
-%----------------------------------------------------------------------------------------
-
-\geometry{
-	paper=letterpaper, % Change to letterpaper for US letter
-	inner=2.5cm, % Inner margin
-	outer=3.8cm, % Outer margin
-	bindingoffset=2cm, % Binding offset
-	top=1.5cm, % Top margin
-	bottom=1.5cm, % Bottom margin
-	%showframe,% show how the type block is set on the page
-}
-
-%----------------------------------------------------------------------------------------
-%	THESIS INFORMATION
-%----------------------------------------------------------------------------------------
-
-\thesistitle{Universal Real-Time XYZ rectified Reconstruction for RGB-D Cameras}
-\university{\href{http://www.uky.edu}{University of Kentucky}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
-\author{Sen Li} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
-\supervisor{Daniel L. Lau} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
+\usepackage{setspace} 
 
 
+%\usepackage{amsxtra}     % Use various AMS packages
+%\usepackage{amssymb}
+%\usepackage{amsfonts}
+%\usepackage{graphicx}    % Add some packages for figures. Read epslatex.pdf on ctan.tug.org
+%\usepackage{rotating}
+%\usepackage{color}
+%\usepackage{epsfig}
+%\usepackage{verbatim}
+%\usepackage{natbib}      % Allows you to use BibTeX
+%\usepackage[printonlyused]{acronym} 
 
-
-
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
-\pagestyle{plain} % Default to the plain heading style until the thesis style is called for the body content
+%author data  Electrical Engineering
+\author{Sen Li}
+\title{Universal Real-Time XYZ rectified Reconstruction\\ for RGB-D Cameras}
+\abstract{%
+Ever since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D
+sensing technology as the core depth determination principle for its first generation,
+great interest has been invigorated into RGB-D sensors. However, there has not been a systematic solution to combine both of 3D reconstruction and the radial dominated lens distortions correction. What is worse, the traditional pinhole-camera-model based 3D camera calibration method does not consider the depth distortion. In this thesis, a data-based look-up table software calibration method is proposed to do real-time rectified 3D reconstruction for universal RGB-D cameras. High-order polynomial surface mapping is employed for non-linear distortion correction, and an individual Bluetooth Low Energy Optical-Flow tracking module is introduced for external \(Z^w\) value support.
+}
+\advisor{Dr. Daniel L. Lau}
+\keywords{3D Reconstruction; Camera Calibration; RGBD; Image Processing}
+\dgs{Dr. Caicheng Lu}
 
 
-%----------------------------------------------------------------------------------------
-%	TITLE PAGE
-%----------------------------------------------------------------------------------------
-
-\begin{titlepage}
-\begin{center}
-
-{\scshape\LARGE \univname\par}\vspace{1.5cm} % University name
-\textsc{\Large Master Thesis}\\[0.5cm] % Thesis type
-
-\HRule \\[0.4cm] % Horizontal line
-{\huge \bfseries \ttitle\par}\vspace{0.4cm} % Thesis title
-\HRule \\[1.5cm] % Horizontal line
- 
-\begin{minipage}[t]{0.4\textwidth}
-\begin{flushleft} \large
-\emph{Author:}\\
-\href{https://www.linkedin.com/in/sensprouting}{\authorname} % Author name - remove the \href bracket to remove the link
-\end{flushleft}
-\end{minipage}
-\begin{minipage}[t]{0.4\textwidth}
-\begin{flushright} \large
-\emph{Supervisor:} \\
-\href{http://drhalftone.com/}{\supname} % Supervisor name - remove the \href bracket to remove the link  
-\end{flushright}
-\end{minipage}\\[3cm]
- 
- 
-{\large \today}\\[4cm] % Date
-%\includegraphics{Logo} % University/department logo - uncomment to place it
- 
-\vfill
-\end{center}
-\end{titlepage}
+%the title pages
+\frontmatter
+\maketitle
+%\begin{acknowledgments}
+%Acknowledge people/things here
+%\end{acknowledgments}
+%\begin{dedication}
+%Dedicated to things (optional)
+%\end{dedication}
 
 
+\tableofcontents\clearpage
+\listoffigures\clearpage
+\listoftables\clearpage
 
-\tableofcontents
-%\listoffigures
 
+%----------------------------------------------
+\mainmatter
+
+
+\input{Chapters/Chapter1}
+\copyrightnotice
+\input{Chapters/Chapter2}
+\copyrightnotice
+\input{Chapters/Chapter3} 
+\copyrightnotice
+\input{Chapters/Chapter4}
+\copyrightnotice
 
 
 
+\cite{paper} \cite{einstein}
+
+\backmatter
 
 
+% \begin{singlespace} % Bibliography must be single spaced
+\bibliographystyle{plain}    % Set the bibliography style. agu04, plain, alpha, etc.
+\bibliography{SenResource}
+% \end{singlespace}
 
-%----------------------------------------------------------------------------------------
-%	THESIS CONTENT - CHAPTERS
-%----------------------------------------------------------------------------------------
-
-\mainmatter % Begin numeric (1,2,3...) page numbering
-
-\pagestyle{thesis} % Return the page headers back to the "thesis" style
-
-% Include the chapters of the thesis as separate files from the Chapters folder
-% Uncomment the lines as you write the chapters
-
-\include{Chapters/Chapter1}
-\include{Chapters/Chapter2} 
-\include{Chapters/Chapter3}
-\include{Chapters/Chapter4} 
-%\include{Chapters/Chapter5} 
+%\chapter{Vita}
+%A brief vita goes here.
 
 
 
@@ -129,9 +109,14 @@
 
 
 
+\end{document}
 
 
 
 
 
-\end{document}  
+
+
+
+
+
