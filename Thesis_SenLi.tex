@@ -22,11 +22,14 @@
 \usepackage{caption}
 \usepackage{float}
 
+\DisemulatePackage{setspace}
+\usepackage{setspace}
+
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 \graphicspath{{Figures/}{./}} % Specifies where to look for included images
 
-\usepackage{setspace} 
-
+\usepackage{multirow}
+\usepackage{makecell}
 
 %\usepackage{amsxtra}     % Use various AMS packages
 %\usepackage{amssymb}
@@ -56,7 +59,9 @@ great interest has been invigorated into RGB-D sensors. However, there has not b
 
 %the title pages
 \frontmatter
-\maketitle
+%\maketitle
+
+
 %\begin{acknowledgments}
 %Acknowledge people/things here
 %\end{acknowledgments}
@@ -73,15 +78,17 @@ great interest has been invigorated into RGB-D sensors. However, there has not b
 %----------------------------------------------
 \mainmatter
 
+\onehalfspacing
 
 \input{Chapters/Chapter1}
 \copyrightnotice
-\input{Chapters/Chapter2}
-\copyrightnotice
-\input{Chapters/Chapter3} 
-\copyrightnotice
-\input{Chapters/Chapter4}
-\copyrightnotice
+%\input{Chapters/Chapter2}
+%\copyrightnotice
+%\input{Chapters/Chapter3} 
+%\copyrightnotice
+%
+%\input{Chapters/Chapter4}
+%\copyrightnotice
 
 
 
@@ -89,11 +96,11 @@ great interest has been invigorated into RGB-D sensors. However, there has not b
 
 \backmatter
 
-
-% \begin{singlespace} % Bibliography must be single spaced
+\onehalfspacing
+%\begin{singlespace} % Bibliography must be single spaced
 \bibliographystyle{plain}    % Set the bibliography style. agu04, plain, alpha, etc.
 \bibliography{SenResource}
-% \end{singlespace}
+%\end{singlespace}
 
 %\chapter{Vita}
 %A brief vita goes here.

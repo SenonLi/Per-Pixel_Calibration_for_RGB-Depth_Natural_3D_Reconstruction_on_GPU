@@ -1,7 +1,7 @@
 % Chapter 1
 \chapter{Introduction} % Main chapter title
 \label{sens_introduction} % For referencing the chapter elsewhere, use \ref{sens_introduction} 
-3D reconstruction aims to reproduce the 3D profile of real objects as accurate as possible, which require accurate world \(X\)/\(Y\)/\(Z\) (noted as \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\)  henceforth) coordinate values in three dimensional space for every single point of a profile. Ever since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D sensing technology as the core depth determination principle for its first generation, great interest has been invigorated into RGB-D sensors. Camera calibration is a necessary part in 3D reconstruction in order to extract metric information from 3D images, i.e., to determine a translation from \(Z^{w}\) to \(X^{w}\)/\(Y^{w}\)  for every pixel based on its row and column. In the mean time, optical and perspective distortion become a problem that stops from getting a good view. On most wide angle prime lenses and many zoom lenses with relatively short focal lengths,  especially cheap low quality lenses, barrel distortion would typically be present.
+3D reconstruction aims to reproduce the 3D profile of real objects as accurate as possible, which require accurate world coordinate \(X\)/\(Y\)/\(Z\) (noted as \(X^{w}\)/\(Y^{w}\)/\(Z^{w}\)  henceforth) values in three dimensional space for every single point of a profile. Ever since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D sensing technology as the core depth determination principle for its first generation, great interest has been invigorated into RGB-D sensors. Camera calibration is a necessary part in 3D reconstruction in order to extract metric information from 3D images, i.e., to determine a translation from \(Z^{w}\) to \(X^{w}\)/\(Y^{w}\)  for every pixel based on its row and column. In the mean time, optical and perspective distortion become a problem that stops from getting a good view. On most wide angle prime lenses and many zoom lenses with relatively short focal lengths,  especially cheap low quality lenses, barrel distortion would typically be present.
 \\
 \\In this research, a more accurate novel method with precise calibration system is brought in for real-time rectification and 3D reconstruction of universal RGB-D cameras. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -11,19 +11,59 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{3D Reconstruction}
 %
-\begin{figure}[h]
-\centering
-\includegraphics[width=\textwidth]{3DImagingBranchTree}
+\begin{table}[ht]
+\begin{center}
 \caption{ 3D profile acquisition Taxonomy}
 \label{3DImagingTaxonomy}
-\end{figure}%
-\par%
-Three dimensional (3D) profile measurement technologies have been developed by various means, as summarized by Curless and Seitz \cite{Reference1}, % B. Curless and S. Seitz, \3d photography," ACM Siggraph '00 Course Notes, Course No. 19 (2000).
+\hspace*{-1cm}
+\begin{tabular}{ |>{\small}l|>{\small}l|>{\small}l|>{\small}l| }
+\hline
+\multicolumn{4}{|c|}{3D Shape Extraction} \\
+\hline
+\multicolumn{2}{|c|}{Passive}  & \multicolumn{2}{c|}{Active}\\
+\hline
+Single Vantage Point & Multiple Vantage Points & Single Vantage Point & Multiple Vantage Points\\
+\hline
+\multirow{5}{*}{
+\makecell[l]{
+\textbullet \, Shape from Texture\\ 
+\textbullet \, Shape from Occlusion\\
+\textbullet \, Time to Contact\\
+\textbullet \, Shape from Defocus\\
+\textbullet \, Shape from Contour}
+} 
+&
+\multirow{5}{*}{\makecell[l]{
+\textbullet \, Passive Stereo\\ 
+\textbullet \, Structure from Motion\\
+\textbullet \, Shape from Silhouettes}
+}
+&
+\multirow{5}{*}{\makecell[l]{
+\textbullet \, Time of Flight\\ 
+\textbullet \, Shape from Shading}
+} 
+&
+\multirow{5}{*}{\makecell[l]{
+\textbullet \, Structured Light\\ 
+\textbullet \, Active Stereo\\
+\textbullet \, Photometric Stereo}
+} \\ & & &
+\\ & & &	\\ & & &	\\ & & &\\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+%
+\noindent
+Three dimensional (3D) profile measurement technologies have been developed by various means, as summarized by Curless and Seitz \cite{Reconstruction10}, % B. Curless and S. Seitz, \3d photography," ACM Siggraph '00 Course Notes, Course No. 19 (2000).
 among which the non-contact optical methods are widely applied into reality as consumer RGB-D camera. Traditionally, with Pinhole camera model, as the basics of camera calibration, to supply the translation from \(Z^{w}\)  to \(X^{w}\)/\(Y^{w}\) , the core procedure of 3D Reconstruction falls on the determination of per-pixel depth to serve as \(Z^{w}\) .\par%
 %
 Within the non-contact optical category, as well as 3D reconstruction using multiple images, there are two levels of distinctions[2],
 % 3D Reconstruction from Multiple Images.pdf
- as shown in the 3D profile acquisition taxonomy diagram is given in Figure \ref{3DImagingTaxonomy}.
+ as shown in the 3D profile acquisition taxonomy diagram is given in table \ref{3DImagingTaxonomy}.
  %
  \\\\The first distinction: active methods and passive methods. Their classifications are decided by the control of light sources. Active methods need special light sources control as part of the strategy to get 3D information, while on the other hand, passive techniques could work with whichever reasonable available ambient light. With a special known illumination offering more information to simplify some of the steps for 3D information acquiring process, active methods tend to be computationally less demanding. Both of the famous consumer PrimeSense and KinectV2 3D cameras, which are calibrated by the new proposed approach, are using active methods.
 \\\\The second distinction: single-vantage points methods and multi-vantage points methods. The second distinction is determined by the number of vantage points. With a single vantage system, reconstruction is done based on single view point. In the case that there are multiple viewing or illumination components, all of them would be positioned very close to each other so that they could ideally coincide. For multi-vantage points methods, several viewpoints, with possible controlled illumination source positions, are involved. As contrast with the single-vantage points methods, the multi-vantage systems need the different components to be positioned far enough from each other. 
