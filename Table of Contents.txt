@@ -1,47 +1,57 @@
-Chapter 1: Introduction
+Remove any and all references to Seikowave.  Also, remove equations from Chapter 1.  Same them for Chapter 2.  Create a new chapter 2 and introduce the pin hole camera model and the equations from Kai’s dual-frequency paper.  From there, explain how the pin hole camera model doesn’t account for radial distortion.  And then explain how you want to insert a calibration based on measuring targets and introduce the polynomial fitting.  Also introduce the idea of using a polynomial to map from phase to Z instead of the (ep+f)/(g+h) equation.  Don’t describe the system for data collection, push that to Chapter 3.    So in Chapter 3 describe the system you built for collecting data.
+
+Also as you write, don’t use single paragraph sections and subsections.  Tell a story with a smooth transition from paragraph to paragraph.  Use sections and subsections sparingly.  Also, don’t divid a section into subsections unless you have at least three subsections.
+
+
+
+Just write the introduction to say what Kai did and how we intend to modify it to include radial distortion.  After that, we will explain how we will extend his process with our radial distortion to all RGB+D sensors, not just structured light scanners.
+
+
+
+Chapter 1 Introduction
 1.1 3D Reconstruction
-
-Optical -> from row and column to Xw/Yw (Camera Calibration)
-core: Ways to determine Depth as Zw
-
-1.2 Traditional RGB-D camera Rectification (specially with cheap low quality lenses)
-
-a.Find the translation from Zw to Xw/Yw (pinhole camera model + radial distortion)
-b.Depth Rectification
-
-1.3 Contributions of this thesis (abandon pinhole camera model)
-	****  Real-Time Analysis  ******
-	****  high order **********
-	****  accurate calibration system *******
+1.2 Structured Light (SL) 3D Scanner Calibration
+ (include 2D (pinhole perspective distortion + lens distortion) and 3D (abcd beams equation))
+	Kai's real-time 3D reconstruction.
+1.3 Contributions of this thesis
 1.4 Summation
 
-Real-time XYZ recified Reconstruction
+Chapter2: SL Camera Calibration based on Pinhole Model
+2.1 PinHole Camera Model (not able to handle non-linear distortion)
+2.2 3D Reconstruction in Real-Time (Kai's calculation)
+2.3 Shortcoming and Extensions (Systems Transformation)
 
-Chapter 2: Wold XYZ Rectification ( on PrimeSense, KinectV2, and Prosilica )all of equations
-2.1 From Depth to Z-coordinate
-2.2 From Z to X/Y
-2.3 3D Reconstructions for PrimeSense, KinectV2, and Prosilica
-2.4 Mathematical tools
-2.4.1 singular value decomposition
-2.4.2 least square solution with pseudo-inverse method
+Chapter 3 Data-Based Real-Time 3D Calibration 
+3.1 Xw/Yw Rectifications
+3.2 Zw Rectification
+3.3 Data-Based XYZWRGB-D Look-Up Table
+3.4 Real-Time analysis
 
+Chapter 4 Calibration System for RGBD Cameras
+4.1 Rail System
+4.2 BLE Optical-Flow Tracking Module
 
-X= ExZ + Fx
-Y= EyZ + Fy
-with what we are doing)
-
-
-Chpater 3: System for RGBD Camera Calibration(experiment, collecting data)
-2.1 Rail System
-2.2 Round Grid for Radial X/Y Distortion Correction
-2.3 Optical-Flow Sensor for Z Tracking
-2.4 Bluetooth Low Energy for wireless communication
-
-Chapter 4: results for 3 types of RGB-D cameras.
-Chapter 5: conclusion
+Chapter 5 Conclusion and Future Work
+5.1 Conclusion
+5.2 Future Work
 
 
-Talor polinomial for continous function data.
+
+
+
+
+
+In the matlab script, what you call D is called P. You probably don’t need lines 32-36.  You also don’t need lines 40-42. Line 45 creates the LUT.  Lines 47-56 rebuilds Z from D so that you can see how good your LUT is by comparing Zp and Z.  Lines 58-72 saves the LUT to disk as a .tif file. If you resync to the github repository, you will see that I modified my software to use this LUT file format regardless of the sensor.  I still need to modify the Kinect shader though.
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -30,6 +30,7 @@
 
 \usepackage{multirow}
 \usepackage{makecell}
+\usepackage{varwidth}
 
 %\usepackage{amsxtra}     % Use various AMS packages
 %\usepackage{amssymb}
@@ -46,11 +47,11 @@
 \begin{document}
 %author data  Electrical Engineering
 \author{Sen Li}
-\title{Universal Real-Time XYZ rectified Reconstruction\\ for RGB-D Cameras}
+\title{Universal Real-Time XYZ Calibrated Reconstruction\\ for RGB-D Cameras}
 \abstract{%
 Ever since the Kinect brought low-cost depth cameras into consumer market, with PrimeSense 3D
 sensing technology as the core depth determination principle for its first generation,
-great interest has been invigorated into RGB-D sensors. However, there has not been a systematic solution to combine both of 3D reconstruction and the radial dominated lens distortions correction. What is worse, the traditional pinhole-camera-model based 3D camera calibration method does not consider the depth distortion. In this thesis, a data-based look-up table software calibration method is proposed to do real-time rectified 3D reconstruction for universal RGB-D cameras. High-order polynomial surface mapping is employed for non-linear distortion correction, and an individual Bluetooth Low Energy Optical-Flow tracking module is introduced for external \(Z^w\) value support.
+great interest has been invigorated into RGB-D sensors. However, there has not been a systematic solution to combine both of 3D reconstruction and the radial dominated lens distortions correction. What is worse, the traditional pinhole-camera-model based 3D camera calibration method does not consider the depth distortion. In this thesis, a data-based look-up table software calibration method is proposed to do real-time rectified 3D reconstruction for universal RGB-D cameras. The idea is inspired and extended from a structured light real-time 3D reconstruction system. A transition from pinhole-camera calibration model to data-based lens distortion-removed calibration model is analyzed. High-order polynomial surface mapping is employed for non-linear distortion correction, and an individual Bluetooth Low Energy Optical-Flow tracking module is introduced for external \(Z^w\) value support.
 }
 \advisor{Dr. Daniel L. Lau}
 \keywords{3D Reconstruction; Camera Calibration; RGBD; Image Processing}
@@ -80,19 +81,20 @@ great interest has been invigorated into RGB-D sensors. However, there has not b
 
 \onehalfspacing
 
-\input{Chapters/Chapter1}
+\input{Chapters/01_Introduction}
 \copyrightnotice
-%\input{Chapters/Chapter2}
-%\copyrightnotice
-%\input{Chapters/Chapter3} 
-%\copyrightnotice
-%
-%\input{Chapters/Chapter4}
-%\copyrightnotice
+\input{Chapters/02_PinHoleCameraStructuredLight}
+\copyrightnotice
+\input{Chapters/03_HighOrderPolynomial_LUT}
+\copyrightnotice
+\input{Chapters/04_CalibrationSystemBLE_OF} 
+\copyrightnotice
+\input{Chapters/05_ConclusionAndFutureWork}
+\copyrightnotice
 
 
 
-\cite{paper} \cite{einstein}
+\cite{paper}
 
 \backmatter
 
