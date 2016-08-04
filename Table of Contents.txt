@@ -1,14 +1,16 @@
-Remove any and all references to Seikowave.  Also, remove equations from Chapter 1.  Same them for Chapter 2.  Create a new chapter 2 and introduce the pin hole camera model and the equations from Kai’s dual-frequency paper.  From there, explain how the pin hole camera model doesn’t account for radial distortion.  And then explain how you want to insert a calibration based on measuring targets and introduce the polynomial fitting.  Also introduce the idea of using a polynomial to map from phase to Z instead of the (ep+f)/(g+h) equation.  Don’t describe the system for data collection, push that to Chapter 3.    So in Chapter 3 describe the system you built for collecting data.
-
-Also as you write, don’t use single paragraph sections and subsections.  Tell a story with a smooth transition from paragraph to paragraph.  Use sections and subsections sparingly.  Also, don’t divid a section into subsections unless you have at least three subsections.
 
 
+You focus on getting X and Y from Z, but you don’t mention the issues with getting D.  The point is that while these RGB+D systems work great for human-computer interaction, they aren’t the best at doing 3-D scanning of objects for applications in metrology.  Say something about the rise in 3D printing and the market for building 3D models from fused scans acquired by the sensor.  So for these 3D scanning objects, we want to use low-cost cameras, but their built in calibration just isn’t great.  At the same time, there are a lot of similarities in how these sensors work compared to structured light scanners.  So can we learn anything from the calibration procedure of Kai?  Is there anything we can do to Kai’s work to make that better and also apply it to off-the-shelf RGB+D sensors like the Prime Sense and the Kinect?
 
-Just write the introduction to say what Kai did and how we intend to modify it to include radial distortion.  After that, we will explain how we will extend his process with our radial distortion to all RGB+D sensors, not just structured light scanners.
 
-
+Lens distortion calibration does not cover corners, where offers the most distortion info
 
 Chapter 1 Introduction
+** Depth Camera Application (human-computer interaction)
+** 3D reconstruction
+** Structured Light Illumination
+** Calibration
+
 1.1 3D Reconstruction
 1.2 Structured Light (SL) 3D Scanner Calibration
  (include 2D (pinhole perspective distortion + lens distortion) and 3D (abcd beams equation))
@@ -16,7 +18,7 @@ Chapter 1 Introduction
 1.3 Contributions of this thesis
 1.4 Summation
 
-Chapter2: SL Camera Calibration based on Pinhole Model
+Chapter2: From Structured Light to 3D Scanner Calibration based on Pinhole Model
 2.1 PinHole Camera Model (not able to handle non-linear distortion)
 2.2 3D Reconstruction in Real-Time (Kai's calculation)
 2.3 Shortcoming and Extensions (Systems Transformation)
@@ -34,6 +36,7 @@ Chapter 4 Calibration System for RGBD Cameras
 Chapter 5 Conclusion and Future Work
 5.1 Conclusion
 5.2 Future Work
+alignment from a random depth sensor to a random RGB sensor.
 
 
 
