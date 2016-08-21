@@ -21,6 +21,7 @@
 Most of those defects in the methods discussed above are based on the losing control of the calibration points. Even though a flexible two dimension calibration method got its camera observing orientations easily changed by hand, it is almost impossible to numerically locate all desired poses that can make calibration points fill up all image space area. However, Tsai's old calibration system, which requires a known motion of the plane, can make them up. It has been obsoleted nowadays due to the fact that knowing the motion is not necessary for determining the intrinsic and extrinsic parameters. But as the resolution of camera sensor gets higher and higher, like a high definition sensor, researchers need a better calibration system. What's more, with the motion of the calibration plane controllable, it will not be a problem to determine the mapping from \(Depth (D)\) to \(Z^W\), thus equation \ref{kaiBeamEquation} could be applied as one important step to simplify 3D reconstruction using a look-up table (lut) after calibration. Note that, both of the mapping from \(D\) to \(Z^W\) and the coefficients \(c/d/e/f\) help map from \(Z^W\) to \(X^W/Y^W\) are with respect to per-pixel, such that even the \enquote{Depth Distortion} could be calibrated.
 
 \section{Novel Per-Pixel Calibration and LUT Reconstruction}
+\label{sectionPerPixelCalibration}
 In this thesis, we build a moving plane calibration system collecting tree dimensional data, with a rail that gets the RGB-D camera mounted on its slider observing a planar pattern. The 3D camera we used is KinectV2, but the calibration method could be applied on any RGB-D cameras. As shown in Fig.~\ref{trackingModuleOnKinectV2CalibrationSystem}, a uniform grid dots pattern is hung on the wall, and the rail is perpendicular to the wall. We will assign the wall, on which the canvas is hung and printed with uniform grid dots pattern, as the \(X^WY^W\) plane in world space, and \(Z^W\)-axis would be along the rail. The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because all of the mappings we are going to determine are with respect to per-pixel, \textit{i.e.}, the calculated parameters group for every single pixel, which will determine the pixel's view, are independent with that of the other pixels. As the slider moves along the rail, the planar dots pattern hung on the wall is moving further with respect to the RGB-D camera. This rail offers the possibility of taking infinite various frames of various camera working distances (or \(Z^C\)). Although the dots pattern hung on the wall for camera calibration is static itself, however, the dots distributions would be dynamic (covering every single pixel) in the image space when counted together in all of those various frames of various \(Z^C\). 
 \\\\\indent%
 %how to per-pixel calibrate ?
@@ -49,7 +50,7 @@ In our calibration system, \(Z^{W}\) values for all pixels of every frame will b
 %%XwYw collection
 %%
 \\\indent
-As for (\(X^\text{W}, \, Y^\text{W}\)) values' collection, a transformation from (\(R, C\)) is needed, during which the lens distortions correction must be considered. In the traditional calibration method, world space \(X^\text{W}/Y^\text{W}/Z^\text{W}\) is mapped to undistorted (\(R', C'\)) by linear pinhole camera matrix \(M\). And then the undistortion step, from undistorted (\(R', C'\)) to distorted (\(R, C\)) is done by eqn.~\ref{lensDistortion}, which is a high order (higher than 2nd order) polynomial equation. Assuming that there is a high order mapping relationship directly from the distorted image space (\(R, C\)) to world space (\(X^\text{W}, \, Y^\text{W}\)), we will do different orders of two-dimensional polynomial prototypes in Matlab and then decide a best-fit mapping model.
+As for (\(X^\text{W}, \, Y^\text{W}\)) values' collection, a transformation from (\(R, C\)) is needed, during which the lens distortions correction must be considered. In the traditional calibration method, world space \(X^\text{W}/Y^\text{W}/Z^\text{W}\) are mapped to undistorted (\(R', C'\)) by linear pinhole camera matrix \(M\). And then the undistortion step from undistorted (\(R', C'\)) to distorted (\(R, C\)) is done by eqn.~\ref{lensDistortion}, which uses a high order (higher than 2nd order) polynomial equation. Assuming that there is a high order mapping relationship directly from the distorted image space (\(R, C\)) to world space (\(X^\text{W}, \, Y^\text{W}\)), we will do different orders of two-dimensional polynomial prototypes in Matlab and then decide a best-fit mapping model.
 %
 \begin{figure}[!t]
 \hspace*{-0.3cm}
@@ -161,7 +162,7 @@ Y^W &=  a_{21}C^4 + a_{22}C^3R + a_{23}C^2R^2 + a_{24}CR^3 + a_{25}R^4 + a_{26}C
 \noindent
 To prototype equation \ref{secondOrderPolynomial} and \ref{fourthOrderPolynomial} in Matlab, \enquote{Curve Fitting Toolbox} is used to obtain the 2x6 and 2x15 parameters. Based on the \enquote{Goodness of fit} of transformation parameters from Matlab, the Root-Mean-Square Error (RMSE) of (\(X^W\), \(Y^W\)) is (0.06796, 0.05638) for the \(2^{nd}\) order polynomial, and (0.02854, 0.02343) for the \(4^{th}\) order polynomial. Fig.~\ref{Second_MatlabPrototype} and fig.~\ref{Fourth_MatlabPrototype} show the transformed images in world space respectively by the \(2^{nd}\) order and \(4^{th}\) order polynomial parameters, from which we can get \(d_2 = [-3.807 - (-4.035)] / [5.779 - (-4.8)] = 2.1\%\) and \(d_4 = [-3.936 - (-3.992)] / [5.923 - (-4.928)] = 0.516\%\). It is straightforward to tell that, \(d_4\) is much smaller than \(d_0\) and fig.~\ref{Fourth_MatlabPrototype} intuitively shows a satisfying calibrated image.
 \\\indent
-Then, by applying those polynomial mappings into real-time streams transformation, we can get the transformed stream images. As shown in fig.~\ref{HighOrderNearIRRectification}, the outlines of the transformed steam images are same with Matlab prototypes in fig.~\ref{MatlabPrototpyeOfHighOrder}. It is easy to tell that the \(4^{th}\) order polynomial surface mapping is much better than the second order, and a higher order than \(4^{th}\) could be more accurate. However, as the order of the polynomial mapping goes higher, the number of parameters also get larger and larger, which costs more calculations and requires more data (coordinate-pairs) for training the transformation model. Considering that a \(5^{th}\) order polynomial mapping will have much more (2x21=42) parameters to calculate while may not enhance much accuracy, we choose the \(4^{th}\) order polynomial as the main mapping model to get \(X^WY^W\) values from \(RC\). Limited by the static dot pattern, fewer and fewer dot-clusters could be observed by the camera as the camera getting closer to the dot pattern. Practically, \(4^{th}\) order calibration is replaced by \(2^{nd}\) order when the number of dot-clusters is too few to train its transformation model.
+Then, by applying those polynomial mappings into real-time streams transformation, we can get the transformed stream images. As shown in fig.~\ref{HighOrderNearIRRectification}, the outlines of the transformed steam images are same with Matlab prototypes in fig.~\ref{MatlabPrototpyeOfHighOrder}. It is easy to tell that the \(4^{th}\) order polynomial surface mapping is much better than the second order, and a higher order than \(4^{th}\) could be more accurate. However, as the order of the polynomial mapping goes higher, the number of parameters also get larger and larger, which costs more calculations and requires more data (coordinate-pairs) for training the transformation model. Considering that a \(5^{th}\) order polynomial mapping will have much more (2x21=42) parameters to calculate while may not enhance much accuracy, we choose the \(4^{th}\) order polynomial as the main mapping model to get \(X^WY^W\) values from \(RC\). Limited by the static dot pattern, fewer and fewer dot-clusters could be observed by the camera as the camera getting closer to the dot pattern. Practically, \(4^{th}\) order calibration is replaced by \(2^{nd}\) order to guarantee a robust software when the observed dot-clusters are too few to train the transformation model.
 \\\\\indent
  %% mapping model parameters determination
  %%
@@ -189,7 +190,7 @@ Z^W_{[row, \, col]} = a_{[row, col]}D_{[row, \, col]}+b_{[row, col]} ,
 \end{equation}%
 %
 \noindent
-where \({[row, \, col]}\) denotes the address of a pixels, \(a/b\) are the corresponding linear coefficients that help map from \(D\) to \(Z^\text{W}\). 
+where \({[row, \, col]}\) denotes the address of a pixel, \(a/b\) are the corresponding linear coefficients that help map from \(D\) to \(Z^\text{W}\). 
 \\\indent%
 %
 \begin{figure}[t]
@@ -204,44 +205,21 @@ The per-pixel \(X^W\) is determined by eqn.~\ref{fromD_To_Z}. And per-pixel \(X^
 %
 %
 %
-\section{DIP Techniques on (\(Col,\, Row\)) Extraction}
+\section{DIP Techniques on (\(R,\, C\)) Extraction}
 \label{sectionDIPTechniques}
 %  add noises analysis
-
-
-
 \noindent
-As analyzed in chapter \ref{sens_introduction}, traditional camera calibration based on pinhole camera model is not able to supply RGB-D cameras a satisfying real-time solution for lens and depth distortions. In this chapter, instead of using any models, a data based look-up table (LUT) method is used, which will not only suit for both of NearIR steams and RGB steams, but also for all of the universal RGB-D cameras. Rectifications of 3D world coordinates \(X^{W}\)/\(Y^{W}\)/\(Z^{W}\) will be separated into two parts. 
-\\\\%
-Above all, \(X^{W}\) and \(Y^{W}\) will be separately translated though two different transformation matrices that contains radial dominated lens distortions information. The transformation matrices are determined by pixels' coordinates-pairs ( image plan coordinates \(row\) / \(column\) and corresponding world coordinates \(X^{W}\)/\(Y^{W}\) ) that are extracted from captured uniform round dot grid pattern. Then, for each frame, external calibrated data from optical-flow sensor will be added as fixed \(Z^{W}\) for every pixel in the frame. After both of RGB stream and NearIR stream pixels find a match with world coordinate \(X^{W}\)/\(Y^{W}\)/\(Z^{W}\), depth data will be finally added for each pixel to generate a table of XYZWRGB-D.
-
-\section{\(X^{W}\)/\(Y^{W}\) Calibration}
-\label{sectionXY_calibration}
-The uniform round grid captured by RGB/NearIR steams contains radial dominated distortions information, which will be used for \(X^{W}\)/\(Y^{W}\) calibrations, to generate transform matrices to translate image plane rows and columns to world coordinates \(X^{W}\)/\(Y^{W}\). In order to appropriately make use of the distortions information, the core mission is to locate the coordinates-pairs of each round dot. \\\\
+In order to train the \(4^{th}\) order mapping model that can map from (\(R, \, C\)) to (\(X^W, \, Y^W\)), we need to obtain at least 15 points' coordinate-pairs of both image space coordinates and world space coordinates. Therefore, a robust DIP process to extract the points' addresses (\(R,\, C\))s is of the top priority. Concretely in this project, we are going to extract the dot-clusters' centers from KinectV2 NearIR steams using DIP techniques. To guarantee a robust processing, the extraction steps consist of gray-scaling, histogram equalization, adaptive thresholding and a little trick on black pixels counting. OpenGL is selected as the CPU image processing language. The default data type of steams saved on GPU during processing is single-floating, with a range from 0 (balck) to 1 (white). 
+\\\indent
+Gray-scaling is done in order to suit for both of the RGB and the NearIR steams. For NearIR steam, its data contains only color gray. There is no need to consider gray-scale problem, and data will be saved on GPU as single-floating automatically. Whereas for RGB steam, a conversion from RGB to gray value is needed. Typically, there are three converting methods: lightness, average, and luminosity. The luminosity method is finally chosen as a human-friendly way for gray-scaling, because it uses a weighted average value to account for human perception, which is give by eqn.~\ref{luminosityGrayScaling}.
+\\\indent
 %
-The whole process of transformation matrices generation could be separated into three steps. %
-The first step is to track the \((column, row)\) of each round dot cluster's center captured by RGB/NearIR steams, and the second step is to determine the corresponding world coordinates \((X^W, \,Y^W)\) for every \((column, row)\). After the coordinates-pairs are determined for every round dot cluster's center captured by RGB/NearIR steams, the last step is to use them to train high-order polynomial surface fitting models to generate transformation matrices, which could map from \((column, row)\) to \((X^W, \,Y^W)\) for every single pixel of a frame.
-%
-%\subsection{Round Dot Center \((column, row)\) extraction}
-\label{RowColumnExtraction}
-The round dot pattern consists of black dots and white background. As the simplest way to segment black dots from background, which is not 100\% white in the captured image, thresholding (binarizing) is applied as pre-processing of the uniform grid's tracking, using Digital Image Processing (DIP) technologies. After an adaptive binarizing of a frame, a \enquote{sniffer} (edge modification) will be applied for captured clusters' centers determination, \textit{i.e.}, the extraction of (column, row) as clusters' centers.\par
-%
-\subsubsection{Digital Image Processings}
-In this section, DIP technologies are used for the goal of RGB/NearIR steams' binarizing. Considering that the many steps of processing will be applied on every single pixel of every frame, using GPU (parallel processing) has more advantages on handling this kind of mission than using CPU. OpenGL is selected as image processing language, and the default data type of steams saved on GPU during processing will be Single-Floating type, with a range from 0 (balck) to 1 (white). For both of RGB steam and NearIR steam, steam data need to be saved onto GPU first, during which progress gray-scale converting is also done.\\%
-\\\par%
- \qquad \enquote{Converting RGB/NearIR to Gray-Scale}\\%
-In order to suit for both of the RGB and the NearIR steams, the first step of binarizing is to do gray-scaling. For NearIR steam, its data contains only color gray. There is no need to consider gray-scale problem, and data will be saved on GPU as single-floating automatically. Whereas for RGB steam, a conversion from RGB to gray value is needed. Typically, there are three converting methods: lightness, average, and luminosity. The luminosity method is finally chosen as a human-friendly way for gray-scaling, because it uses a weighted average value to account for human perception, which could be written as
-
 \begin{equation}
-%
 Intensity_{\text{\_gray}} =  0.21 Red\,  + \, 0.72 Green \, + \, 0.07 Blue
-%\label{lensDistortion}
-%
+\label{luminosityGrayScaling}
 \end{equation}%
 %
-\\\par%
- \qquad \enquote{Histogram Equalization}\\%
-As values saved on GPU, all of the pixel intensity values are within the range of [0, 1], where \enquote{0} means 100\% black and \enquote{1}  means 100\% white. In practical, NearIR steam image is always very dark, as shown in Fig.~\ref{Raw_Single_NIR} (with their intensity values every close to zero).  In order to enhance the contrast of NearIR image for a better binarizing, rescaling is necessary. In this section, histogram equalization technique is used maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB steam.\\\\
+As values saved on GPU, all of the pixel intensity values are within the range of [0, 1], where \enquote{0} means 100\% black and \enquote{1}  means 100\% white. In practical, NearIR steam image is always very dark, as shown in Fig.~\ref{Raw_Single_NIR} (with their intensity values every close to zero).  In order to enhance the contrast of NearIR image for a better binarizing, rescaling is necessary. In this section, histogram equalization technique is used maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB steam.
 %
  \begin{figure}[t]
 \hspace*{-0.5cm}
@@ -257,59 +235,52 @@ As values saved on GPU, all of the pixel intensity values are within the range o
 \label{Histogram_Equalization}
 \end{figure}%
 %
-Commonly, Probability Mass Function (PMF) and Cumulative Distributive Function (CDF) will be calculated to determine the minimum valid intensity value (\(floor\)) and maximum valid value (\(ceiling\)) for rescaling, whereas tricks could be used by taking advantage of the GPU drawing properties.\\%
-\\%
-PMF means the frequency of every valid intensity value for all of the pixels in an image. Dividing all of the pixels in terms of their intensity values into \(N\) levels, every pixel belongs to one level of them, which is called gray level. With an proper selection of \(N\) to make sure a good accuracy, the intensity value of a pixel could be expressed based on its gray level \(n\), as\par%
-
+Commonly, Probability Mass Function (PMF) and Cumulative Distributive Function (CDF) will be calculated to determine the minimum valid intensity value (\(floor\)) and maximum valid value (\(ceiling\)) for rescaling, whereas tricks could be used by taking advantage of the GPU drawing properties.%
+\\\indent%
+PMF means the frequency of every valid intensity value for all of the pixels in an image. Dividing all of the pixels in terms of their intensity values into \(N\) levels, every pixel belongs to one level of them, which is called gray level. With an proper selection of \(N\) to make sure a good accuracy, the intensity value of a pixel could be expressed based on its gray level \(n\)
+%
 \begin{equation}
-%
-Intensity = n/N * (1 - 0) + 0 = n/N
-%\label{lensDistortion}
-%
+Intensity = n/N * (1 - 0) + 0 = n/N \, ,
 \end{equation}%
-%
-where \(n\) and \(N\) are integers and \(1 \leqslant n \leqslant N\).\\\\%
+\noindent
+where \(n\) and \(N\) are integers and \(1 \leqslant n \leqslant N\).%
 %
 PMF calculation is very similar with the points-drawing process in terms of GPU that, both of them share the properties of pixel-by-pixel calculation. For the GPU points-drawing process onto a customer framebuffer, the single-floating \enquote{color} value could go beyond the normal range [0, 1], with a maximum value of a signed 32-bit integer (\(2^{31}\) - 1). And different \enquote{color} values will be added together to form a \enquote{summational-color} in the case that some pixels are drawn onto the same position coordinates. \enquote{Taking} the range of pixel intensity values [0, 1] \enquote{as} a segment on x-axis waiting to be drawn, the intensity frequency \enquote{as} the \enquote{summational-color} of multiple pixels with different intensity drawn at the same position, and the counting process of intensity frequency \enquote{as} a points-drawing process, PMF could be calculated by drawing all of the pixels onto the x-axis within the normal intensity range [0, 1], with every single pixel's position coordinates re-assigned as (\(pixel\_intensity\), \(0\)) and its \enquote{color} value constantly being equal to one. Given the width (range of x-axis) of customer framebuffer being [-1, 1] in OpenGL, which is twice the range of pixel intensity [0, 1], the half-width of the customer framebuffer is same with the total number \(N\) of gray levels, which determines the precision of \(floor\) / \(ceiling\) intensity selection. 
-\\\\%
+\\\indent%
 With PMF calculated and each intensity frequency that mapped to its corresponding gray level saved in the customer framebuffer, CDF could be easily calculated as
 %
 \begin{equation}
 %
-CDF(n) = \frac{sum}{N_{\text{\_Total Pixels/Image}}} 
+CDF(n) = \frac{sum}{N_{\text{\_Total Pixels/Image}}} \, ,
 %\label{lensDistortion}
 %
 \end{equation}%
 %
-where the gray level \(n\) is counted from the middle of the framebuffer's width to the end (1 \texttildelow \, \(N\)). And \(sum\) is the summation of customer framebuffer's values added up consecutively from 1 till \(n\).\\\\%
+where the gray level \(n\) is counted from the middle of the framebuffer's width to the end (1 \texttildelow \, \(N\)). And \(sum\) is the summation of customer framebuffer's values added up consecutively from 1 till \(n\). %
 %
 Then, at appropriate CDFs, e.g., \(CDF(n_{\text{\_floor}}) = 0.01\) and \(CDF(n_{\text{\_ceiling}}) = 0.99\), the intensities \(floor\) and \(ceiling\) could be written as
 %
 \begin{equation}
-%
 \begin{aligned}
 floor &=  n_{\text{\_floor}} / N%
 \\%
 ceiling &=  n_{\text{\_ceiling}} / N
 \end{aligned}
 \label{intensityFloorCeilingDetermination}
-%
 \end{equation}%
 %
+\noindent
 Finally, a new intensity value of every single pixel in an image could be rescaled as
 %
 \begin{equation}
-%
-\begin{aligned}
-Intensity_{\text{\_new}} &= \frac{Intensity_{\text{\_original}} - floor}{ceiling - floor} 
-\end{aligned}
-%
+Intensity_{\text{\_new}} = \frac{Intensity_{\text{\_original}} - floor}{ceiling - floor} 
 \end{equation}%
 %
+\noindent
 After this final rescaling step of Histogram Equalization, the new image gets better contrast effect, as shown in Fig.~\ref{NIR_After_HistogramEqualization}%
-\\\par%
- \qquad \enquote{Adaptive Thresholding}\\%
-Affected by radial dominated lens distortions, the intensity value tend to decrease as the position of a pixel moves from the center of an image to the borders, in the case of observing a singular color view. Therefore, using fixed thresholding will generate too much noise around borders, and an adaptive thresholding process is needed. To segment the black dots from white background, we could simply subtract an image's background from an textured image. And an image's background comes from a blurring process on that image. \par%
+\\\\\indent%
+%% Adaptive Thresholding
+Affected by radial dominated lens distortions, the intensity value tend to decrease as the position of a pixel moves from the center of an image to the borders, in the case of observing a singular color view. Therefore, an adaptive thresholding process is needed, whereas using fixed thresholding will generate too much noise around borders. To segment the black dots from white background, we could simply subtract an image's background from an textured image, where the background comes from a blurring process of that image.%
 %
  \begin{figure}[t]
 \hspace*{-0.5cm}
@@ -323,7 +294,6 @@ Affected by radial dominated lens distortions, the intensity value tend to decre
 \caption{NearIR Streams before / after Adaptive Thresholding}
 \label{Adaptive_Thresholding}
 \end{figure}%
-\par%
 %
 There are three common types of blurring filters: mean filter, weighted average filter, and gaussian filter. Mean filter is selected for this background-aimed blurring process, because it has the smallest calculation and also a better effect of averaging than the others. After the blurred image containing background information is obtained, the binarizing (subtraction) process for every single pixel could be written as
 
@@ -336,17 +306,18 @@ Intensity_{\text{\_binarized}} = %
 \\%
 \,\, 0 , \quad \quad \quad \quad else%
 \end{cases}
-%
+ \, ,%
 \end{equation}%
 %
 where \(I\) is short for \(Intensity\) of every single pixel, and \(C_{\text{\_offset}}\) is a small constant that could be adjusted depending on various thresholding situations. In this project, \(C_{\text{\_offset}}\) is around 0.1.%
-\\\\%
+%
 To sharpen the edge of the binarized image for a better \enquote{circle} shape detection, a median filter could be added as the last step of adaptive thresholding. As shown in Fig.~\ref{Adaptive_Thresholding}, background is removed in the binarized image after adaptive thresholding.
+\\\indent
 %
 %
-\subsubsection{Sniffer for Round Dot Center}
+% Sniffer for Round Dot Center
 After the adaptive thresholding, image data saved on GPU is now composed of circle-shaped \enquote{0}s within a background of \enquote{1}s. In order to locate the center of those \enquote{0}s circle, which is the center of captured round dot, it is necessary to know the edge of those circles. A trick is used to turn all of the edge data into markers that could lead a pathfinder to retrieve circle information.%
-\\\\%
+%
 The idea that helps to mark edge data is to reassign pixels' values (intensity values) based on their surroundings. Using letter \(O\) to represent one single pixel in the center of a 3x3 pixels environment, and letters from \(A\)\texttildelow \(H\) to represent surroundings, a mask of 9 cells for pixel value reassignment could be expressed as below.
 
 \begin{center}
@@ -360,7 +331,7 @@ The idea that helps to mark edge data is to reassign pixels' values (intensity v
 \end{center}
 %
 To turn the surroundings \(A\)\texttildelow \(H\) into marks, different weights will be assigned to them. Those markers with different weights have to be non-zero data, and should be counted as the edge-part of circles. Therefore, the first step is to inverse the binary image, generating an image that consists of circle-shaped \enquote{1}s distributed in a background of \enquote{0}s.%
-\\\\%
+%
 After reversing, the next step is to assign weight to the surroundings. OpenGL offers convenient automatic data type conversion, which means the intensity values from \enquote{0} to \enquote{1} of single-floating data type save on GPU could be retrieved to CPU as unsigned-byte data type from \enquote{0} to \enquote{255}. Considering a bitwise employment of markers, a binary calculation related weight assignment is used in the shader process for pixels. The intensity reassignment for every single pixel is expressed as the equation below.
 %
 \begin{equation}
@@ -370,13 +341,13 @@ I_{\text{\_Path Marked}} = I_{\text{\_Original}} * \frac{(128I_{\text{A}} + 64I_
 %
 \label{snifferDistributionWeight}
 \end{equation}%
-\\%
+\indent%
 After this reassignment, the image is not binary any more. Every non-zero intensity value contains marked information of its surroundings, data at the edge of circles are now turned into fractions. In other words, the image data saved on GPU at the moment is composed of \enquote{0}s as background and \enquote{non-zero}s circles, which contains fractions at the edge and \enquote{1}s in the center.%
-\\\\%
+%
 Now, it is time to discover dots through an inspection over the whole path-marked image, row by row and pixel by pixel. Considering that, a process of one single pixel in this step may affect the processes of the other pixels (which cannot be a parallel processing), it is necessary to do it on CPU. The single-floating image data will be retrieved from GPU to a buffer on CPU as unsigned-byte data, waiting for inspection. And correspondingly the new CPU image will have its \enquote{non-zero}s circles composed of fractions at the edge and \enquote{1}s in the center. Whenever a non-zero value is traced, a dot-circle is discovered and a singular-dot analysis could start. The first non-zero pixel will be called as an anchor, which means the beginning of a singular-dot analysis. %
-\\\\%
+%
 During the singular-dot analysis beginning from the anchor, very connected valid (non-zero) pixel will be a stop, and a \enquote{stops-address} queue buffer is used to save addresses of both visited pixels and the following pixels waiting to be visited. On very visit of a pixel, there is a checking procedure to find out valid (non-zero) or not. Once valid, the following two steps are waiting to go. The first step is to sniff, looking for possible non-zero pixels around as the following stops. And the second step is to colonize this pixel, concretely, changing the non-zero intensity value to zero. Every non-zero pixel might be checked 1\texttildelow 4 times, but will be used to sniff for only once.%
-\\\\%
+\\\indent%
 As for the sniffing step, base on the distribution table of \(A\)\texttildelow \(H\) that has been discussed above and their corresponding weight given by equation \ref{snifferDistributionWeight}, the markers \(A\)/\(B\)/\(C\)/\(D\) are valid (non-zero) as long as the intensity value of pixel \(O\) satisfies the following conditions shown as below.%
 %
 \begin{equation}
@@ -394,8 +365,8 @@ if \,\, ( I_{\text{O}} \,\, \& \,\, \text{0x10}  == 1 ),\quad &then,\quad \text{
 %
 \end{equation}%
 %
+\noindent
 Once a valid marker is found, its address \((column, row)\) will be saved into the \enquote{stops-address} queue. One pixel's address might be saved for up to 4 times, but \enquote{colonizing} procedure will only happen once at the first time, so that the sniffing will stop once all of the connected valid pixels in a singular dot-cluster are colonized as zeros.%
-\par%
 %
  \begin{figure}[t]
 \hspace*{-0.5cm}
@@ -413,99 +384,95 @@ Once a valid marker is found, its address \((column, row)\) will be saved into t
 \end{figure}
 %
 In the second step \enquote{colonizing},  \(I_{\text{O}}\) is changed to zero, variable \(area\) of this dot-cluster pluses one, and bounding data \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\) are also updated.%
-\\\\%%
+%
 Finally, the Round Dot Centers \((column, row)\) could be determined as the center of bounding boxes with their borders \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\). After potential noises being removed based on their corresponding \(area\) and shape (ratio of width and height), the data left are taken as valid dot-clusters. As shown in Fig.~\ref{Dots_Extracted_Single_NIR}, the centers of valid dot-clusters are marked within their corresponding homocentric circles.
-%
-%
-%\subsection{\((X^W, \,Y^W)\) Fitting based on Uniform Grid}
-\label{uniformGridFittingXY}
-%
-The list of round dot centers \((column, row)\)s is extracted through section \ref{RowColumnExtraction}. The following is to map every dot center's \((column, row)\) to its corresponding world coordinates \((X^W, \,Y^W)\). As shown in Fig.~\ref{trackingModuleOnKinectV2CalibrationSystem}, world coordinates are from the uniform grid. Taking the side of unit-square (distance between two adjacent dots) as \enquote{Unit One} in the world coordinates and one dot as the origin of plan \(X^WY^W\), every dot cluster's center \(column\) / \(row\) will be mapped to integer values \(X^W\)/\(Y^W\). %
 \\\\%
-Ideally, a 3x3 perspective transformation matrix could help set a linear mapping between two plane coordinates, and 3 dot centers with know coordinates pair of \((column, row)\) and \((X^W, \,Y^W)\) are enough to determine the transformation matrix. Once four points with a squared-shape \(column\)/\(row\) distribution is found, a 3x3 perspective transformation matrix \(A\) could be determined by solving eqn.~\ref{perspectiveDistortionCorrectionEquation}, %
-where \(C\) and \(R\) are vectors consist of \((column, row)\)s of four squared-shape distributed points; \(X^W\) and \(Y^W\) are vectors consist of four points \((0, 0)\), \((0, 1)\), \((1, 1)\), and \((1, 0)\); \(z\) denotes the third axis in the homogenous system connecting two planes. %
-\\\\%
-Due to the distortions, cluster centers in image plane are not uniformly distributed, and this 3x3 transformation matrix can only generate corresponding decimal \(X^W\)/\(Y^W\) values that are close integers. But in practical, the correct integer values \(X^W\)/\(Y^W\) could still be calculated through \(Rounding\). The list of cluster centers' image coordinate \((column, row)\)s can give many groups of four squared-shape distributed points, while each of them gives a different image coordinate distance that maps to the \enquote{Unit One} in world coordinates. Taking those points with generated \(X^W\)/\(Y^W\) values that are within an appropriate range close to integers as valid points, the \enquote{best} 3x3 transformation matrix could be determined by going through all of the possible groups of four squared-shape distributed points and picking out the group that leads to the most valid points.%
-\\\\%
-In this way, the so-called \enquote{best} transformation matrix can give a best \enquote{Unit One} distance in image coordinate, however its corresponding origin point \((0, 0)\), one of the four points that are used to calculate a transformation matrix, is usually not close to the center of cameras' Field of View (FoV). A translation matrix \(T\) could be used to refine the \enquote{best} transformation matrix, and help to translate the origin point to be a dot cluster that is closest to the center of FoV. The refined transformation matrix \(A_{\text{\_refined}}\) is written as%
 %
-\begin{equation}
-%
-A_{\text{\_refined}}%
-= %
-T \cdot A %
-= %
-\begin{bmatrix} 
-1 & 0 & -X_{\text{\_Zero\_A}} \\%
-0 & 1 & -Y_{\text{\_Zero\_A}} \\%
-0 & 0 &   1 \\%
-\end{bmatrix}%
-\cdot A%
-%
-\end{equation}%
-%
-where the integer world coordinate point \((X_{\text{\_Zero\_A}}, \, Y_{\text{\_Zero\_A}})\) are mapped from the center point \((C_{\text{\_center}}, \, R_{\text{\_center}})\) of FoV in image plane by the so-called \enquote{best} transformation matrix \(A\), written as%
-%
-\begin{equation}
-%
-\left[ \begin{array}{c} %
-zX_{\text{\_Zero\_A}} \\ zY_{\text{\_Zero\_A}} \\ z \end{array} \right] %
-= %
-A\cdot \left[ \begin{array}{c} %
-C_{\text{\_center}} \\ R_{\text{\_center}} \\ 1 \end{array} \right] %
-%
-\end{equation}%
-%
-Eventually, the refined transformation matrix eventually generates a list of world coordinate points \((X^W, \, Y^W)\)s that correspond to image coordinates \((column, row)\)s. As shown in Fig.~\ref{XY_GridFitting_Matlab}, world coordinates are integers and the origin (blue circle) is chosen as where the center-closest dot-cluster is sitting.\par%
-%
- \begin{figure}[t]
-\hspace*{-0.3cm}
-\centering
-\subfloat[Image Plane Coordinates][ImagePlane Coordinate]{
-\includegraphics[width=0.54\textwidth, height = 0.425\textwidth]{Grid_Centered_Single_NIR}
-\label{Grid_Centered_Single_NIR}}
-%\qquad
-\subfloat[World Coordinates][World Coordinate]{
-\includegraphics[width = 0.47\textwidth, height = 0.425\textwidth]{XY_GridFitting_Matlab}
-\label{XY_GridFitting_Matlab}}
-%
-\caption{Coordinates-Pairs: (Row, Column)s and (\(X^W\), \(Y^W\))s}
-\label{Grid_Fitting}
-\end{figure}%
+%%\subsection{\((X^W, \,Y^W)\) Fitting based on Uniform Grid}
+%\label{uniformGridFittingXY}
+%%
+%The list of round dot centers \((column, row)\)s is extracted through section \ref{RowColumnExtraction}. The following is to map every dot center's \((column, row)\) to its corresponding world coordinates \((X^W, \,Y^W)\). As shown in Fig.~\ref{trackingModuleOnKinectV2CalibrationSystem}, world coordinates are from the uniform grid. Taking the side of unit-square (distance between two adjacent dots) as \enquote{Unit One} in the world coordinates and one dot as the origin of plan \(X^WY^W\), every dot cluster's center \(column\) / \(row\) will be mapped to integer values \(X^W\)/\(Y^W\). %
+%\\\\%
+%Ideally, a 3x3 perspective transformation matrix could help set a linear mapping between two plane coordinates, and 3 dot centers with know coordinates pair of \((column, row)\) and \((X^W, \,Y^W)\) are enough to determine the transformation matrix. Once four points with a squared-shape \(column\)/\(row\) distribution is found, a 3x3 perspective transformation matrix \(A\) could be determined by solving eqn.~\ref{perspectiveDistortionCorrectionEquation}, %
+%where \(C\) and \(R\) are vectors consist of \((column, row)\)s of four squared-shape distributed points; \(X^W\) and \(Y^W\) are vectors consist of four points \((0, 0)\), \((0, 1)\), \((1, 1)\), and \((1, 0)\); \(z\) denotes the third axis in the homogenous system connecting two planes. %
+%\\\\%
+%Due to the distortions, cluster centers in image plane are not uniformly distributed, and this 3x3 transformation matrix can only generate corresponding decimal \(X^W\)/\(Y^W\) values that are close integers. But in practical, the correct integer values \(X^W\)/\(Y^W\) could still be calculated through \(Rounding\). The list of cluster centers' image coordinate \((column, row)\)s can give many groups of four squared-shape distributed points, while each of them gives a different image coordinate distance that maps to the \enquote{Unit One} in world coordinates. Taking those points with generated \(X^W\)/\(Y^W\) values that are within an appropriate range close to integers as valid points, the \enquote{best} 3x3 transformation matrix could be determined by going through all of the possible groups of four squared-shape distributed points and picking out the group that leads to the most valid points.%
+%\\\\%
+%In this way, the so-called \enquote{best} transformation matrix can give a best \enquote{Unit One} distance in image coordinate, however its corresponding origin point \((0, 0)\), one of the four points that are used to calculate a transformation matrix, is usually not close to the center of cameras' Field of View (FoV). A translation matrix \(T\) could be used to refine the \enquote{best} transformation matrix, and help to translate the origin point to be a dot cluster that is closest to the center of FoV. The refined transformation matrix \(A_{\text{\_refined}}\) is written as%
+%%
+%\begin{equation}
+%%
+%A_{\text{\_refined}}%
+%= %
+%T \cdot A %
+%= %
+%\begin{bmatrix} 
+%1 & 0 & -X_{\text{\_Zero\_A}} \\%
+%0 & 1 & -Y_{\text{\_Zero\_A}} \\%
+%0 & 0 &   1 \\%
+%\end{bmatrix}%
+%\cdot A%
+%%
+%\end{equation}%
+%%
+%where the integer world coordinate point \((X_{\text{\_Zero\_A}}, \, Y_{\text{\_Zero\_A}})\) are mapped from the center point \((C_{\text{\_center}}, \, R_{\text{\_center}})\) of FoV in image plane by the so-called \enquote{best} transformation matrix \(A\), written as%
+%%
+%\begin{equation}
+%%
+%\left[ \begin{array}{c} %
+%zX_{\text{\_Zero\_A}} \\ zY_{\text{\_Zero\_A}} \\ z \end{array} \right] %
+%= %
+%A\cdot \left[ \begin{array}{c} %
+%C_{\text{\_center}} \\ R_{\text{\_center}} \\ 1 \end{array} \right] %
+%%
+%\end{equation}%
+%%
+%Eventually, the refined transformation matrix eventually generates a list of world coordinate points \((X^W, \, Y^W)\)s that correspond to image coordinates \((column, row)\)s. As shown in Fig.~\ref{XY_GridFitting_Matlab}, world coordinates are integers and the origin (blue circle) is chosen as where the center-closest dot-cluster is sitting.\par%
+%%
+% \begin{figure}[t]
+%\hspace*{-0.3cm}
+%\centering
+%\subfloat[Image Plane Coordinates][ImagePlane Coordinate]{
+%\includegraphics[width=0.54\textwidth, height = 0.425\textwidth]{Grid_Centered_Single_NIR}
+%\label{Grid_Centered_Single_NIR}}
+%%\qquad
+%\subfloat[World Coordinates][World Coordinate]{
+%\includegraphics[width = 0.47\textwidth, height = 0.425\textwidth]{XY_GridFitting_Matlab}
+%\label{XY_GridFitting_Matlab}}
+%%
+%\caption{Coordinates-Pairs: (Row, Column)s and (\(X^W\), \(Y^W\))s}
+%\label{Grid_Fitting}
+%\end{figure}%
 %
 %
 %\subsection{Mathematical tools}
 %\subsubsection{Singular Value Decomposition (SVD)}
 %\subsubsection{Least Square with Pseudo-Inverse}
 %
-\section{Alignment from Depth Sensor to RGB Sensor}
+\section{Alignment of RGB Pixel to Depth Pixel}
+A undistorted 3D reconstruction could be displayed with the help of a LUT generated by the per-pixel calibration method, which has been discussed in section~\ref{sectionPerPixelCalibration}. However, we have not figured out yet what the color of each pixel is. To generate a colored 3D reconstruction with a combination of a random depth sensor and a random RGB sensor, we need to align the RGB pixels to depth pixels. The intermediate between the depth sensor image space and RGB sensor image space is the world space. As long as we figure out the mapping from world space to RGB sensor image space, the color of pixel with known \(X^WY^WZ^W\) could be looked up from the RGB image space. The pinhole camera matrix \(M\) is used to map from world space to RGB image space. Using the frame data from Kinect RGB steams and Kinect NearIR streams, a Matlab prototype of RGB pixels alignment is shown in fig.~\ref{RGBAligned_Matlab}, where the RGB textured is mapped onto its corresponding NearIR image, who has same pixels with depth sensor. The total black area on the top edge and bottom edge is where the depth sensor's view goes beyond the RGB sensor's view. Fig.~\ref{RGBAligned_Qt} shows the screen-shot of live video after calibration with the RGB pixels aligned by a pinhole camera model \(M\).
 
-\section{Real-Time analysis}
-Real-time analysis is in contrast with off-line process. In terms of camera steams process, real-time means to display the first processed frame before the second frame processing starts. In this thesis, \enquote{real-time} could be used to describe both of the 3D calibration procedure for Look-Up Table (LUT) generation and the live show of calibrated observation using LUT.
-%\subsection{Real-Time during Calibration}
-In the process of 3D (\(X^{W}\),\,\(Y^{W}\),\,\(Z^{W}\)) calibration using an uniform grid dots pattern, \enquote{real-time} means being able to show a calibrated frame, as well as to record its calibrated \(XYZWRGBD\) steams data, before the start of second frame processing. The recored frames (\(XYZWRGBD\)s) will be used to generating LUT.%
-\\\\%
-With the help of the BLE Optical-Flow tracking module, which will be discussed in section \ref{BLE_OF_TrackingModule}, this calibration step could really be called \enquote{real-time}: not only \(X^{W}\) and \(Y^{W}\) are calibrated before the coming of the next frame, but also \(Z^{W}\) is updated (at a rate of 100Hz, maximum 5KHz) as the slider moving along the rail (along \(Z\)-axis). After an appropriate setting, a group (concretely, 63 frames) of calibrated \(XYZWRGBD\) steams data could be recorded automatically as the slider moving (record one calibrated frame at every 25mm) from the head of the rail to the tail, as already shown in Fig.~\ref{Data63FranesForLUT}.%
-\\\\%
-The processing speed depends on the number of detected dot-clusters. The further where the camera is observing the dots pattern, the more dot-clusters are detected, the slower processing speed will be. In practical, the real-time calibration speed 4 fps at the head of the rail (working distance 1.05m), and 0.4 fps at the end of the rail (working distance 2.7m).
 %
-%\subsection{Real-Time Observing after Calibration}
-%
-For the live-show of observed steams after calibration, the camera's view is no longer limited by the uniform grid pattern. At that time, \enquote{real-time} means to look up the calibrated (\(X^{W}\),\, \(Y^{W}\),\, \(Z^{W}\)) based on \(D\) and read its corresponding RGB for every single pixel, and then show the reconstructed 3D image, before the next frame.%
-\\\\%
-Concretely, for every single pixel, 6 coefficients (\(a\),\(b\),\(c\),\(d\),\(e\),\(f\)) will be looked up, and their corresponding \(Z^{W}\) and \(X^{W}\)/\(Y^{W}\) will be determined by equation \ref{fromD_To_Z} and equation \ref{fromZ_To_XY}.
-%
-%
-%\section{3D Reconstruction differences for PrimeSense, KinectV2, and Prosilica}
-%pixels, steams, and shader comparison
-%
-%
-%
-%
-%
-%
+ \begin{figure}[b]
+\hspace*{-0.5cm}
+\centering
+\subfloat[][]{
+\includegraphics[width = 0.5\textwidth]{RGBAligned_Matlab}
+\label{RGBAligned_Matlab}}
+\subfloat[][]{
+\includegraphics[width=0.5\textwidth]{RGBAligned_Qt}
+\label{RGBAligned_Qt}}
+\caption{Alignment of RGB Texture onto NearIR Image}
+\label{Adaptive_Thresholding}
+\end{figure}%
 %
 
+\section{Summation}
+A per-pixel calibration method, using a moving plane calibration system, is proposed in this chapter. The main idea of this method is to directly determine the per-pixel mapping from \(D\) to \(Z^W\), and then to \(X^W/Y^W\). Therefore, this per-pixel calibration method consists of two big steps: \(X^WY^WZ^W+D\) data collection and mapping determination. \(D\) is directly from depth streams. \(Z^W\) is from external based on the camera's position on the rail. And (\(X^W, \, Y^W\)) are from the transformation of \(R/C\) by a \(4^{th}\) order polynomial mapping model. With the frames data of \(X^WY^WZ^W+D\) collected, the per-pixel mapping parameters \(a/b/c/d/e/f\) could be determined by eqn.~\ref{fromD_To_Z} and eqn.~\ref{kaiBeamEquation}. And finally a \(column\)-by-\(row\)-by-\(6\) look-up table that contains 6 coefficients (\(a/b/c/d/e/f\)) for every single pixel will be generated for the display of a calibrated real-time 3D reconstruction. %
+%\\\indent
+Without using the traditional pinhole camera model, two polynomial mapping models are employed in this calibration method. The first model is the two-dimensional \(4^{th}\) order polynomial mapping from \(R/C\) to \(X^W/Y^W\) during the frames data collection, which takes care of the removal of lens distortions; and the second model is the linear mapping from \(D\) to \(Z^W\), which can handle \enquote{depth distortion}. Both of the two mapping models are determined and calculated by real streams data from the camera, so that we claim this per-pixel calibration method a \enquote{data-based} calibration method. 
+\\\indent
+Besides the data-based calibration method, a robust DIP process during calibration is also discussed, which guarantees that the live video during undistorted frames collection could be in real-time. Note that \enquote{real-time} here means being able to show an undistorted frame before the start of the second frame processing. After the undistorted 3D reconstruction, the alignment of the RGB pixel to Depth pixel is also discussed. The data-based calibration method could be applied universally on any RGB-D cameras. With the alignment of RGB pixels, it could even work on the combined 3D camera of a random Depth sensor and a random RGB sensor.
 
 
 

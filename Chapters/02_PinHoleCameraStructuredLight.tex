@@ -27,7 +27,7 @@ A pinhole camera is a simple optical imaging device in the shape of a closed box
 \end{figure}%
 %
 %
-Pinhole cameras are characterized by the fact that they do not have a lens. It rely on the fact that light travels in straight lines, which is a principle called the rectilinear theory of light. This makes the image appear upside down in the camera, as shown in fig.~\ref{PinHoleVirtualFocalPlane}. Tracing the corners of the camera sensor through the pin hole, those dark green lines show the limits of the field of view in 3D coordinate space. The back side plane of the pinhole camera, which is behind the origin at a positive \(Z^c\)-axis and also where our sensor sits, is also called the focal plane. It is not intuitive, nor convenient for mathematical analysis that the images on the focal plane are always upside down. So a virtual focal plane is defined created in front of the pinhole on the negative \(Z^c\)-axis, which is equal distant from the focal point (pin hole) as the actual focal plane is behind. Notice that the limits of the field of view intersect with the virtual focal plane at the four corners of the up-right image just as they disseminate from the four corners of the sensor at the real focal plane.
+Pinhole cameras are characterized by the fact that they do not have a lens. It rely on the fact that light travels in straight lines, which is a principle called the rectilinear theory of light. This makes the image appear upside down in the camera, as shown in fig.~\ref{PinHoleVirtualFocalPlane}. Tracing the corners of the camera sensor through the pin hole, those dark green lines show the limits of the field of view in 3D coordinate space. The back side plane of the pinhole camera, which is behind the origin at a positive \(Z^C\)-axis and also where our sensor sits, is also called the focal plane. It is not intuitive, nor convenient for mathematical analysis that the images on the focal plane are always upside down. So a virtual focal plane is defined in front of the pinhole on the negative \(Z^C\)-axis, which is equal distant from the focal point (pin hole) as the actual focal plane is behind. Notice that the limits of the field of view intersect with the virtual focal plane at the four corners of the up-right image just as they disseminate from the four corners of the sensor at the real focal plane.
 
 \begin{figure}[b]
 \centering
@@ -37,7 +37,7 @@ Pinhole cameras are characterized by the fact that they do not have a lens. It r
 \end{figure}%
 %
 
-With the virtual focal plane, the camera body with the real focal plane could be removed. And the rest parts in front of the the camera body, the focal point and the virtual focal plane together, form the most common pinhole camera model. In order to employ this model for 3D analyzing points inside the camera's field of view based on 2D image, the most prior step is to define the relationship between points in 3D camera space and the 2D image coordinates row and column of the corresponding captured image. As shown in fig.~\ref{CommonPinholeCameraModel}, only the sensor (in color red) is visible at the virtual focal plane. The focal point is right at the origin of the camera 3D space coordinates, from where to the sensor has the vertical distance of \(f\), the focal distance. The 2D image coordinates are in dark green, where its origin is sitting at the up-left corner of the sensor. Taking the PrimeSense camera, whose RGB and Depth sensor share the pixel height and width 240*320. As long as both of the camera 3D space and image 2D space are defined, the next step is the determine the determine their relationship. Note that, the range of image should be either ([0:239], [0:319]) or ([1:240], [1:320]).
+With the virtual focal plane, the camera body with the real focal plane could be removed. And the rest parts in front of the the camera body, the focal point and the virtual focal plane together, form the most common pinhole camera model. In order to employ this model to analyze arbitrary 3D object points inside the camera's field of view in 2D image space, the prior step is to define the relationship between points in 3D camera space and the 2D image space (\(row\) and \(column\)). As shown in fig.~\ref{CommonPinholeCameraModel}, The focal point is right at the origin of the camera 3D space coordinates, from where to the sensor is the vertical distance of \(f\), the focal distance. The 2D image coordinates are in dark green, and its origin is sitting at the up-left corner of the sensor. Only the a virtual sensor (in color red) is visible on the virtual focal plane, whose size in 2D image space is noted as 240*320 (using the size of PrimeSense camera). As long as both of the camera 3D space coordinates and image 2D space coordinates are defined, the next job is to build a mapping between them. Note that, the range of image should be either ([0:239], [0:319]) or ([1:240], [1:320]).
 %
 \begin{figure}[b]
 \centering
@@ -220,12 +220,12 @@ To inspect the pinhole camera matrix \(M\), it is composed of rotation/translati
 \label{section3DcameraCalibration}
 %    3. Pinhole camera matrix solving for matrix M
 \indent
-The calibration of a 3D camera aims to be able to generate the world coordinates (\(X^w, Y^w, Z^w\)) and corresponding \(RGB\) values for every single pixel, given the depth steams and RGB streams retrieved from the 3D camera. From section \ref{sectionPinholeCamera}, we know that the pinhole camera matrix \(M\) (eqn.~\ref{pinholeMatrix3x4M}) could help map from the world space to image space, however not able to directly transform image space data to world space coordinates. In order to determine \(X^w/Y^w/Z^w\) (based on eqn.~\ref{HomoProportionalFromCamToImInPixels} and eqn.~\ref{mappingFromWorldToCameraSpace}), both of the intrinsic camera matrix and extrinsic camera matrix are needed, both of which are intermediate parameters and practically can only be determined through matrix \(M\). Thus, the first job for 3D camera calibration is to solve the pinhole camera matrix \(M\). To solve the pinhole camera matrix, we can use least squares fit with known 3D points (\(X^w\), \(Y^w\), \(Z^w\)) and their corresponding image points (\(R, C\)). With one point, based on eqn.~\ref{pinholeMatrix3x4M} and \ref{pinholeCameraMatrixCalculation}, we can get two equations.
+The calibration of a 3D camera aims to be able to generate the world coordinates (\(X^W, Y^W, Z^W\)) and corresponding \(RGB\) values for every single pixel, given the depth steams and RGB streams retrieved from the 3D camera. From section \ref{sectionPinholeCamera}, we know that the pinhole camera matrix \(M\) (eqn.~\ref{pinholeMatrix3x4M}) could help map from the world space to image space, however not able to directly transform image space data to world space coordinates. In order to determine \(X^W/Y^W/Z^W\) (based on eqn.~\ref{HomoProportionalFromCamToImInPixels} and eqn.~\ref{mappingFromWorldToCameraSpace}), both of the intrinsic camera matrix and extrinsic camera matrix are needed, both of which are intermediate parameters and practically can only be determined through matrix \(M\). Thus, the first job for 3D camera calibration is to solve the pinhole camera matrix \(M\). To solve the pinhole camera matrix, we can use least squares fit with known 3D points (\(X^W\), \(Y^W\), \(Z^W\)) and their corresponding image points (\(R, C\)). With one point, based on eqn.~\ref{pinholeMatrix3x4M} and \ref{pinholeCameraMatrixCalculation}, we can get two equations.
 \begin{equation}
 \begin{aligned}
-m_{11}X^w + m_{12}Y^w + m_{13}Z^w + m_{14} - m_{31}X^wC - m_{32}Y^wC - m_{33}Z^wC - m_{34}C = 0%
+m_{11}X^W + m_{12}Y^W + m_{13}Z^W + m_{14} - m_{31}X^WC - m_{32}Y^WC - m_{33}Z^WC - m_{34}C = 0%
 \\%
-m_{21}X^w + m_{22}Y^w + m_{23}Z^w + m_{24} - m_{31}X^wR - m_{32}Y^wR - m_{33}Z^wR - m_{34}R = 0
+m_{21}X^W + m_{22}Y^W + m_{23}Z^W + m_{24} - m_{31}X^WR - m_{32}Y^WR - m_{33}Z^WR - m_{34}R = 0
 \end{aligned}
 \label{onePointEquationCR}
 \end{equation}%
@@ -235,13 +235,13 @@ There are totally 12 unknowns to solve, thus we need at least six points to solv
 \begin{equation}
 \hspace*{-1cm}
 \begin{bmatrix} 
-X^w_1 & Y^w_1 & Z^w_1 & 1 & 0 & 0 & 0 & 0 & -X^w_1C_1 & -Y^w_1C_1 & -Z^w_1C_1 & -C_1\\
-0 & 0 & 0 & 0 & X^w_1 & Y^w_1 & Z^w_1 & 1 &  -X^w_1R_1 & -Y^w_1R_1 & -Z^w_1R_1 & -R_1\\
-X^w_2 & Y^w_2 & Z^w_2 & 1 & 0 & 0 & 0 & 0 & -X^w_2C_2 & -Y^w_2C_2 & -Z^w_2C_2 & -C_2\\
-0 & 0 & 0 & 0 & X^w_2 & Y^w_2 & Z^w_2 & 1 &  -X^w_2R_2 & -Y^w_2R_2 & -Z^w_2R_2 & -R_2\\
+X^W_1 & Y^W_1 & Z^W_1 & 1 & 0 & 0 & 0 & 0 & -X^W_1C_1 & -Y^W_1C_1 & -Z^W_1C_1 & -C_1\\
+0 & 0 & 0 & 0 & X^W_1 & Y^W_1 & Z^W_1 & 1 &  -X^W_1R_1 & -Y^W_1R_1 & -Z^W_1R_1 & -R_1\\
+X^W_2 & Y^W_2 & Z^W_2 & 1 & 0 & 0 & 0 & 0 & -X^W_2C_2 & -Y^W_2C_2 & -Z^W_2C_2 & -C_2\\
+0 & 0 & 0 & 0 & X^W_2 & Y^W_2 & Z^W_2 & 1 &  -X^W_2R_2 & -Y^W_2R_2 & -Z^W_2R_2 & -R_2\\
  & & & & & & & \vdots & & & & \\
-X^w_n & Y^w_n & Z^n_2 & 1 & 0 & 0 & 0 & 0 & -X^w_nC_n & -Y^w_nC_n & -Z^w_nC_n & -C_n\\
-0 & 0 & 0 & 0 & X^w_n & Y^w_n & Z^w_n & 1 & -X^w_nR_n & -Y^w_nR_n & -Z^w_nR_n & -R_n
+X^W_n & Y^W_n & Z^n_2 & 1 & 0 & 0 & 0 & 0 & -X^W_nC_n & -Y^W_nC_n & -Z^W_nC_n & -C_n\\
+0 & 0 & 0 & 0 & X^W_n & Y^W_n & Z^W_n & 1 & -X^W_nR_n & -Y^W_nR_n & -Z^W_nR_n & -R_n
 \end{bmatrix}
 \begin{bmatrix} 
 m_{11} \\ m_{12} \\ m_{13} \\ m_{14} \\
@@ -262,13 +262,13 @@ Considering that this matrix is build on homogeneous system, there is no unique 
 \begin{equation}
 \hspace*{-0.1cm}
 \begin{bmatrix} 
-X^w_1 & Y^w_1 & Z^w_1 & 1 & 0 & 0 & 0 & 0 & -X^w_1C_1 & -Y^w_1C_1 & -Z^w_1C_1\\
-0 & 0 & 0 & 0 & X^w_1 & Y^w_1 & Z^w_1 & 1 &  -X^w_1R_1 & -Y^w_1R_1 & -Z^w_1R_1\\
-X^w_2 & Y^w_2 & Z^w_2 & 1 & 0 & 0 & 0 & 0 & -X^w_2C_2 & -Y^w_2C_2 & -Z^w_2C_2\\
-0 & 0 & 0 & 0 & X^w_2 & Y^w_2 & Z^w_2 & 1 &  -X^w_2R_2 & -Y^w_2R_2 & -Z^w_2R_2\\
+X^W_1 & Y^W_1 & Z^W_1 & 1 & 0 & 0 & 0 & 0 & -X^W_1C_1 & -Y^W_1C_1 & -Z^W_1C_1\\
+0 & 0 & 0 & 0 & X^W_1 & Y^W_1 & Z^W_1 & 1 &  -X^W_1R_1 & -Y^W_1R_1 & -Z^W_1R_1\\
+X^W_2 & Y^W_2 & Z^W_2 & 1 & 0 & 0 & 0 & 0 & -X^W_2C_2 & -Y^W_2C_2 & -Z^W_2C_2\\
+0 & 0 & 0 & 0 & X^W_2 & Y^W_2 & Z^W_2 & 1 &  -X^W_2R_2 & -Y^W_2R_2 & -Z^W_2R_2\\
  & & & & & & & \vdots & & &\\
-X^w_n & Y^w_n & Z^n_2 & 1 & 0 & 0 & 0 & 0 & -X^w_nC_n & -Y^w_nC_n & -Z^w_nC_n\\
-0 & 0 & 0 & 0 & X^w_n & Y^w_n & Z^w_n & 1 & -X^w_nR_n & -Y^w_nR_n & -Z^w_nR_n
+X^W_n & Y^W_n & Z^n_2 & 1 & 0 & 0 & 0 & 0 & -X^W_nC_n & -Y^W_nC_n & -Z^W_nC_n\\
+0 & 0 & 0 & 0 & X^W_n & Y^W_n & Z^W_n & 1 & -X^W_nR_n & -Y^W_nR_n & -Z^W_nR_n
 \end{bmatrix}
 \begin{bmatrix} 
 m_{11} \\ m_{12} \\ m_{13} \\ m_{14} \\
@@ -296,7 +296,7 @@ X(9) & X(10) & X(11) & 1
 \end{equation}%
 \\
 \indent
-After we get the perspective projection matrix \(M\), the next step is to recover the intrinsic and extrinsic camera matrix \(K\) and [\(R_{3*3}, \, T_{3*1}\)], with which we could generate the world coordinates \(X^w/Y^w/Z^w\). Starting from the decomposition of eqn.~\ref{pinholeMatrix3x4M} step by step, and we could get
+After we get the perspective projection matrix \(M\), the next step is to recover the intrinsic and extrinsic camera matrix \(K\) and [\(R_{3*3}, \, T_{3*1}\)], with which we could generate the world coordinates \(X^W/Y^W/Z^W\). Starting from the decomposition of eqn.~\ref{pinholeMatrix3x4M} step by step, and we could get
 
 \begin{equation}
 M =
@@ -397,21 +397,21 @@ In 3D object calibration technique, camera calibration is performed by observing
 
 %\\\\%
 
-Zhengyou Zhang, a Chinese professor of computer science, IEEE and ACM Fellow and a specialist in computer vision and graphics, has deep studies on camera calibration from one-dimension calibration to tree-dimension calibration \cite{zhangCalibration1_2004} \cite{zhangCalibration2_2000} \cite{Zhengyou04}. The accuracy of calibration from 1D to 3D is getting better, but the calibration system setting-up needs more and more work and cost as well. One dimension object is suitable for calibrating multiple cameras at once. Two dimension planer pattern approaches seems to be a good compromise, with good accuracy and simple setup. Also using the three dimension method for calibration, Kai \cite{Kai10} derived the per-pixel  beam equation, the linear relationship that could map to \(X^w/Y^w\) from \(Z^w\) as eqn.~\ref{kaiBeamEquation} shows, directly from pinhole camera matrix \(M\) for every single pixel. That is to say, we could easily look up \(X^w/Y^w\) after calibration once found the way to get \(Z^w\).
+Zhengyou Zhang, a Chinese professor of computer science, IEEE and ACM Fellow and a specialist in computer vision and graphics, has deep studies on camera calibration from one-dimension calibration to tree-dimension calibration \cite{zhangCalibration1_2004} \cite{zhangCalibration2_2000} \cite{Zhengyou04}. The accuracy of calibration from 1D to 3D is getting better, but the calibration system setting-up needs more and more work and cost as well. One dimension object is suitable for calibrating multiple cameras at once. Two dimension planer pattern approaches seems to be a good compromise, with good accuracy and simple setup. Also using the three dimension method for calibration, Kai \cite{Kai10} derived the per-pixel  beam equation, the linear relationship that could map to \(X^W/Y^W\) from \(Z^W\) as eqn.~\ref{kaiBeamEquation} shows, directly from pinhole camera matrix \(M\) for every single pixel. That is to say, we could easily look up \(X^W/Y^W\) after calibration once found the way to get \(Z^W\).
 
 \begin{equation}
 \begin{aligned}
-X^w_{[row, \, col]} = c_{[row, col]}Z^w_{[row, \, col]}+d_{[row, col]}
+X^W_{[row, \, col]} = c_{[row, col]}Z^W_{[row, \, col]}+d_{[row, col]}
 \\%
-Y^w_{[row, \, col]} = e_{[row, col]}Z^w_{[row, \, col]}+f_{[row, col]}
+Y^W_{[row, \, col]} = e_{[row, col]}Z^W_{[row, \, col]}+f_{[row, col]}
 \end{aligned}
 \label{kaiBeamEquation}
 \end{equation}%
 \noindent
-where \(c/d/e/f\) are per-pixel coefficients for the linear beam equations, and the subscripts [\(row, \, col\)] are corresponding per-pixel image coordinates.
+where \(c/d/e/f\) are per-pixel coefficients for the linear beam equations, and the subscripts [\(row, \, col\)] are corresponding pixel address in image space.
 
-%D[r, c] ~= Z^w[r, c] -- > (X^c, Y^c)
-%Z^w[r, c] = Z^c[r, c] = D[r,c]
+%D[r, c] ~= Z^W[r, c] -- > (X^c, Y^c)
+%Z^W[r, c] = Z^c[r, c] = D[r,c]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                                                                   %%%%%%%%%%
@@ -438,7 +438,7 @@ All above in Chapter \ref{chapterTraditionalCalibration} are talking about the i
 \label{DistortionComprehension}
 \end{figure}%
 
-There are (a)(b)(c) three parts shown in fig.~\ref{DistortionComprehension}. Each part has the pinhole camera only on the top, in contrast to the camera-with-lens situation at the bottom. To understand how the barrel distortion happens, we should go through from part (c) to part (a). In part (c), the gray background uniform grid is the \enquote{object} our that the camera is going to observe, and the blue frames shows the FoV of the camera in the camera space. Due to the fact that, there will be worse and worse distortions as one pixel goes from the center to the edge, the enlarged FoV of a camera with lens in the camera space is in pincushion (or star) shape. With the enlarged Fov is mapped to the \enquote{Virtual Focal Plane}, as defined in fig.~\ref{PinHoleVirtualFocalPlane}, the pincushion shape doesn't change because rays from the camera space have not gone through the lens yet. Note that we quoted the \enquote{Virtual Focal Plane} because the image on this virtual plane, when considering lens distortion, does not equal to the real focal plane (where the sensor is) any more. We can tell from part (b) that, even though the image space coordinates still are composed of \(Col\) and \(Row\), their ranges have changed from positive integers only to the whole real integers that include negative ones. But the sensor never changes, and so the image space in part (a) still has its range of positive integers. With rays going through the lens, the pincushion-shape FoV (the frame in blue) will be squeezed into a small rectangle, and thus we get the image in the real focal plane with its background grid showing a barrel distorted shape.%
+There are (a)(b)(c) three parts shown in fig.~\ref{DistortionComprehension}. Each part has the pinhole camera only on the top, in contrast to the camera-with-lens situation at the bottom. To understand how the barrel distortion happens, we should go through from part (c) to part (a). In part (c), the gray background uniform grid is the \enquote{object} our that the camera is going to observe, and the blue frames shows the FoV of the camera in the camera space. Due to the fact that, there will be worse and worse distortions as one pixel goes from the center to the edge, the enlarged FoV of a camera with lens in the camera space is in pincushion (or star) shape. With the enlarged FoV is mapped to the \enquote{Virtual Focal Plane}, as defined in fig.~\ref{PinHoleVirtualFocalPlane}, the pincushion shape doesn't change because rays from the camera space have not gone through the lens yet. Note that we quoted the \enquote{Virtual Focal Plane} because the image on this virtual plane, when considering lens distortion, does not equal to the real focal plane (where the sensor is) any more. We can tell from part (b) that, even though the image space coordinates still are composed of \(Col\) and \(Row\), their ranges have changed from positive integers only to the whole real integers that include negative ones. But the sensor never changes, and so the image space in part (a) still has its range of positive integers. With rays going through the lens, the pincushion-shape FoV (the frame in blue) will be squeezed into a small rectangle, and thus we get the image in the real focal plane with its background grid showing a barrel distorted shape.%
 \\\indent%
 With lens distortions counted, eqn.~\ref{twoDRelativeFromCamToIm} now needs to be changed into 
 %
@@ -462,7 +462,7 @@ R' =  R (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_2 (r^2 + 2 R^2) + 2 p_1 CR]
 \end{equation}%
 %
 \noindent
-where higher order parameters are omitted for being negligible; \((C', \, R')\) denote the undistorted pixels in the \enquote{Virtual Focal Plane}, \((C, \, R)\) denote the distorted pixel in real sensor image, \(k_i\)'s are coefficients of radial distortion, and \(p_j\)'s are coefficients of tangential distortion. The five parameters \(k_1/k_2/k_3/p_1/p_2\) are usually called distortion parameters. With the distortion parameters calculated, the distorted \((C, \, R)\) could be undistorted into \((C', \, R')\), and then \((C', \, R')\) could be used to generate the world space \(X^w/Y^w/Z^w\) with intrinsic and extrinsic parameters.
+where higher order parameters are omitted for being negligible; \((C', \, R')\) denote the undistorted pixels in the \enquote{Virtual Focal Plane}, \((C, \, R)\) denote the distorted pixel in real sensor image, \(k_i\)'s are coefficients of radial distortion, and \(p_j\)'s are coefficients of tangential distortion. The five parameters \(k_1/k_2/k_3/p_1/p_2\) are usually called distortion parameters. With the distortion parameters calculated, the distorted \((C, \, R)\) could be undistorted into \((C', \, R')\), and then \((C', \, R')\) could be used to generate the world space \(X^W/Y^W/Z^W\) with intrinsic and extrinsic parameters.
 %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
