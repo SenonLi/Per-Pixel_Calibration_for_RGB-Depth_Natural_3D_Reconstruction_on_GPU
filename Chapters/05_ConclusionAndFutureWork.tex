@@ -1,35 +1,25 @@
 % Chapter 3
 \chapter{Conclusion and Future Work} % Main chapter title
 \label{sens_ConclusionAndFutureWork} 
-%
-RGB-D cameras have both of lens distortions and depth distortion problem. Distortions correction is wildly discussed in image processing area. In this thesis, a data-based LUT software calibration method for general RGB-D cameras is proposed, in contrast with the pinhole-camera-model based traditional method. In this section, both of the advantages and and disadvantages are concluded, and the possible avenues of future study are discussed.
-%
-\section{Conclusion}
-In traditional 3D cameras' calibration, 3D reconstruction (based on pinhole camera model) and lens distortion are separated, which depresses the efficiency of image processing. Moreover, it does not include the depth distortion correction, assuming that the depth values are accurate and employing them directly as \(Z^w\) in 3D reconstruction.%
-\\\\%
-In stead of using a pinhole camera model, which in practical is not ideally accurate, our new proposed calibration method is based on real data. Not only \(X^w\)/\(Y^w\) values are rectified directly through one step transformation, but \(Z^w\) is also guaranteed accurate by importing externally measured data. 
-\\\\%
-During this data-based calibration method, high-order polynomial surface mapping is employed for \(X^w\)/\(Y^w\) rectification, as discussed in section \ref{sectionHighOrderPolynomialSurfaceMapping}. And an IoT technology, an individual BLE OF tracking module is introduced for the support of external \(Z^w\) data, offering a way for the depth distortion correction.
-\\\\%
-In contrast with the traditional pinhole-camera-model based method, the new proposed data-based method offers more efficient rectified 3D reconstruction coordinates, with rectified \(Z^w\) after the depth distortion correction. One disadvantage is the memory cost. The data-based method brings in better accuracy at the expense of more data collection. With the help of the BLE OF tracking module, data could be collected automatically during one-way of sliding the slider on the rail from one end to the other, whereas the memories cost cannot be skipped. However, with the fast development of semiconductor technologies, memories cost should not be a problem.
 
+\section{Conclusion}
+The depth sensor technologies opens a new epoch for 3D markets. Ever since the Microsoft brought the low-cost depth camera Kinect into consumer market, RGB-D cameras are famous in in research areas of HCI, and an accurate RGB-D camera calibration is now important in computer vision. However, the traditional camera calibration methods are not ideal on accuracy and efficiency. They do not cover all pixels of a sensor, and did not consider the problem of \enquote{Depth Distortion} either. Besides, those methods need the distortion removal to be a second step after raw 3D reconstruction (from a pinhole camera matrix), which is not an efficient way displaying the 3D reconstruction in real-time.
+\\\indent
+In this thesis, a novel per-pixel calibration method with look-up table based 3D reconstruction in real-time is introduced, using a rail calibration system. Instead of using the traditional pinhole camera model, two polynomial mapping models are employed in this calibration method. The first model is the two-dimensional \(4^{th}\) order polynomial mapping from \(R/C\) to \(X^W/Y^W\) during the frames data collection, which takes care of the removal of lens distortions; and the second model is the linear mapping from \(D\) to \(Z^W\), which can handle \enquote{depth distortion}. The method consists of two big steps: \(X^WY^WZ^W+D\) data collection and mapping parameters determination. \(D\) is simply from depth streams. \(Z^W\) is from external based on the camera's position on the rail. And the undistorted (\(X^W, \, Y^W\)) are from the transformation of \(R/C\) by a \(4^{th}\) order polynomial mapping model, during which lens-distortions could be removed. This method is claimed as \enquote{data-based} calibration method, because both of the two mapping models are determined and calculated by real streams data from the camera. 
+\\\indent
+With the fewest calculations, the undistorted 3D world coordinates (\(X^\text{W}, \, Y^\text{W}, \, Z^\text{W}\)) for every single pixel could be looked up in real-time based on \(D\) from a \(column\)-by-\(row\)-by-\(6\) look-up table. Two out of six parameters \(a/b\) are to determine the per-pixel \(Z^W\), which is generated from per-pixel depth value \(D\); and the other four parameters \(c/d/d/f\) are to determine the per-pixel \(X^W/Y^W\) respectively, which are mapped by per-pixel linear beam equation from the per-pixel \(Z^W\). Note that \enquote{real-time} here means being able to show an undistorted frame in 3D world space before the start of the second frame processing. The data-based per-pixel calibration method could be applied universally on any RGB-D cameras. With the alignment of RGB pixels using a pinhole camera matrix, it could even work on the combined 3D camera of a random Depth sensor and a random RGB sensor.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%                                                                %%%%%%%%%%%%%%%%%
+%%%%%%%%%%     5.2  Future Work                                    %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%                                                                %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Future Work}
 %
-The new proposed data-based method applies universally to all of the RGB-D cameras. With a better calibration system and corresponding DIP technologies, there could be a huge improvement space for calibration accuracy.
-\\\\%
-An apparent limit during the \(X^w\)/\(Y^w\) rectifications is the static patten, which offers only uncontrollable dead distortion information. As the working distance changes, the dot-clusters, which contains distortion information, observed by a camera also changes, resulting an inconsistent resolution of rectification. What's worse, for different RGB-D cameras with different resolution, the pattern (size) needs to be changed for a better match. 
-\\\\%
-In the future calibration system, in a lab with high-performance light control to reduce possible noises, the uniform pattern could be displayed by a large LCD screen. Managed thus, the uniform pattern is totally controllable, and will be part of the calibration system to form a new close-loop system. Data extracted from the camera stream supplying distortion information will be feedback for the best live pattern generating, helping adjust both size and distribution of the displayed pattern in real-time. In this way, we can control a fixed pattern distribution (offering uniformly distortion information) for cameras with various resolution at any working distance all along the rail.
-\\\\%
-The dots pattern could also be changed to uniform grid pattern (like a checker board) for more precise coordinates extraction. And corresponding DIP methods' improvement can also improve the accuracy for camera calibration.
-
-%Chapter 4: results for 3 types of RGB-D cameras.\\
-%Chapter 5: conclusion\\
-
-
-
-
-
+The rail calibration system and per-pixel calibration method with LUT-based real-time 3D reconstruction could be applied universally to all kinds of RGB-D cameras. With a more precise calibration system and corresponding DIP technologies, there could be a huge improvement space for calibration accuracy. Hardware improvement is sometimes more important than a software updating. Concretely the system in the lab now can only handle a working distance \(Z^W\) from 1.165m to 2.565m. Considering that the depth resolution deteriorates notably with depth, it might not be linear relationship between \(D\) and \(Z^W\) for every single pixel, when the depth \(D\) value goes much further than the limit of the rail. In that case, the per-pixel \(D\) to \(Z^W\) mapping could be changed from singular linear to segmented mapping function that has non-linear section when \(D\) gets larger than a certain value.
+\\\indent
+Not only the rail, the planar pattern could also be changed based on the resolution of the camera (\textit{e.g.}, size of the dots and side distance of the unit square-shaped of the uniform grid could be larger when calibrating camera with a supper high resolution). A two dimensional object is totally enough for calibrating KinectV2, because the NearIR stream have same pixels' distortions with the depth stream. However, if NearIR stream could not be used to extract points \(R/C\) in image space (\textit{e.g.} a structured light based depth sensor) and the size (pixel numbers) of the RGB sensor does not share the same one with the depth sensor, we could make the planar pattern into a \enquote{three dimension mode}: change the printed dots into real whole such that the depth stream could detect a difference between the \enquote{dots} and \enquote{white background}. Instead of using a laser distance measurer to manually input \(Z^W\) into every frame during the frame data collection, we could add a tracking module onto the rail to active the frame collection by software. In this way, not only \(Z^W\) could be traced by the tracking module, but also the frame collection could be automatically done by the activation of the tracking module, to record one frame data after moving every certain distance. 
+\\\indent
+Besides the hardware enhancement, softwares like DIP process can also be improved. The order of polynomial model that help map from image space \(R/C\) to world space \(X^W/Y^W\) could also be heightened for a better accuracy, as long as there will be enough calibrating points to offer the coordinates pairs of both image space and world space. Considering the possible lens-distortions of the RGB sensor, the high order polynomial mapping could also be applied into the alignment from RGB sensor pixels to depth sensor pixels, after the first step of pinhole camera model mapping.
 
 
 

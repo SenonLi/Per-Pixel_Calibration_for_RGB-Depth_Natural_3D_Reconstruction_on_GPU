@@ -4,8 +4,8 @@
 %
 %
 \section{Rail System}%
-As already shown in chapter \ref{sens_introduction} figure \ref{trackingModuleOnKinectV2CalibrationSystem}, the whole calibration system consists of an RGB-D camera, a plane of round dot pattern, rail, and a BLE Optical-Flow tracking module. 
-Other than the round dot pattern standing in front of the 3D camera for offering distortion information, all of the rest parts of the whole calibration system are centered on the rail, which is made with 80/20s. Taking the round dot pattern plane as plane \(X^wY^w\), the rail is placed right perpendicular to the dot pattern along the direction of \(Z^w\) axis. Both of the RGB-D camera and the BLE Optical-Flow tracking module are mounted on the slider of the rail. Sitting on the top of the elevated carriage of the slider, the RGB-D camera's vision keeps being horizontal, parallel with \(Z^w\) axis. And the origin is chosen right at the center of the camera's field of view, like figure \ref{cameraFieldOfView} shows.\par
+As already shown in section \ref{sectionRGBDcameraCalibration} fig.~\ref{trackingModuleOnKinectV2CalibrationSystem}, the whole calibration system consists of an RGB-D camera on the rail, a plane of round dot pattern and a BLE Optical-Flow tracking module. 
+Other than the round dot pattern standing in front of the 3D camera offering distortion information, all of the rest parts of the whole calibration system are centered on the rail, which is made with 80/20s. Taking the round dot pattern plane as plane \(X^WY^W\), the rail is placed right perpendicular to the dot pattern along the \(Z^W\)-axis. Both of the RGB-D camera and the BLE Optical-Flow tracking module are mounted on the slider of the rail.
 %
 \begin{figure}[h]
 \centering
@@ -58,19 +58,19 @@ An optical flow sensor is a vision sensor capable of measuring optical flow or v
 \label{OpticalFlowSensor}
 \end{figure}%
 %
-%\subsubsection{Accumulated \(Z^w\)-axis data calibration}
+%\subsubsection{Accumulated \(Z^W\)-axis data calibration}
 %
 Sensor ANDS-3080 has a programmable frame rate of over 6400 fps. With a lens mounted, this optical flow sensor can theoretically adjust its working distance from zero to one meter. Both of the raw 30-by-30 image frame and the calculated motion results could be retrieved from the optical flow sensor in two different working modes. In the \enquote{image burst} mode, the raw 30-by-30 image frames form a 10 fps live video, helping adjust the lens for a better focus. Whereas in the \enquote{motion burst} mode, the calculated motion results offers accumulation data for both of the sensor's \(x\)-axis and \(y\)-axis.
 \\\\%
-Concretely as shown in figure \ref{MountedTrackingModuleObservingRail}, only the \(y\)-axis accumulated data is used as the accumulated \(Z^w\)-axis data in the world coordinate, whereas the \(x\)-axis accumulation is always zero (no motion on the \(x\)-axis. Employing the \enquote{motion burst} mode, on ever update, the world coordinate \(Z^w\) could be written as%
+Concretely as shown in figure \ref{MountedTrackingModuleObservingRail}, only the \(y\)-axis accumulated data is used as the accumulated \(Z^W\)-axis data in the world coordinate, whereas the \(x\)-axis accumulation is always zero (no motion on the \(x\)-axis. Employing the \enquote{motion burst} mode, on ever update, the world coordinate \(Z^W\) could be written as%
 %
 \begin{equation}
 %
-Z^w = Z^w_0 + ratio*y^{acc} = Z^w_0 + ratio*(y_{\text{\_all\_previous}} + y_{\text{\_new\_updated}})
+Z^W = Z^W_0 + ratio*y^{acc} = Z^W_0 + ratio*(y_{\text{\_all\_previous}} + y_{\text{\_new\_updated}})
 %
 \end{equation}
 %
-where \(Z^w_0\) denotes the beginning point of accumulating (concretely at the closest end of the rail to dots pattern), \(ratio\) maps the \enquote{unit one} from \(y\)-axis to the \(Z^w\)-axis, \(y^{acc}\) denotes the accumulated \(y\)-axis movement by data retrieved from the optical flow sensor, which equals to the sum of all previous values and the new updated value.
+where \(Z^W_0\) denotes the beginning point of accumulating (concretely at the closest end of the rail to dots pattern), \(ratio\) maps the \enquote{unit one} from \(y\)-axis to the \(Z^W\)-axis, \(y^{acc}\) denotes the accumulated \(y\)-axis movement by data retrieved from the optical flow sensor, which equals to the sum of all previous values and the new updated value.
 %
 %\subsection{Bluetooth Low Energy for wireless communication}
 %
@@ -105,7 +105,7 @@ Cypress BLE Module helps handle the lowest hardware controller section (PHY, LL,
 \\\\%
 Concretely for the BLE programming in this project, on the GPA layer, the BLE module continuously retrieving data from Optical-Flow sensor is the \enquote{Peripheral} that advertises to a Central, while a BLE dongle (receiver connected on PC) is the \enquote{Central} that scans for advertisements from GAP Peripherals and is going to establish the connection with the BLE module. Whereas on the GATT layer, the BLE module is the \enquote{Sever} that contains data and the dongle on PC works as a \enquote{Client} to receive data.
 \\\\%
-To program on the PC side, both of the command sending and data receiving are through the serial port which connects the BLE dongle. Both of the output command to send and received the input data are packaged in a center format, which means for every command about BLE control, there must be a method to package it and a corresponding decoding method to extract valid data. All of the commands that need to be managed are to handle GATT data transmission and GAP connection problem. After GATT and GAP setting, concretely, the optical flow sensor works at a sampling rate of 2000Hz and the BLE communication speed is 100 updates per second, i.e., \(Z^w\) is updated at 100Hz.
+To program on the PC side, both of the command sending and data receiving are through the serial port which connects the BLE dongle. Both of the output command to send and received the input data are packaged in a center format, which means for every command about BLE control, there must be a method to package it and a corresponding decoding method to extract valid data. All of the commands that need to be managed are to handle GATT data transmission and GAP connection problem. After GATT and GAP setting, concretely, the optical flow sensor works at a sampling rate of 2000Hz and the BLE communication speed is 100 updates per second, i.e., \(Z^W\) is updated at 100Hz.
 %
 %
 \subsection{PCB Joint, Power Supply and Illumination}

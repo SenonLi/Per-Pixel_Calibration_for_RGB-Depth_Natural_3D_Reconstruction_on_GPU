@@ -397,7 +397,7 @@ In 3D object calibration technique, camera calibration is performed by observing
 
 %\\\\%
 
-Zhengyou Zhang, a Chinese professor of computer science, IEEE and ACM Fellow and a specialist in computer vision and graphics, has deep studies on camera calibration from one-dimension calibration to tree-dimension calibration \cite{zhangCalibration1_2004} \cite{zhangCalibration2_2000} \cite{Zhengyou04}. The accuracy of calibration from 1D to 3D is getting better, but the calibration system setting-up needs more and more work and cost as well. One dimension object is suitable for calibrating multiple cameras at once. Two dimension planer pattern approaches seems to be a good compromise, with good accuracy and simple setup. Also using the three dimension method for calibration, Kai \cite{Kai10} derived the per-pixel  beam equation, the linear relationship that could map to \(X^W/Y^W\) from \(Z^W\) as eqn.~\ref{kaiBeamEquation} shows, directly from pinhole camera matrix \(M\) for every single pixel. That is to say, we could easily look up \(X^W/Y^W\) after calibration once found the way to get \(Z^W\).
+Zhengyou Zhang, a Chinese professor of computer science, IEEE and ACM Fellow and a specialist in computer vision and graphics, has deep studies on camera calibration from one-dimension calibration to tree-dimension calibration \cite{zhangCalibration1_2004} \cite{zhangCalibration2_2000} \cite{Zhengyou04}. The accuracy of calibration from 1D to 3D is getting better, but the calibration system setting-up needs more and more work and cost as well. One dimension object is suitable for calibrating multiple cameras at once. Two dimension planer pattern approaches seems to be a good compromise, with good accuracy and simple setup. Also using the three dimension method for calibration, Kai \cite{Kai10} derived the per-pixel  beam equation, the linear relationship that could map to \(X^W/Y^W\) from \(Z^W\) as eqn.~\ref{kaiBeamEquation} shows, directly from pinhole camera matrix \(M\). That is to say, we could easily look up \(X^W/Y^W\) after calibration once found the way to get \(Z^W\).
 
 \begin{equation}
 \begin{aligned}
@@ -479,7 +479,7 @@ where higher order parameters are omitted for being negligible; \((C', \, R')\) 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.6\textwidth]{flowChart}
-\caption{Traditional Camera Calibration Flow Char}
+\caption{Traditional Camera Calibration Flow Chart}
 \label{flowChart}
 \end{figure}%
 \\\indent
@@ -489,7 +489,33 @@ Fig.~\ref{flowChart} shows the flow chart of the whole traditional camera calibr
 
 
 
-
+\begin{equation*}%
+c_{[row, col]} %
+= \frac%
+{(m_{22}m_{33} - m_{23}m_{32})col + (m_{13}m_{32} - m_{12}m_{33})row + (m_{12}m_{23} - m_{13}m_{22})}%
+{(m_{21}m_{32} - m_{22}m_{31})col + (m_{12}m_{31} - m_{11}m_{32})row + (m_{11}m_{22} - m_{12}m_{21})} \, ,
+\end{equation*}
+%
+\begin{equation*}%
+d_{[row, col]} %
+= \frac%
+{(m_{22}m_{34} - m_{24}m_{32})col + (m_{14}m_{32} - m_{12}m_{34})row + (m_{12}m_{24} - m_{14}m_{22})}%
+{(m_{21}m_{32} - m_{22}m_{31})col + (m_{12}m_{31} - m_{11}m_{32})row + (m_{11}m_{22} - m_{12}m_{21})} \, ,
+\end{equation*}
+%
+\begin{equation*}%
+e_{[row, col]} %
+= \frac%
+{(m_{23}m_{31} - m_{21}m_{33})col + (m_{11}m_{33} - m_{13}m_{31})row + (m_{13}m_{21} - m_{11}m_{23})}%
+{(m_{21}m_{32} - m_{22}m_{31})col + (m_{12}m_{31} - m_{11}m_{32})row + (m_{11}m_{22} - m_{12}m_{21})} \, ,
+\end{equation*}
+%
+\begin{equation*}%
+f_{[row, col]} %
+= \frac%
+{(m_{23}m_{32} - m_{22}m_{33})col + (m_{12}m_{33} - m_{13}m_{32})row + (m_{13}m_{22} - m_{12}m_{23})}%
+{(m_{21}m_{32} - m_{22}m_{31})col + (m_{12}m_{31} - m_{11}m_{32})row + (m_{11}m_{22} - m_{12}m_{21})}
+\end{equation*}
 
 
 

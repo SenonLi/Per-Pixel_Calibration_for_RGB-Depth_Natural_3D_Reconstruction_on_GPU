@@ -1,7 +1,7 @@
 \documentclass[final]{ukthesis}
 %you must include these 2 packages.
 \usepackage[pdfauthor={Sen Li},
-            pdftitle={Universal Real-Time XYZ rectified Reconstruction for RGB-D Cameras},
+            pdftitle={RGB-D Cameras’ Parallel Calibration and 3D Reconstruction in Real-Time},
             pdfsubject={3D Camera Calibration},
             pdfkeywords={3D Reconstruction; Camera Calibration; RGBD; Image Processing},
             pdfproducer={Latex with hyperref},
@@ -31,6 +31,10 @@
 \usepackage{multirow}
 \usepackage{makecell}
 \usepackage{varwidth}
+
+\usepackage{color}
+\usepackage[T1]{fontenc}
+
 \setcounter{MaxMatrixCols}{20}
 
 %\usepackage{amsxtra}     % Use various AMS packages
@@ -82,14 +86,14 @@ great interest has been invigorated into RGB-D sensors. However, there has not b
 
 \onehalfspacing
 
-\input{Chapters/01_Introduction}
+%\input{Chapters/01_Introduction}
+%\copyrightnotice
+%\input{Chapters/02_PinHoleCameraStructuredLight}
+%\copyrightnotice
+\input{Chapters/03_CalibrationReconstructionOnGPU}
 \copyrightnotice
-\input{Chapters/02_PinHoleCameraStructuredLight}
-\copyrightnotice
-\input{Chapters/03_HighOrderPolynomial_LUT}
-\copyrightnotice
-\input{Chapters/04_CalibrationSystemBLE_OF} 
-\copyrightnotice
+%\input{Chapters/04_CalibrationReconstruction} 
+%\copyrightnotice
 %\input{Chapters/05_ConclusionAndFutureWork}
 %\copyrightnotice
 
