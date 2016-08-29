@@ -33,111 +33,128 @@
 %5. RGB values alignment based on pinhole camera model.
 %
 %
+%In this chapter, a simple parallel RGB-D camera calibration method with a simple undistorted 3D reconstruction on GPU is introduced. A KinectV2 camera, as one famous consumer RGB-D camera, is utilized to during the calibration and 3D reconstruction. We will finally show an undistorted 3D reconstruction with color (RGB) on GPU. The calibration method can be applied universally on all kinds of RGB-D cameras. 
 %
-As described in chapter \ref{chapterIntroduction}, there are applications like SLAM and KinectFusion that require \(D\) to be converted into \(X^CY^CZ^C\) coordinates on a per-pixel basis.
-
-
-
-Now that we have 
-%
+%show the piled frames
 %
 %
 \section{\(RGBD\) to \(X^CY^CZ^CRGB\)}
-Red-Green-Blue-Depth (RGB-D) cameras are famous in 3D applications. In autonomous flight of micro air vehicle (MAV) applications, a RGB-D camera can be used to cooperate with Simultaneous Localization And Mapping (SLAM) techniques in creating a world space 3D map of MAV's surroundings \cite{RGBDSLAMmav_2013}. KinectFusion technologies, which greatly advance the development of 3D printing, allows a user to create a detailed 3D reconstruction of an object or a small environment in real-time using Microsoft Kinect sensor \cite{KinectFusionIzadi_2011}. In those 3D application, RGB-D cameras play a major role supporting world space \(X^WY^WZ^W\) coordinates. Those world space coordinates are converted based on  depth (\(D\)) streams from image space \(row/column\), which requires transformations for every single pixel. Kai \cite{Kai10} shows that, GPU programing is ideally suited to this kind of per-pixel processing. He did a good job on structed light 3D scanner parallel calibration on GPU, and derived the per-pixel beam equation~(\ref{kaiBeamEquationCh3}) directly from a pinhole camera matrix \(M\). 
+\label{sectionCameraSpaceReconstruction}
+As described in chapter \ref{chapterIntroduction}, there are applications like SLAM and KinectFusion that require \(D\) to be converted into \(X^CY^CZ^C\) coordinates on a per-pixel basis. From chapter \ref{chapterTraditionalCalibration}, we know that the depth sensor measures \(Z^C\), and a pinhole camera model (more specifically the intrinsic matrix) in homogeneous coordinates offers the relationship between \(Z^C\) and \(X^C/Y^C\) respectively. In this section, we will introduce how to generate the camera space 3D coordinates without calibration, and draw a colored camera space 3D reconstruction on GPU using a KinectV2 camera.
+\\\indent
+%
+\begin{figure}[!b]
+\centering
+\includegraphics[width=0.7\textwidth]{VHfieldOfView}
+\caption{Field of View in Pinhole-Camera Model}
+\label{VHfieldOfView}
+\end{figure}%
+%
+The KinectV2 depth sensor measures \(Z^C\) in millimeter and supports its positive data in unsigned-short data-type. Those data will be automatically converted into single-floating type with its range from 0.0f to +1.0f when uploaded onto GPU. Considering that in practical \(D\)s from KinectV2 are always positive whereas \(Z^C\)s should be always negative, we will add a negative sign in the un-scaling step to recover the \(Z^C\) in metric on GPU:
+\begin{equation}
+Z^C[m, n] = - \beta D[m, n] \, ,
+\label{unscalingZc}
+\end{equation}%
+\noindent
+where \(\beta\) constantly equals to 65535.0 (range of unsigned short in single-floating) for all pixels. Besides the depth stream, KinectV2 supports both of the horizontal and vertical field of view (FoV) that can help generate per-pixel \(X^C\) and \(Y^C\), which share the same credits with the intrinsic parameters in a pinhole camera model. Figure~\ref{VHfieldOfView} shows an intuitive view of the horizontal and vertical FoVs in a pinhole camera model, based on which we can derive the \(X^C\) and \(Y^C\) values given a random \(Z^C\) value on the per-pixels basis. Assuming the depth sensor, with its size numDepthRows by numDepthCols, is observing right perpendicularly to a wall where all pixels share the same \(|Z^C_0|\) from the sensor to the wall. Talking about the horizontal FoV only, it is easy to get the range of the camera space FoV along 
+\(X^C\)-axis from \(-|X^C_{\text{Max}}|\) to \(|X^C_{\text{Max}}|\), as shown in fig.~\ref{horizontalFoVtoColumns}. %
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.6\textwidth]{horizontalFoVtoColumns}
+\caption{map \(Col\) to \(X^C\) via horizontal FoV}
+\label{horizontalFoVtoColumns}
+\end{figure}%
+%
+The horizontal range value \(|X^C_{\text{Max}}|\) depends on \(|Z^C_0|\) and the horizontal FoV, given by:
+%
+\begin{equation}
+|X^C_{\text{Max}}| = |Z^C_0| \cdot tan(horFov / 2) 
+\label{cameraXMaxfromZ}
+\end{equation}%
+\noindent
+where the pixel observing on \(X^C = |X^C_{\text{Max}}|\) has its column address of numDepthCols. Similarly, given a random pixel of column address \(Col_0\), its horizontal view \(X^C_0\) could be expressed based on its own horizontal view angle \(\alpha_0\).
+%
+\begin{equation}
+|X^C_{0}| = |Z^C_0| \cdot tan(\alpha_0)
+\label{alphaZeroHorFOV}
+\end{equation}%
+\noindent
+To combine eqn.~\ref{cameraXMaxfromZ} and eqn.~(\ref{alphaZeroHorFOV}), we get
+%
+\begin{equation}
+\frac{X^C_0}{|X^C_{\text{Max}}|} = \frac{tan(\alpha_0)}{tan(horFov / 2)} = \frac{Col_0}{numDepthCols} - 0.5 \, ,
+\label{alphaZeroHorFOV}
+\end{equation}%
+\noindent
+which shows how to get the per-pixel \(X^C_0\) from \(|X^C_{\text{Max}}|\) based on its column address, while \(|X^C_{\text{Max}}|\) depends on the depth sensor's horizontal filed of view. It is intuitively better to change eqn.~(\ref{alphaZeroHorFOV}) a little by substituting \(|X^C_{\text{Max}}|\) with eqn.~(\ref{cameraXMaxfromZ}) such that we can get eqn.~(\ref{proportionalEqnFromZtoX}), a proportional per-pixel mapping based on the column addresses from \(Z^C\) to \(X^C\).
+%
+\begin{equation}
+X^C[m, n] = tan(horFov / 2) \cdot (\frac{n}{numDepthCols} - 0.5) \cdot |Z^C[m, n]|\, ,
+\label{proportionalEqnFromZtoX}
+\end{equation}%
+\noindent
+where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in the depth sensor. Similarly, we can also get the proportional per-pixel mapping from \(Z^C\) to \(Y^C\), based on the vertical FoV and row addresses.
+%
+\begin{equation}
+Y^C[m, n] = tan(verFov / 2) \cdot (\frac{m}{numDepthRows} - 0.5) \cdot |Z^C[m, n]|
+\label{proportionalEqnFromZtoY}
+\end{equation}%
+\noindent
+Note that, \(horFov\) and \(verFov\) are constant during image processing, such that the mapping functions from per-pixel \(Z^C\) to per-pixel \(X^C/Y^C\) totally depend on a pixel's address [\(m, n\)]. Therefore eqn.~(\ref{proportionalEqnFromZtoX}) and eqn.~(\ref{proportionalEqnFromZtoY}) could be expressed as 
 %
 \begin{equation}
 \begin{aligned}
-X^W[m,\,  n] = c[m, n]Z^W[m,\,  n]+d[m, n]
+X^C[m, n] &= a[m, n] \cdot |Z^C[m, n]|
 \\%
-Y^W[m,\,  n] = e[m, n]Z^W[m,\,  n]+f[m, n]
+Y^C[m, n] &= b[m, n] \cdot |Z^C[m, n]| 
 \end{aligned}
-\label{kaiBeamEquationCh3}
+\label{proportionalBeamEqn}
 \end{equation}%
 \noindent
-where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in a M by N sensor. This per-pixel beam equation shows per-pixel linear mappings from \(Z^W\) to \(X^W/Y^W\), and the per-pixel \(Z^W\) can be mapped from features of structured light. 
-\\\indent
-Without calibration, we can also derive per-pixel beam equations in camera space and apply them in GPU parallel processing. In this section, we will introduce how to draw a colored camera space 3D reconstruction on GPU without calibration, using a KinectV2 camera. As shown in the diagram in fig.~\ref{cameraSpaceDiagram}, we will retrieve \(Depth\), \(RGB\) and \(mapping\) streams from the KinectV2 camera, and save them into corresponding buffers respectively. The mapping streams contains \(Row\) and \(Column\) values that can help every depth pixel to look for color infos from \(RGB\) streams. Then those three streams will be uploaded from CPU onto GPU as textures for image drawing. The camera space 3D coordinates \(X^CY^CZ^C\) for the final 3D image will be generated based on depth texture, which will also be processed on GPU in the way that similar to drawing colors on a pixel. In short, we will draw on GPU twice: one for camera space coordinates generation and \(RGB\) alignment, the other one for real 3D image drawing.
+where
+%
+\begin{equation}
+\begin{aligned}
+a[m, n] &= tan(horFov / 2) \cdot (\frac{n}{numDepthCols} - 0.5)
+\\%
+b[m, n] &= tan(verFov / 2) \cdot (\frac{m}{numDepthRows} - 0.5) \, \, .
+\end{aligned}
+\label{parametersABofProportional}
+\end{equation}%
 \\\indent
 %
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\textwidth]{cameraSpaceDiagram}
-\caption{Block Diagram for Camera Space 3D Reconstruction without calibration}
+\includegraphics[width=0.9\textwidth]{cameraSpaceDiagram}
+\caption{Diagram for Camera Space 3D Reconstruction without calibration}
 \label{cameraSpaceDiagram}
 \end{figure}%
 %
-In the first drawing step of camera space coordinates generation, a look-up texture will be created for the final 3D image drawing, which contains both camera space coordinates and color (RGB) values. To draw a certain color on one single pixel, GPU provide one single fragment shader to generate and save corresponding four color channel RGBA (A for alpha, opacity) single-floating data into a corresponding position in a framebuffer. We could take the framebuffer as a screen on which we are going to draw, and the positions in the framebuffer would be same with pixels in the screen. We will follow the way how GPU do drawing, and use GPU to calculate per-pixel \(X^CY^CZ^C\) and save the calculation results with RGB streams together as total six channels into a customer framebuffer. The first thing is to initial a customer framebuffer, whose texture will finally be utilized to look up per-pixel's \(X^CY^CZ^CRGB\) six channels of data for the eventual 3D image drawing. The internal texture format of {\ttfamily\color[rgb]{0.0,0.0,0.5019608}GL\_RGBA32F}, which means one pixel position (\(row\), \(column_0\)) can contain four channels. We need a second position (\(row\), \(column_0 + 1\)) for every single pixel to contain the total six channels. Therefore the customer framebuffer will be initialed with a size of %
-({\ttfamily
-\textcolor[rgb]{0.0,0.0,0.5019608}{2}\textcolor{black}{*}\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthCols}\textcolor{black}{,}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthRows}}),
-where numDepthRows and numDepthCols denote the size of total rows and total columns of the depth sensor. %
-\\\indent
-Four corner points coordinates, as four vertices, will be uploaded onto vertex shader to form a quadrilateral filling up the screen, which will cover the numDepthRows by (2*numDepthCols) framebuffer. With respect to a random position of every single depth pixel, two corresponding \enquote{virtual pixels} (positions) will be processed by two independent fragment shaders to respectively save \(X^CY^CZ^C\) and \(RGB\) data into the customer framebuffer. The fragment shader is programmed as below.
+Now that we have the per-pixel mapping from \(Z^C\) to \(X^CY^C\), it is time to draw the colored camera space 3D image. Figure~\ref{cameraSpaceDiagram} shows the diagram of drawing using GPU. We will retrieve \(Depth\) and \(RGB\) streams from the KinectV2 camera, and save them into corresponding buffers respectively. Then those three streams will be uploaded from CPU onto GPU as textures for fragment shader processing. The camera space 3D coordinates \(X^CY^CZ^C\) will be generated from depth texture based on eqn.~(\ref{proportionalBeamEqn}), while \(RGB\) values can be looked up from the color texture. Six channels of data \(X^CY^CZ^CRGB\) for all pixels will be saved into a framebuffer object, whose texture can be utilized for looking up during the final 3D image drawing. The fragment shader is programmed as below.
 \\%
-%
-%
 {\ttfamily
-\textbf{\textcolor[rgb]{0.5019608,0.0,0.5019608}{\#version }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textbf{\textcolor[rgb]{0.5019608,0.0,0.5019608}{410 }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}core}
-
-{\ttfamily
-\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{uniform }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{sampler2D }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}qt\_mappingTexture; \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{HOLDS }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{DEPTH }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TO }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COLOR }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{MAPPING}}
-
-{\ttfamily
-\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{uniform }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{sampler2D }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}qt\_colorTexture;\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-\ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{HOLDS }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{INCOMING }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{RGB }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{VIDEO }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FRAME}}
-
-{\ttfamily
-\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{uniform }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{sampler2D }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{\ \ \ \ uniform } }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{sampler2D }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }qt\_depthTexture;\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-\ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{HOLDS }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{INCOMING }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{DEPTH }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{VIDEO }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FRAME}}
+\ \ }}
 
 {\ttfamily
-\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{uniform }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{sampler2D }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}qt\_spherTexture;\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-\ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{HOLDS }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{SPHERICAL }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TO }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{CARTESION }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FACTORS }}
+\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{uniform } }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{sampler2D }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}qt\_spherTexture;\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ \ }}
+
+
+\bigskip
 
 {\ttfamily
-\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{layout}}(\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{location}}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{layout}}(\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{location } }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }0,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{index}}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{index } }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }0)\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{ out }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{vec4 }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{out } }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{vec4 }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }qt\_fragColor;}
 
 {\ttfamily
@@ -148,362 +165,328 @@ Four corner points coordinates, as four vertices, will be uploaded onto vertex s
 \{}
 
 {\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{ MAP }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FRAGMENT }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATES }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TO }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TEXTURE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATES}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2 }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}textureCoordinate \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2 }(\textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.x
-/
-\textcolor[rgb]{0.0,0.0,0.5019608}{2},\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.y);}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{GET }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{PIXEL }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{OF }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{CURRENT }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FRAGMENT}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{if}}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}(\textcolor[rgb]{0.5019608,0.5019608,0.0}{int}(\textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.x)
-\%
-\textcolor[rgb]{0.0,0.0,0.5019608}{2}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}==\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.0,0.5019608}{0})\{}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{CONVERT}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COLUMN}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TO}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{PACKED}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATES}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{int}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}col\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }textureCoordinate.x
-/ \textcolor[rgb]{0.0,0.0,0.5019608}{4};}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{int}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}chn\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }textureCoordinate.x
-\% \textcolor[rgb]{0.0,0.0,0.5019608}{4};}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{USE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FOLLOWING}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COMMAND}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TO}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{GET}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{Z}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FROM}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{DEPTH}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{BUFFER}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{vec4}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-\ }a\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \  }\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2 }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}textureCoordinate\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2}(
+ \textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.x, \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.y);}
+
+\bigskip
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{float}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{texelFetch}}(qt\_depthTexture,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}textureCoordinate,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textcolor[rgb]{0.0,0.0,0.5019608}{0}).r
+*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textcolor[rgb]{0.0,0.0,0.5019608}{65535.0};}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{vec4}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+\ }a\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{texelFetch}}(qt\_spherTexture,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }textureCoordinate,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }\textcolor[rgb]{0.0,0.0,0.5019608}{0});}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{float}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{texelFetch}}(qt\_depthTexture,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2}(col,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}textureCoordinate.y),\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.0,0.5019608}{0})[chn]\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ }*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-\ }\textcolor[rgb]{0.0,0.0,0.5019608}{65130.0}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
--- }\textcolor[rgb]{0.0,0.0,0.5019608}{20.0};}
 
 
 \bigskip
 
 {\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{CONVERT}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{SPHERICAL}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATES}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TO}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{CARTESIAN}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.x\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }{}-
-z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }qt\_fragColor.x\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}{}-z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }a.r;}
 
 {\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.y\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }{}-
-z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }qt\_fragColor.y\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}{}-z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 }*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }a.g;}
 
 {\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }{}- z;}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.w\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.5019608,0.0}{float}(z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}{\textgreater}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.0,0.5019608}{0.0});}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{SET}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{UNRESOLVED}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{PIXELS}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TO}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{NAN}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.xyz\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}qt\_fragColor.xyz\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}(qt\_fragColor.w/qt\_fragColor.w);}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{else}}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\{}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{GRAB}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COLOR}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{IMAGE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATES}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FROM}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{DEPTH}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{IMAGE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATES}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{vec2}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}pos\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{texelFetch}}(qt\_mappingTexture,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}textureCoordinate,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.0,0.5019608}{0}).xy;}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{NORMALIZE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{PIXEL}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COORDINATES}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }pos.x\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }(pos.x +
-\textcolor[rgb]{0.0,0.0,0.5019608}{0.5}) /
-\textcolor[rgb]{0.0,0.0,0.5019608}{1920.0};}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }pos.y\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }(pos.y +
-\textcolor[rgb]{0.0,0.0,0.5019608}{0.5}) /
-\textcolor[rgb]{0.0,0.0,0.5019608}{1080.0};}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }\textcolor[rgb]{0.0,0.5019608,0.0}{//}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{READ}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FRAGMENT}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COLOR}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{FROM}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{THE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{COLOR}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{IMAGE}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.5019608,0.0}{TEXTURE}}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{texture}}(qt\_colorTexture,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}pos.xy,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.0,0.0,0.5019608}{0});}
-
-{\ttfamily
-\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\}}
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }qt\_fragColor.z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+} = \textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }{}-z;}
 
 {\ttfamily
 \}}
 
 %
-This fragment shader handles both of \(X^CY^CZ^C\) generation and \(RGB\) texel fetch. There are four uniform input textures uploaded on GPU. The \emph{qt\_colorTexture} is RGB stream, and \emph{qt\_depthTexture} is depth stream. \emph{qt\_mappingTexture} is a mapping stream also given by KinectV2 camera, which contains two channels \(Row/Col\) mapping data. It offers a link between RGB stream and Depth stream, helping align RGB values to depth pixels. \emph{qt\_spherTexture} is a per-pixel beam mapping texture created by ourselves, which helps map from \(Z^C\) to \(X^C/Y^C\) respectively based on the horizontal and vertical field of view of a pinhole camera model. Let's view the fragment shader step by step, and then talk about the creation of beam mapping texture in detail.%
-\\\\
+This fragment shader handles both of \(X^CY^CZ^C\) generation and \(RGB\) texel fetch. There are four uniform input textures uploaded on GPU. The \emph{qt\_colorTexture} is RGB stream, and \emph{qt\_depthTexture} is depth stream. \emph{qt\_mappingTexture} is a mapping stream also given by KinectV2 camera, which contains two channels \(Row/Col\) mapping data. It offers a link between RGB stream and Depth stream, helping align RGB values to depth pixels. \emph{qt\_spherTexture} is a  \(Z^C\) to \(X^C/Y^C\) proportional mapping texture, which contains the per-pixel parameters \(a/b\) based on eqn.~(\ref{parametersABofProportional}). Let's view the fragment shader step by step, and then have a view of the 3D reconstruction in camera space.%
+\\\indent
 We will first get the texture coordinates from the fragment coordinates.
+\\
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \  }\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2 }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}textureCoordinate\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2}(\textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.x/\textcolor[rgb]{0.0,0.0,0.5019608}{2},\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.y);}
 \\\\
-    ivec2 textureCoordinate = ivec2(gl\_FragCoord.x/2, gl\_FragCoord.y);
-\\\\
-And then have a check if this fragment shader should be assigned for \(X^CY^CZ^C\) generation, or \(RGB\) texel fetch.\\\\
-    if (int(gl\_FragCoord.x)\%2 == 0)\{\\
- 		// \(X^CY^CZ^C\) generation
-    \} else \{
-		// \(RGB\) texel fetch
-    \}%
+\noindent
+And then have a check if this fragment shader should be assigned for \(X^CY^CZ^C\) generation, or \(RGB\) texel fetch.
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{if } }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}(\textcolor[rgb]{0.5019608,0.5019608,0.0}{int}(\textcolor[rgb]{0.5019608,0.0,0.5019608}{gl\_FragCoord}.x)\%\textcolor[rgb]{0.0,0.0,0.5019608}{2 }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}==\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.0,0.0,0.5019608}{0})\{}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ }
+\textcolor[rgb]{0.0,0.5019608,0.0}{// \(X^CY^CZ^C\) generation}
+}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{else }}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\{}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ }
+\textcolor[rgb]{0.0,0.5019608,0.0}{// \(RGB\) texel fetch}
+}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ }\}}
 %
+\\\\\noindent
+The depth steam measures \(Z^C\), which is always negative and will be rescaled from \(D\).
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \  }\textcolor[rgb]{0.5019608,0.5019608,0.0}{int }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}col\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}textureCoordinate.x/\textcolor[rgb]{0.0,0.0,0.5019608}{4};}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \  }\textcolor[rgb]{0.5019608,0.5019608,0.0}{int }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}chn\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}textureCoordinate.x\%\textcolor[rgb]{0.0,0.0,0.5019608}{4};}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \  }\textcolor[rgb]{0.5019608,0.5019608,0.0}{float }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{texelFetch}}(qt\_depthTexture}
+
+{\ttfamily
+\ \ \ \ \ \ 
+\ \ \ \ \ \ \ \ \ \ ,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.5019608,0.5019608,0.0}{ivec2}(col,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}textureCoordinate.y),\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.0,0.0,0.5019608}{0})[chn]\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.0,0.0,0.5019608}{65535.0};}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }{}-z;}
 %
-\begin{figure}[!b]
+\\\\\noindent
+The per-pixel \(X^C/Y^C\) can be generated through a proportional mapping from \(Z^C\), as discussed in eqn.~(\ref{proportionalBeamEqn}). And the parameters the per-pixel parameters \(a/b\) can be acquired from \emph{qt\_spherTexture}.
+%
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \  }\textcolor[rgb]{0.5019608,0.5019608,0.0}{vec4 }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+\ }a\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}\textbf{\textcolor[rgb]{0.5019608,0.5019608,0.0}{texelFetch}}(qt\_spherTexture,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}textureCoordinate,\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+ }\textcolor[rgb]{0.0,0.0,0.5019608}{0});}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.x\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}{}-z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }a.r;}
+
+{\ttfamily
+\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{\ \ \ \ \ \ \ \ }qt\_fragColor.y\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}=\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}{}-z\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+}*\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{ }a.g;}
+%
+\\\\\noindent%
+%
+\begin{figure}[b]
 \centering
-\includegraphics[width=0.7\textwidth]{VHfieldOfView}
-\caption{Proportional Mapping from \(Z^C\) to \(X^C/Y^C\)}
-\label{VHfieldOfView}
+\subfloat[Front View][Front View]{
+\includegraphics[height=0.42\textwidth]{distortedRGB}
+\label{distortedRGB}}
+\subfloat[Left View][Left View]{
+\includegraphics[height=0.42\textwidth , width = 0.4\textwidth]{distortedSideViewRGB}
+\label{distortedSideViewRGB}}
+%\qquad
+\caption{Colored Camera Space 3D Reconstruction}
+\label{reconstructionInCameraSpace}
 \end{figure}%
 %
-\\\\
-The depth steam measures \(Z^C\), which after rescaling is given by :
-\\\\
-        float z = texelFetch(qt\_depthTexture, ivec2(col, textureCoordinate.y), 0)[chn] * 65130.0 - 20.0;
-\\\\
+The whole parallel image processing above shows a natural 3D reconstruction on GPU. With the per-pixel \(X^CY^CZ^C\) coordinates generated and saved together with corresponding RGB values, we are ready to draw the 3D image. Figure~\ref{reconstructionInCameraSpace} shows the view of colored camera space 3D reconstruction when observing uniform grid dots pattern on the flat wall. We can tell from the image that, this reconstruction is totally based on raw data, without calibration at all. Not only the radial dominated lens distortions are apparent in the front view, but the \emph{depth distortion} is also material that cannot be ignored. Therefore, calibration must be done for an undistorted 3D image.
 
-Based on the pinhole-camera model, we could derive a per-pixel proportional mapping from \(Z^C\) to \(X^C/Y^C\) using the horizontal and vertical Field of View. In a depth sensor of size %
-({\ttfamily
-\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthCols}\textcolor{black}{,}\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
-}\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthRows}}),
-%
-a pixel with image address (\(Row, \, Col\)) has its view in camera space as a beam passing through the camera space origin (the pin hole). For one specific camera with a certain filed of view, a pixel's beam function depends on its address (\(Row, \, Col\)). As shown in fig.~\ref{VHfieldOfView}, the relationship between a pixel's beam view (\(Z^C\) to \(X^CY^C\)) and the sensor's vertical / horizontal Field of View could be expressed as eqn.~(\ref{pinholeProportionZXY}).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Rail Calibration System}
+
+Talking about camera calibration, the pinhole camera matrix \(M\) will come up in most people's mind. As discussed in chapter~\ref{chapterTraditionalCalibration}, the pinhole-camera matrix \(M\) consists of an intrinsic matrix \(K\) and an extrinsic matrix \([R_{3*3}, T_{3*1}]\). The camera space 3D reconstruction method we discussed in section~\ref{sectionCameraSpaceReconstruction} utilizes horizontal and vertical field of view (FoV)s, which works in the same way with the intrinsic matrix \(K\)'s principle. However, a camera's calibration needs external help from world space objects, which means neither of the FoVs and intrinsic matrix \(K\) alone are able to do calibration,  and extrinsic parameters that can link to world space are necessary in calibration. 
+\\\indent
+Kai \cite{Kai10} did a good job on structed light 3D scanner parallel calibration on GPU, and derived the per-pixel beam equation~(\ref{kaiBeamEquationCh3}) directly from a pinhole camera matrix \(M\), which offers the possibility of natural 3D reconstruction on GPU similar to eqn.~(\ref{proportionalBeamEqn}).
 %
 \begin{equation}
 \begin{aligned}
-\frac{X^C_{[Row, \, Col]}}{Z^C_{[Row, \, Col]} \times tan(horFoV / 2)} 
-=
-%tan\bigg[
-%	Hor\text{FoV}
-%		\bigg(
-			\frac{Col}{numDepthCols} - 0.5
-%		\bigg)
-%\bigg]
-\\\\%
-\frac{Y^C_{[Row, \, Col]}}{Z^C_{[Row, \, Col]} \times tan(verFoV / 2)} 
-=
-%tan\bigg[
-%	Ver\text{FoV}
-%		\bigg(
-			\frac{Row}{numDepthRows} - 0.5
-%		\bigg)
-%\bigg]
+X^W[m,\,  n] = a[m, n]Z^W[m,\,  n]+b[m, n]
+\\%
+Y^W[m,\,  n] = c[m, n]Z^W[m,\,  n]+d[m, n]
 \end{aligned}
-\label{pinholeProportionZXY}
+\label{kaiBeamEquationCh3}
 \end{equation}%
-
 \noindent
-From eqn.~\ref{pinholeProportionZXY}, we could generate a per-pixel beam mapping texture which contains the proportion parameters that can map from per-pixel \(Z^C\) to per-pixel \(X^C/Y^C\).
-\\\\
-        vec4  a = texelFetch(qt\_spherTexture, textureCoordinate, 0);\\
-        // CONVERT SPHERICAL COORDINATES TO CARTESIAN\\
-        qt\_fragColor.x = -z * a.r;\\
-        qt\_fragColor.y = -z * a.g;\\\\
-
-
-
-
-
-
-
-
-%In this chapter, a simple parallel RGB-D camera calibration method with a simple undistorted 3D reconstruction on GPU is introduced. A KinectV2 camera, as one famous consumer RGB-D camera, is utilized to during the calibration and 3D reconstruction. We will finally show an undistorted 3D reconstruction with color (RGB) on GPU. The calibration method can be applied universally on all kinds of RGB-D cameras. 
+where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in a M by N sensor. This per-pixel beam equation shows per-pixel linear mappings from \(Z^W\) to \(X^W/Y^W\), and the per-pixel \(Z^W\) can be mapped from features of structured light. It is not specially proportional like eqn.~(\ref{proportionalBeamEqn}), because it contains space translation infos from camera space to world space. Although it is in world space now and the intrinsic parameters are able to be determined, however, lens distortions are still not able to be handled. To make it ideal, we need to not only remove the lens distortions and \emph{depth distortion}, but also realize the 3D reconstruction on GPU in a natural method similar to eqn.~(\ref{kaiBeamEquationCh3}).
+\\\indent
 %
-%show the piled frames
-%
-%\section{Calibration System}
-%%
-%In this section, we will find a best-fit calibration system for a KinectV2 camera's easy parallel calibration and reconstruction, which is able the handle both of lens distortion and \emph{depth distortion}(as introduced in section~\ref{sectionLastSecInCh1}). The KinectV2 camera has one depth sensor and one RGB sensor. The RGB sensor offers RGB streams, whose color infos will be aligned to pixels according to their corresponding world space coordinates after the 3D reconstruction. The depth sensor offers NearIR and Depth streams, both of which share the same size ($row$ and $column$) and lens distortions of the depth sensor, and can both be utilized for lens distortion correction. We will use the Depth stream to recover world space 3D coordinates $X^WY^WZ^W$ for reconstruction, during which the NearIR stream will be used for lens distortion correction. 
+In this section, we will find a best-fit calibration system for a KinectV2 camera's natural calibration and reconstruction, which is able the handle both of lens distortion and \emph{depth distortion}. %
+%The KinectV2 camera has one depth sensor and one RGB sensor. The RGB sensor offers RGB streams, whose color infos will be aligned to pixels according to their corresponding world space coordinates after the 3D reconstruction. The depth sensor offers NearIR and Depth streams, both of which share the same size ($row$ and $column$) and lens distortions of the depth sensor, and can both be utilized for lens distortion correction. We will use the Depth stream to recover world space 3D coordinates $X^WY^WZ^W$ for reconstruction, during which the NearIR stream will be used for lens distortion correction. 
 %\\\indent
-%To easily show 3D reconstruction in a parallel way on the GPU, we would like to find a per-pixel mapping model that can generate per-pixel world coordinates $X^WY^WZ^W$ from per-pixel Depth(\(D\)) value. Kai \cite{Kai10} did a good job on structed light 3D scanner parallel calibration on GPU. He derived the per-pixel beam equation~(\ref{kaiBeamEquationCh3}), the linear relationship that map to \(X^W/Y^W\) from \(Z^W\), directly from pinhole camera matrix \(M\), while the per-pixel \(Z^W\) comes from features of structured light. Got inspired by Kai, we would like our calibration system to be able to determine a per-pixel \(D\) to \(Z^W\) mapping model. In this way, not only eqn.~\ref{kaiBeamEquationCh3} can be employed during the parallel reconstruction on GPU, but the \emph{depth distortion} could also be corrected during the per-pixel \(D\) to \(Z^W\) mapping.
+To easily show 3D reconstruction in a parallel way on the GPU, we would like our calibration system to be able to offer a per-pixel mapping from \(D\) to \(Z^W\), which then could be used to map to \(X^W/Y^W\) using eqn.~(\ref{kaiBeamEquationCh3}). In this way, the \emph{depth distortion} could also be corrected during the per-pixel \(D\) to \(Z^W\) mapping.
+%
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.55\textwidth]{trackingModuleOnKinectV2CalibrationSystem}
+\caption{KinectV2 Calibration System}
+\label{trackingModuleOnKinectV2CalibrationSystemCh3}
+\end{figure}%
+%
+Of all different kinds of calibration systems, a camera on rail system with a planar pattern on wall is finally decided, which offers a moving plane with respect to the camera when the camera moves along the rail. As fig.~\ref{trackingModuleOnKinectV2CalibrationSystemCh3} shows, a canvas on which printed an uniform grid dots pattern is hung on the wall, and the rail is required to be perpendicular to the wall. The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because the per-pixel calibration requires only accurate world space coordinates which will be decided by the rail and the wall, whereas the camera's space is not considered at all. We will assign the pattern plane as the \(X^WY^W\) plane in world space, and the rail to be along with (not exactly on) \(Z^W\)-axis. The world coordinate is static with the camera on the slider. %
+%
+\begin{figure}[!t]
+\centering
+%calibrated \(X^{W}\)/\(Y^{W}\) and \(Z^{W}\)
+\includegraphics[width=0.7\textwidth, height= 0.5\textwidth]{OneFrameXYZ_Calibrated}
+\caption{NearIR \(X^{W}Y^{W}Z^{W}\) 3D Reconstruction}
+\label{OneFrameXYZ_Calibrated}
+\end{figure}%
+%
+\\\indent
+Figure~\ref{OneFrameXYZ_Calibrated} shows one frame of NearIR \(X^WY^WZ^W\) 3D reconstruction, which can help a lot explaining how the world space origin is assigned. Inside the figure, both of the origin and \(Z\)-axis are high-lighted in blue, and the origin of world space is on the left end of the blue line. On the pattern plane with dot-clusters marked in circles, we can see one dot-cluster is high-lighted inside a thick circle, and its center point is where \(X^W/Y^W = 0\). The dot-cluster which will be sitting on the \(Z^W\)-axis is the one whose center point is closest to the center pixel of the sensor. All pixels in this frame share the exact same \(Z^W\), which is also why we require the rail to be perpendicular to the pattern. And the value of \(Z^W\) is measured by a laser distance measurer that static with the camera. The final origin of the world space will be decided by both of the camera's observing orientation and the laser distance measurer's position. This kind of world coordinate assignment is totally for simplifying image processing during calibration.  Practically, we do not even care where exactly the origin is, as long as the rail is perpendicular to the pattern and the distance measurer is static with the camera.
+\\\indent
+With this rail calibration system, infinite number of frames with infinite number of calibration points could be utilized for training a calibration model. Besides, as the slider moves along the rail, the amount and distribution of the grid dots captured by the camera will change, which means a dynamic pattern for calibration instead of static. With more and more dots walking into the camera's field of view under a certain rhythm as the slider moves further from the pattern plane, the dots (which will be extracted as calibration points) are able to cover all pixels of a sensor. What's more, a moving-plane system (multiple frames calibration instead of one frame calibration) makes it possible to do dense \(D\) to \(Z^W\) mapping, which will handle \emph{depth distortion}.
+
+
+\section{Calibration Procedures}
+%
+With the calibration system built up and world coordinate assigned, we are now ready to calibrate. \(Z^{W}\) values for all pixels of every frame will be supported from external laser distance measurer. To simplify potential calculation during image processing, we assign the world coordinate \emph{Unit One} based on the uniform grid dots patter, to be same with the side of pattern's unit-square. Concretely, the distance between every two adjacent dots' centers in real-world is 228mm. Therefore, \(Z^{W}\) = -\(Z\)(mm) / 228(mm), where \(Z\) is the vertical distance to the pattern plane in reality measured by the laser distance measurer. Note that, \(Z^{W}\) values are always negative, based on the assignment of Cartesian world coordinate. The outline of calibration procedures is listed below.
+%
+\begin{enumerate}
+   	\item Mount both of the camera and laser distance measurer onto the slider.
+   	\item Move the slider to the nearest position to the pattern plane.
+   	\item Record one frame of RGB data and one frame of NearIR data at this position.
+   	\label{repeatMovingSlider}
+   	\begin{enumerate}
+     		\item measure \(|Z^W|\) using the laser distance measurer.
+     		\item grab RGB, NearIR and Depth streams from KinectV2 camera.
+     		\item extract center points (\(R/C\)) of dot-clusters from RGB and NearIR streams respectively.
+     		\item assign \(X^W/Y^W\) values to the extracted points, RGB and NearIR respectively.
+     		\item train and determine the best-fit high order polynomial model that map from \(RC\) to \(X^W/Y^W\), RGB and NearIR respectively.
+     		\item generate dense \(X^W/Y^W\) for all pixels using the model, for NearIR and RGB streams respectively.
+     		\item save 2 frames of RGB and NearIR all pixels' data respectively: \(X^WY^WZ^WRGBD\) for RGB stream, and \(X^WY^WZ^WID\) for NearIR stream, where the channel \(I\) in NearIR frame denotes \emph{Intensity}.
+   	\end{enumerate}
+	\item Move the slider to the next position, and repeat step~\ref{repeatMovingSlider}.
+	\item Check all \(X^W/Y^W\) values of all frames, unify the staggered origin by adding or subtracting a corresponding integer (make sure the point \(X^WY^W = 0\) is at the same dot-cluster for all frames).
+	\item Determine the per-pixel mapping from \(D\) to \(Z^W\) and from \(Z^W\) to \(X^W/Y^W\) for all pixels using the NearIR frames of data, and generate a \(row\)-by-\(column\)-by-6 look-up table.
+	\item Determine a pinhole-camera matrix that can map \(X^W/Y^W/Z^W\) to \(R/C\) using RGB frames of data (for the RGB values' alignment to pixels after 3D reconstruction).
+\end{enumerate}
+
+
+
+
+
+
+%
+%
+% Kai \cite{Kai10} shows that, GPU programing is ideally suited to this kind of per-pixel processing. He did a good job on structed light 3D scanner parallel calibration on GPU, and derived the per-pixel beam equation~(\ref{kaiBeamEquationCh3}) directly from a pinhole camera matrix \(M\). 
 %%
 %\begin{equation}
 %\begin{aligned}
-%X^W_{[row, \, col]} = c_{[row, col]}Z^W_{[row, \, col]}+d_{[row, col]}
+%X^W[m,\,  n] = c[m, n]Z^W[m,\,  n]+d[m, n]
 %\\%
-%Y^W_{[row, \, col]} = e_{[row, col]}Z^W_{[row, \, col]}+f_{[row, col]}
+%Y^W[m,\,  n] = e[m, n]Z^W[m,\,  n]+f[m, n]
 %\end{aligned}
 %\label{kaiBeamEquationCh3}
 %\end{equation}%
-%%
+%\noindent
+%where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in a M by N sensor. This per-pixel beam equation shows per-pixel linear mappings from \(Z^W\) to \(X^W/Y^W\), and the per-pixel \(Z^W\) can be mapped from features of structured light. 
 %\\\indent
-%%
-%\begin{figure}[t]
-%\centering
-%\includegraphics[width=0.55\textwidth]{trackingModuleOnKinectV2CalibrationSystem}
-%\caption{KinectV2 Calibration System}
-%\label{trackingModuleOnKinectV2CalibrationSystemCh3}
-%\end{figure}%
-%%
-%Of all different kinds of calibration systems, a camera on rail system with a planar pattern on wall is finally decided, which offers a moving plane with respect to the camera when the camera moves along the rail. As fig.~\ref{trackingModuleOnKinectV2CalibrationSystemCh3} shows, a canvas on which printed an uniform grid dots pattern is hung on the wall, and the rail is required to be perpendicular to the wall. The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because the per-pixel calibration requires only accurate world space coordinates which will be decided by the rail and the wall, whereas the camera's space is not considered at all. We will assign the pattern plane as the \(X^WY^W\) plane in world space, and the rail to be along with (not exactly on) \(Z^W\)-axis. The world coordinate is static with the camera on the slider. %
-%%
-%\begin{figure}[!t]
-%\centering
-%%calibrated \(X^{W}\)/\(Y^{W}\) and \(Z^{W}\)
-%\includegraphics[width=0.7\textwidth, height= 0.5\textwidth]{OneFrameXYZ_Calibrated}
-%\caption{NearIR \(X^{W}Y^{W}Z^{W}\) 3D Reconstruction}
-%\label{OneFrameXYZ_Calibrated}
-%\end{figure}%
-%%
+%Without calibration, we can also derive per-pixel beam equations in camera space and apply them in GPU parallel processing. In this section, we will introduce how to draw a colored camera space 3D reconstruction on GPU without calibration, using a KinectV2 camera. As shown in the diagram in fig.~\ref{cameraSpaceDiagram}, we will retrieve \(Depth\), \(RGB\) and \(mapping\) streams from the KinectV2 camera, and save them into corresponding buffers respectively. The mapping streams contains \(Row\) and \(Column\) values that can help every depth pixel to look for color infos from \(RGB\) streams. Then those three streams will be uploaded from CPU onto GPU as textures for image drawing. The camera space 3D coordinates \(X^CY^CZ^C\) for the final 3D image will be generated based on depth texture, which will also be processed on GPU in the way that similar to drawing colors on a pixel. In short, we will draw on GPU twice: one for camera space coordinates generation and \(RGB\) alignment, the other one for real 3D image drawing.
 %\\\indent
-%Figure~\ref{OneFrameXYZ_Calibrated} shows one frame of NearIR \(X^WY^WZ^W\) 3D reconstruction, which can help a lot explaining how the world space origin is assigned. Inside the figure, both of the origin and \(Z\)-axis are high-lighted in blue, and the origin of world space is on the left end of the blue line. On the pattern plane with dot-clusters marked in circles, we can see one dot-cluster is high-lighted inside a thick circle, and its center point is where \(X^W/Y^W = 0\). The dot-cluster which will be sitting on the \(Z^W\)-axis is the one whose center point is closest to the center pixel of the sensor. All pixels in this frame share the exact same \(Z^W\), which is also why we require the rail to be perpendicular to the pattern. And the value of \(Z^W\) is measured by a laser distance measurer that static with the camera. The final origin of the world space will be decided by both of the camera's observing orientation and the laser distance measurer's position. This kind of world coordinate assignment is totally for simplifying image processing during calibration.  Practically, we do not even care where exactly the origin is, as long as the rail is perpendicular to the pattern and the distance measurer is static with the camera.
+%
+%In the first drawing step of camera space coordinates generation, a look-up texture will be created for the final 3D image drawing, which contains both camera space coordinates and color (RGB) values. To draw a certain color on one single pixel, GPU provide one single fragment shader to generate and save corresponding four color channel RGBA (A for alpha, opacity) single-floating data into a corresponding position in a framebuffer. We could take the framebuffer as a screen on which we are going to draw, and the positions in the framebuffer would be same with pixels in the screen. We will follow the way how GPU do drawing, and use GPU to calculate per-pixel \(X^CY^CZ^C\) and save the calculation results with RGB streams together as total six channels into a customer framebuffer. The first thing is to initial a customer framebuffer, whose texture will finally be utilized to look up per-pixel's \(X^CY^CZ^CRGB\) six channels of data for the eventual 3D image drawing. The internal texture format of {\ttfamily\color[rgb]{0.0,0.0,0.5019608}GL\_RGBA32F}, which means one pixel position (\(row\), \(column_0\)) can contain four channels. We need a second position (\(row\), \(column_0 + 1\)) for every single pixel to contain the total six channels. Therefore the customer framebuffer will be initialed with a size of %
+%({\ttfamily
+%\textcolor[rgb]{0.0,0.0,0.5019608}{2}\textcolor{black}{* }\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthCols}\textcolor{black}{, }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+% }\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthRows}}),
+%where numDepthRows and numDepthCols denote the size of total rows and total columns of the depth sensor. %
 %\\\indent
-%With this rail calibration system, infinite number of frames with infinite number of calibration points could be utilized for training a calibration model. Besides, as the slider moves along the rail, the amount and distribution of the grid dots captured by the camera will change, which means a dynamic pattern for calibration instead of static. With more and more dots walking into the camera's field of view under a certain rhythm as the slider moves further from the pattern plane, the dots (which will be extracted as calibration points) are able to cover all pixels of a sensor. What's more, a moving-plane system (multiple frames calibration instead of one frame calibration) makes it possible to do dense \(D\) to \(Z^W\) mapping, which will handle \emph{depth distortion}.
-%
-%
-%\section{Calibration Procedures}
+%Four corner points coordinates, as four vertices, will be uploaded onto vertex shader to form a quadrilateral filling up the screen, which will cover the numDepthRows by (2*numDepthCols) framebuffer. With respect to a random position of every single depth pixel, two corresponding \enquote{virtual pixels} (positions) will be processed by two independent fragment shaders to respectively save \(X^CY^CZ^C\) and \(RGB\) data into the customer framebuffer. The fragment shader is programmed as below.
+%\\%
 %%
-%With the calibration system built up and world coordinate assigned, we are now ready to calibrate. \(Z^{W}\) values for all pixels of every frame will be supported from external laser distance measurer. To simplify potential calculation during image processing, we assign the world coordinate \emph{Unit One} based on the uniform grid dots patter, to be same with the side of pattern's unit-square. Concretely, the distance between every two adjacent dots' centers in real-world is 228mm. Therefore, \(Z^{W}\) = -\(Z\)(mm) / 228(mm), where \(Z\) is the vertical distance to the pattern plane in reality measured by the laser distance measurer. Note that, \(Z^{W}\) values are always negative, based on the assignment of Cartesian world coordinate. The outline of calibration procedures is listed below.
+%This fragment shader handles both of \(X^CY^CZ^C\) generation and \(RGB\) texel fetch. There are four uniform input textures uploaded on GPU. The \emph{qt\_colorTexture} is RGB stream, and \emph{qt\_depthTexture} is depth stream. \emph{qt\_mappingTexture} is a mapping stream also given by KinectV2 camera, which contains two channels \(Row/Col\) mapping data. It offers a link between RGB stream and Depth stream, helping align RGB values to depth pixels. \emph{qt\_spherTexture} is a per-pixel beam mapping texture created by ourselves, which helps map from \(Z^C\) to \(X^C/Y^C\) respectively based on the horizontal and vertical field of view of a pinhole camera model. Let's view the fragment shader step by step, and then talk about the creation of beam mapping texture in detail.%
+%\\\\
+%We will first get the texture coordinates from the fragment coordinates.
+%\\\\
+%    ivec2 textureCoordinate = ivec2(gl\_FragCoord.x/2, gl\_FragCoord.y);
+%\\\\
+%And then have a check if this fragment shader should be assigned for \(X^CY^CZ^C\) generation, or \(RGB\) texel fetch.\\\\
+%    if (int(gl\_FragCoord.x)\%2 == 0)\{\\
+% 		// \(X^CY^CZ^C\) generation
+%    \} else \{
+%		// \(RGB\) texel fetch
+%    \}%
 %%
-%\begin{enumerate}
-%   	\item Mount both of the camera and laser distance measurer onto the slider.
-%   	\item Move the slider to the nearest position to the pattern plane.
-%   	\item Record one frame of RGB data and one frame of NearIR data at this position.
-%   	\label{repeatMovingSlider}
-%   	\begin{enumerate}
-%     		\item measure \(|Z^W|\) using the laser distance measurer.
-%     		\item grab RGB, NearIR and Depth streams from KinectV2 camera.
-%     		\item extract center points (\(R/C\)) of dot-clusters from RGB and NearIR streams respectively.
-%     		\item assign \(X^W/Y^W\) values to the extracted points, RGB and NearIR respectively.
-%     		\item train and determine the best-fit high order polynomial model that map from \(RC\) to \(X^W/Y^W\), RGB and NearIR respectively.
-%     		\item generate dense \(X^W/Y^W\) for all pixels using the model, for NearIR and RGB streams respectively.
-%     		\item save 2 frames of RGB and NearIR all pixels' data respectively: \(X^WY^WZ^WRGBD\) for RGB stream, and \(X^WY^WZ^WID\) for NearIR stream, where the channel \(I\) in NearIR frame denotes \emph{Intensity}.
-%   	\end{enumerate}
-%	\item Move the slider to the next position, and repeat step~\ref{repeatMovingSlider}.
-%	\item Check all \(X^W/Y^W\) values of all frames, unify the staggered origin by adding or subtracting a corresponding integer (make sure the point \(X^WY^W = 0\) is at the same dot-cluster for all frames).
-%	\item Determine the per-pixel mapping from \(D\) to \(Z^W\) and from \(Z^W\) to \(X^W/Y^W\) for all pixels using the NearIR frames of data, and generate a \(row\)-by-\(column\)-by-6 look-up table.
-%	\item Determine a pinhole-camera matrix that can map \(X^W/Y^W/Z^W\) to \(R/C\) using RGB frames of data (for the RGB values' alignment to pixels after 3D reconstruction).
-%\end{enumerate}
+%\\\\
+%The depth steam measures \(Z^C\), which after rescaling is given by :
+%\\\\
+%        float z = texelFetch(qt\_depthTexture, ivec2(col, textureCoordinate.y), 0)[chn] * 65130.0 - 20.0;
+%\\\\
 %
+%Based on the pinhole-camera model, we could derive a per-pixel proportional mapping from \(Z^C\) to \(X^C/Y^C\) using the horizontal and vertical Field of View. In a depth sensor of size %
+%({\ttfamily
+%\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthCols}\textcolor{black}{, }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
+% }\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthRows}}),
+%%
+%a pixel with image address (\(Row, \, Col\)) has its view in camera space as a beam passing through the camera space origin (the pin hole). For one specific camera with a certain filed of view, a pixel's beam function depends on its address (\(Row, \, Col\)). As shown in fig.~\ref{VHfieldOfView}, the relationship between a pixel's beam view (\(Z^C\) to \(X^CY^C\)) and the sensor's vertical / horizontal Field of View could be expressed as eqn.~(\ref{pinholeProportionZXY}).
+%%
+%\begin{equation}
+%\begin{aligned}
+%\frac{X^C_{[Row, \, Col]}}{Z^C_{[Row, \, Col]} \times tan(horFoV / 2)} 
+%=
+%%tan\bigg[
+%%	Hor\text{FoV}
+%%		\bigg(
+%			\frac{Col}{numDepthCols} - 0.5
+%%		\bigg)
+%%\bigg]
+%\\\\%
+%\frac{Y^C_{[Row, \, Col]}}{Z^C_{[Row, \, Col]} \times tan(verFoV / 2)} 
+%=
+%%tan\bigg[
+%%	Ver\text{FoV}
+%%		\bigg(
+%			\frac{Row}{numDepthRows} - 0.5
+%%		\bigg)
+%%\bigg]
+%\end{aligned}
+%\label{pinholeProportionZXY}
+%\end{equation}%
 %
-%
+%\noindent
+%From eqn.~\ref{pinholeProportionZXY}, we could generate a per-pixel beam mapping texture which contains the proportion parameters that can map from per-pixel \(Z^C\) to per-pixel \(X^C/Y^C\).
+%\\\\
+%        vec4  a = texelFetch(qt\_spherTexture, textureCoordinate, 0);\\
+%        // CONVERT SPHERICAL COORDINATES TO CARTESIAN\\
+%        qt\_fragColor.x = -z * a.r;\\
+%        qt\_fragColor.y = -z * a.g;\\\\
 
 
 
