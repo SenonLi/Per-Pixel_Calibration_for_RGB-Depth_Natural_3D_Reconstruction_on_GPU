@@ -33,10 +33,7 @@
 %5. RGB values alignment based on pinhole camera model.
 %
 %
-%In this chapter, a simple parallel RGB-D camera calibration method with a simple undistorted 3D reconstruction on GPU is introduced. A KinectV2 camera, as one famous consumer RGB-D camera, is utilized to during the calibration and 3D reconstruction. We will finally show an undistorted 3D reconstruction with color (RGB) on GPU. The calibration method can be applied universally on all kinds of RGB-D cameras. 
-%
-%show the piled frames
-%
+RGBD cameras are famous for its 3D reconstruction application. In this chapter, we will show how to reconstruct 3D image naturally on GPU in camera space based on raw data without calibration. Considering the deformation of raw data resulted from lens distortions and \emph{depth distortion}, we propose a per-pixel calibration method based on a rail calibration system. Instead of using a pinhole-camera model, a two-dimensional high-order polynomial mapping model is determined and employed for lens distortions removal. Corresponding data collection procedures and look-up table based undistorted real-time world space 3D reconstruction on GPU are discussed in detail. Color values alignment is also discussed at last.
 %
 \section{\(RGBD\) to \(X^CY^CZ^CRGB\)}
 \label{sectionCameraSpaceReconstruction}
@@ -50,14 +47,14 @@ As described in chapter \ref{chapterIntroduction}, there are applications like S
 \label{VHfieldOfView}
 \end{figure}%
 %
-The KinectV2 depth sensor measures \(Z^C\) in millimeter and supports its positive data in unsigned-short data-type. Those data will be automatically converted into single-floating type with its range from 0.0f to +1.0f when uploaded onto GPU. Considering that in practical \(D\)s from KinectV2 are always positive whereas \(Z^C\)s should be always negative, we will add a negative sign in the un-scaling step to recover the \(Z^C\) in metric on GPU:
+The KinectV2 depth sensor measures \(Z^C\) in millimeter and supports its positive data in unsigned-short data-type. Those data will be automatically converted into single-floating type with its range from 0.0f to +1.0f when uploaded onto GPU. Considering that in practice \(D\)s from KinectV2 are always positive whereas \(Z^C\)s should be always negative, we will add a negative sign in the un-scaling step to recover the \(Z^C\) in metric on GPU:
 \begin{equation}
 Z^C[m, n] = - \beta D[m, n] \, ,
 \label{unscalingZc}
 \end{equation}%
 \noindent
 where \(\beta\) constantly equals to 65535.0 (range of unsigned short in single-floating) for all pixels. Besides the depth stream, KinectV2 supports both of the horizontal and vertical field of view (FoV) that can help generate per-pixel \(X^C\) and \(Y^C\), which share the same credits with the intrinsic parameters in a pinhole camera model. Figure~\ref{VHfieldOfView} shows an intuitive view of the horizontal and vertical FoVs in a pinhole camera model, based on which we can derive the \(X^C\) and \(Y^C\) values given a random \(Z^C\) value on the per-pixels basis. Assuming the depth sensor, with its size numDepthRows by numDepthCols, is observing right perpendicularly to a wall where all pixels share the same \(|Z^C_0|\) from the sensor to the wall. Talking about the horizontal FoV only, it is easy to get the range of the camera space FoV along 
-\(X^C\)-axis from \(-|X^C_{\text{Max}}|\) to \(|X^C_{\text{Max}}|\), as shown in fig.~\ref{horizontalFoVtoColumns}. %
+\(X^C\)-axis from \(-|X^C_{\text{Max}}|\) to \(|X^C_{\text{Max}}|\), as shown in Fig.~\ref{horizontalFoVtoColumns}. %
 \begin{figure}[!t]
 \centering
 \includegraphics[width=0.6\textwidth]{horizontalFoVtoColumns}
@@ -79,7 +76,7 @@ where the pixel observing on \(X^C = |X^C_{\text{Max}}|\) has its column address
 \label{alphaZeroHorFOV}
 \end{equation}%
 \noindent
-To combine eqn.~\ref{cameraXMaxfromZ} and eqn.~(\ref{alphaZeroHorFOV}), we get
+To combine eqn.~(\ref{cameraXMaxfromZ}) and eqn.~(\ref{alphaZeroHorFOV}), we get
 %
 \begin{equation}
 \frac{X^C_0}{|X^C_{\text{Max}}|} = \frac{tan(\alpha_0)}{tan(horFov / 2)} = \frac{Col_0}{numDepthCols} - 0.5 \, ,
@@ -217,7 +214,7 @@ Now that we have the per-pixel mapping from \(Z^C\) to \(X^CY^C\), it is time to
 %
 The uniform \emph{qt\_spherTexture} is a \(Z^C\) to \(X^C/Y^C\) proportional mapping texture, which contains the per-pixel parameters \(a/b\) based on eqn.~(\ref{parametersABofProportional}). Note that we add three negative signs in front of \(X^CY^CZ^C\) respectively to account for the pinhole-imaging. %
 %
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \subfloat[Front View][Front View]{
 \includegraphics[height=0.42\textwidth]{distortedRGB}
@@ -230,7 +227,7 @@ The uniform \emph{qt\_spherTexture} is a \(Z^C\) to \(X^C/Y^C\) proportional map
 \label{reconstructionInCameraSpace}
 \end{figure}%
 %
-The whole parallel image processing above shows a natural 3D reconstruction on GPU. Figure~\ref{reconstructionInCameraSpace} shows the view of camera space 3D reconstruction when observing uniform grid dots pattern on the flat wall. We can tell from the image that, this reconstruction is totally based on raw data, without calibration at all. Not only the radial dominated lens distortions are apparent in the front view, but the \emph{depth distortion} is also material that cannot be ignored. Therefore, calibration must be done for an undistorted 3D image.
+The whole parallel image processing above shows a natural 3D reconstruction on GPU. Figure~\ref{reconstructionInCameraSpace} shows the view of camera space 3D reconstruction when observing uniform grid dots pattern on the flat wall. We can tell from the image that, this reconstruction is totally based on raw data, without calibration at all. Not only the \(X^CY^C\) plane is apparently deformed (lens distortions) in the front view, but the \(Z^C\) is also not as flat as it should be, which we will call it \emph{depth distortion} since now. The \emph{depth distortion} comes from the imperfect depth resolutions among pixels, \textit{i.e.}, \(Z^C_{[row, col]} - Depth_{[row, col]} \neq E_{\text{Constant}}\), which lead to bumps and hollows in the camera space reconstruction when observing a flat wall. Therefore, a per-pixel calibration is necessary for an undistorted 3D image.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Rail Calibration System}
@@ -263,7 +260,7 @@ To easily show 3D reconstruction in a parallel way on the GPU, we would like our
 \label{trackingModuleOnKinectV2CalibrationSystemCh3}
 \end{figure}%
 %
-Of all different kinds of calibration systems, a camera on rail system with a planar pattern on wall is finally decided, which offers a moving plane with respect to the camera when the camera moves along the rail. As fig.~\ref{trackingModuleOnKinectV2CalibrationSystemCh3} shows, a canvas on which printed an uniform grid dots pattern is hung on the wall, and the rail is required to be perpendicular to the wall. The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because the per-pixel calibration requires only accurate world space coordinates which will be decided by the rail and the wall, whereas the camera's space is not considered at all. We will assign the pattern plane as the \(X^WY^W\) plane in world space, and the rail to be along with (not exactly on) \(Z^W\)-axis. The world coordinate is static with the camera on the slider. %
+Of all different kinds of calibration systems, a camera on rail system with a planar pattern on wall is finally decided, which offers a moving plane with respect to the camera when the camera moves along the rail. As Fig.~\ref{trackingModuleOnKinectV2CalibrationSystemCh3} shows, a canvas on which printed an uniform grid dots pattern is hung on the wall, and the rail is required to be perpendicular to the wall. The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because the per-pixel calibration requires only accurate world space coordinates which will be decided by the rail and the wall, whereas the camera's space is not considered at all. We will assign the pattern plane as the \(X^WY^W\) plane in world space, and the rail to be along with (not exactly on) \(Z^W\)-axis. The world coordinate is static with the camera on the slider. %
 %
 \begin{figure}[!t]
 \centering
@@ -320,7 +317,7 @@ Intensity_{\text{\_gray}} =  0.21 Red\,  + \, 0.72 Green \, + \, 0.07 Blue  \, \
 \end{equation}%
 which uses a weighted average value to account for human perception.
 \\\indent%
-The pixel intensity values are automatically converted into single-floating type with its range from 0.0f to 1.0f, where \enquote{0.0f} means 100\% black and \enquote{1.0f}  means 100\% white. In practical, NearIR steam image is always very dark, as shown in fig.~\ref{Raw_Single_NIR} (with their intensity values every close to zero).  In order to enhance the contrast of NearIR image for a better binarizing, histogram equalization technique is utilized to maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB stream.
+The pixel intensity values are automatically converted into single-floating type with its range from 0.0f to 1.0f, where \enquote{0.0f} means 100\% black and \enquote{1.0f}  means 100\% white. In practice, NearIR steam image is always very dark, as shown in Fig.~\ref{Raw_Single_NIR} (with their intensity values every close to zero).  In order to enhance the contrast of NearIR image for a better binarizing, histogram equalization technique is utilized to maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB stream.
 %
  \begin{figure}[t]
 \hspace*{-0.5cm}
@@ -372,7 +369,7 @@ Intensity_{\text{\_new}} = \frac{Intensity_{\text{\_original}} - floor}{ceiling 
 \end{equation}%
 %
 \noindent
-and the image will get a better contrast, as compared in fig.~\ref{Histogram_Equalization}.%
+and the image will get a better contrast, as compared in Fig.~\ref{Histogram_Equalization}.%
 \\\indent%
 %% Adaptive Thresholding
 Affected by radial dominated lens distortions, the intensity value tend to decrease as the position of a pixel moves from the center of an image to the borders, in the case of observing a singular color view. Therefore, an adaptive thresholding process is needed, whereas using fixed thresholding will generate too much noise around borders. To segment the black dots from white background, we could simply subtract an image's background from an textured image, where the background comes from a blurring process of that image.%
@@ -413,7 +410,7 @@ To sharpen the edge of the binarized image for a better \enquote{circle} shape d
 % Sniffer for Round Dot Center
 After the adaptive thresholding, image data saved on GPU is now composed of circle-shaped \enquote{0}s within a background of \enquote{1}s. In order to locate the center of those \enquote{0}s circle, which is the center of captured round dot, it is necessary to know the edge of those circles. A trick is used to turn all of the edge data into markers that could lead a pathfinder to retrieve circle information.%
 %
-The idea that helps to mark edge data is to reassign pixels' values (intensity values) based on their surroundings. Using letter \(O\) to represent one single pixel in the center of a 3x3 pixels environment, and letters from \(A\)\texttildelow \(H\) to represent surroundings, a mask of 9 cells for pixel value reassignment could be expressed as below.
+The idea that helps to mark edge data is to reassign pixels' values (intensity values) based on their surroundings. Using letter \(O\) to represent one single pixel in the center of a $3\times3$ pixels environment, and letters from \(A\)\texttildelow \(H\) to represent surroundings, a mask of 9 cells for pixel value reassignment could be expressed as below.
 
 \begin{center}
   \begin{tabular}{ | c | c | c | }
@@ -489,13 +486,13 @@ Finally, the Round Dot Centers \((column, row)\) could be determined as the cent
 %%
 With a list of image space points (\(R, C\))s extracted, the following is to assign those points with their corresponding world coordinates \((X^W, \,Y^W)\)s, so that we can get coordinate-pairs to train a mapping model for dense \(X^WY^W\) generation. The world coordinates are based on the uniform grid. Taking the side of unit-square (distance between two adjacent dots) as \enquote{Unit One} in the world coordinates and one dot as the origin of plan \(X^WY^W\), all fitted \(X^W\)/\(Y^W\) values will be integers. %
 \\\indent%
-Ideally, a 3x3 perspective transformation matrix could help set a linear mapping between two different 2D coordinates, and 3 dot centers with known coordinates pair of \((R, C)\) and \((X^W, \,Y^W)\) are enough to determine the transformation matrix. Once four points with a squared-shape \(R\)/\(C\) distribution is found, a 3x3 perspective transformation matrix \(A\) could be determined by solving 
+Ideally, a $3\times3$ perspective transformation matrix could help set a linear mapping between two different 2D coordinates, and 3 dot centers with known coordinates pair of \((R, C)\) and \((X^W, \,Y^W)\) are enough to determine the transformation matrix. Once four points with a squared-shape \(R\)/\(C\) distribution is found, a $3\times3$ perspective transformation matrix \(A\) could be determined by solving 
 \begin{equation}
 %
 \left[ \begin{array}{c} %
 zX^W \\ zY^W \\ z \end{array} \right] %
 = %
-A\cdot \left[ \begin{array}{c} %
+A \left[ \begin{array}{c} %
 C \\ R \\ 1 \end{array} \right] %
 = %
 \begin{bmatrix} 
@@ -503,7 +500,7 @@ a_{11} & a_{12} & a_{13} \\
 a_{21} & a_{22} & a_{23} \\
 a_{31} & a_{32} & a_{33} \\
 \end{bmatrix}%
-\cdot \left[ \begin{array}{c} %
+ \left[ \begin{array}{c} %
 C \\ R \\ 1 \end{array} \right] %
 %
 \label{perspectiveDistortionCorrectionEquation}
@@ -512,7 +509,7 @@ C \\ R \\ 1 \end{array} \right] %
 \noindent
 where \(C\) and \(R\) are vectors consist of four squared-shape distributed points' addresses; \(X^W\) and \(Y^W\) are vectors consist of four points \((0, 0)\), \((0, 1)\), \((1, 1)\), and \((1, 0)\); \(z\) denotes the third axis in the homogenous system connecting two coordinates. %
 \\\indent%
-Deformed by lens distortions, the cluster centers in image plane are not uniformly distributed, and this 3x3 transformation matrix can only generate corresponding decimal \(X^W\)/\(Y^W\) values that are close integers. But in practical, the correct integer values \(X^W\)/\(Y^W\) could still be located through \(Rounding\). Considering that a list of cluster centers' image coordinate \((R, C)\)s will give many groups of four squared-shape distributed points, and each of them gives a different image coordinate distance will be mapped to the \enquote{Unit One} in world coordinates, we will traverse all of the possible groups of four squared-shape distributed points and pick out the group whose mapping matrix \(A\) generates the most points that are close to integers. %
+Deformed by lens distortions, the cluster centers in image plane are not uniformly distributed, and this $3\times3$ transformation matrix can only generate corresponding decimal \(X^W\)/\(Y^W\) values that are close integers. But in practice, the correct integer values \(X^W\)/\(Y^W\) could still be located through \(Rounding\). Considering that a list of cluster centers' image coordinate \((R, C)\)s will give many groups of four squared-shape distributed points, and each of them gives a different image coordinate distance will be mapped to the \enquote{Unit One} in world coordinates, we will traverse all of the possible groups of four squared-shape distributed points and pick out the group whose mapping matrix \(A\) generates the most points that are close to integers. %
 %
 In this way, we find the transformation matrix \(A\) can give the best \enquote{Unit One} distance in world coordinates. However, its generated point \(X^W/Y^W = 0\) is usually not at the dot-cluster that is closest to the center of cameras' FoV. A translation matrix \(T\) could be used to refine the transformation matrix \(A\) and help to translate the origin point to be at the dot cluster we want, given by%
 %
@@ -543,7 +540,7 @@ C_{\text{\_center}} \\ R_{\text{\_center}} \\ 1 \end{array} \right] %
 %
 \end{equation}%
 \noindent
-which are mapped from the center point \((C_{\text{\_center}}, \, R_{\text{\_center}})\) of FoV in image plane by the transformation matrix \(A\). Eventually, the refined transformation matrix eventually generates a list of world coordinate points \((X^W, \, Y^W)\)s that correspond to image coordinates \((column, row)\)s. As shown in fig.~\ref{XY_GridFitting_Matlab}, world coordinates are integers and the origin (blue circle) is chosen as where the center-closest dot-cluster is sitting.%
+which are mapped from the center point \((C_{\text{\_center}}, \, R_{\text{\_center}})\) of FoV in image plane by the transformation matrix \(A\). Eventually, the refined transformation matrix eventually generates a list of world coordinate points \((X^W, \, Y^W)\)s that correspond to image coordinates \((column, row)\)s. As shown in Fig.~\ref{XY_GridFitting_Matlab}, world coordinates are integers and the origin (blue circle) is chosen as where the center-closest dot-cluster is sitting.%
 %
  \begin{figure}[t]
 \hspace*{-0.3cm}
@@ -564,12 +561,12 @@ which are mapped from the center point \((C_{\text{\_center}}, \, R_{\text{\_cen
 \subsection{Dense \(X^W/Y^W\) Generation}
 \indent
 %With a list of points with image space addresses (\(R, C\))s extracted,   
-The generation of undistorted dense \(X^WY^W\) needs to consider lens distortion removal. In the traditional calibration method, world space \(X^\text{W}/Y^\text{W}/Z^\text{W}\) are mapped to undistorted (\(R', C'\)) by linear pinhole camera matrix \(M\). And then the undistortion step from undistorted (\(R', C'\)) to distorted (\(R, C\)) is done by eqn.~\ref{lensDistortion}, which uses a high order (higher than 2nd order) polynomial equation. Assuming that there is a high order mapping relationship directly from the distorted image space (\(R, C\)) to world space (\(X^\text{W}, \, Y^\text{W}\)), we will do different orders of two-dimensional polynomial prototypes in Matlab using its application of \enquote{Curve Fitting Toolbox}, and then decide a best-fit mapping model with a high accuracy and a relative small number of parameters.
+The generation of undistorted dense \(X^WY^W\) needs to consider lens distortion removal. In the traditional calibration method, world space \(X^\text{W}/Y^\text{W}/Z^\text{W}\) are mapped to undistorted (\(R', C'\)) by linear pinhole camera matrix \(M\). And then the undistortion step from undistorted (\(R', C'\)) to distorted (\(R, C\)) is done by eqn.~(\ref{lensDistortion}), which uses a high order (higher than 2nd order) polynomial equation. Assuming that there is a high order mapping relationship directly from the distorted image space (\(R, C\)) to world space (\(X^\text{W}, \, Y^\text{W}\)), we will do different orders of two-dimensional polynomial prototypes in Matlab using its application of \enquote{Curve Fitting Toolbox}, and then decide a best-fit mapping model with a high accuracy and a relative small number of parameters.
 %
 \\\indent
 A two-dimensional polynomial model means surface mapping between two different spaces. Equation.~(\ref{perspectiveDistortionCorrectionEquation}) (perspective correction) as \(1^{st}\) order polynomial mapping is not able to handle lens distortions. 
 %
-The second order polynomial mapping has 2x6=12 parameters, written as %
+The second order polynomial mapping has $2\times6=12$ parameters, written as %
 %
 \begin{equation}
 \begin{aligned}
@@ -581,22 +578,22 @@ Y^W &=  a_{21}C^2 + a_{22}CR + a_{23}R^2 + a_{24}C + a_{25}R + a_{26} \, ,
 \end{equation}%
 %
 \noindent
-and similarly, the fourth order polynomial mapping has 2x15=30 parameters, given by 
+and similarly, the fourth order polynomial mapping has $2\times15=30$ parameters, given by 
 %
 \begin{equation}
 \hspace*{-0.3cm}%
 \begin{aligned}
-X^W &=  a_{11}C^4 + a_{12}C^3R + a_{13}C^2R^2 + a_{14}CR^3 + a_{15}R^4 + a_{16}C^3 + a_{17}C^2R \\%
+X^W &=  a_{11}C^4 + a_{12}C^3R + a_{13}C^2R^2 + a_{14}CR^3 + a_{15}R^4 + a_{16}C^3 + a_{17}C^2R \ \ \ ...\\%
 &\,\,\,\,\,\,+ a_{18}CR^2 + a_{19}R^3 + a_{110}C^2 + a_{111}CR + a_{112}R^2 + a_{113}C + a_{114}R + a_{115}
 \\\\%
-Y^W &=  a_{21}C^4 + a_{22}C^3R + a_{23}C^2R^2 + a_{24}CR^3 + a_{25}R^4 + a_{26}C^3 + a_{27}C^2R \\%
+Y^W &=  a_{21}C^4 + a_{22}C^3R + a_{23}C^2R^2 + a_{24}CR^3 + a_{25}R^4 + a_{26}C^3 + a_{27}C^2R \ \ \ ...\\%
 &\,\,\,\,\,\,+ a_{28}CR^2 + a_{29}R^3 + a_{210}C^2 + a_{211}CR + a_{212}R^2 + a_{213}C + a_{214}R + a_{215}      \,\,.
 \end{aligned}
 \label{fourthOrderPolynomial}
 \end{equation}%
 %
 \indent
-To prototype equation \ref{secondOrderPolynomial} and \ref{fourthOrderPolynomial} in Matlab, \enquote{Curve Fitting Toolbox} is used to obtain the 2x6 and 2x15 parameters, using 107 points' coordinates pairs of image space \(R/C\) and world coordinates \(X^W/Y^W\). Based on the \enquote{Goodness of fit} of transformation parameters from Matlab, the Root-Mean-Square Error (RMSE) of (\(X^W\), \(Y^W\)) is (0.06796, 0.05638) for the \(2^{nd}\) order polynomial, and (0.02854, 0.02343) for the \(4^{th}\) order polynomial. As the order of polynomial goes higher, the RMSE gets smaller, and the cost of parameters' calculation gets much higher as well. After the prototyping in Matlab, the different orders of polynomial models will be applied into real-time streams transformation to get live transformed world space reconstruction. Eventually, the \(4^{th}\) order polynomial transformation model is selected as the distortion removal mapping model, which can give an intuitive undistorted world space image while costing relative less calculations. This mapping model will be trained by coordinate-pairs of the extracted points, and then be applied to image space addresses to generate dense \(X^W/Y^W\) for all pixels.
+To prototype equation \ref{secondOrderPolynomial} and \ref{fourthOrderPolynomial} in Matlab, \enquote{Curve Fitting Toolbox} is used to obtain the $2\times6$ and $2\times15$ parameters, using 107 points' coordinates pairs of image space \(R/C\) and world coordinates \(X^W/Y^W\). Based on the \enquote{Goodness of fit} of transformation parameters from Matlab, the Root-Mean-Square Error (RMSE) of (\(X^W\), \(Y^W\)) is (0.06796, 0.05638) for the \(2^{nd}\) order polynomial, and (0.02854, 0.02343) for the \(4^{th}\) order polynomial. As the order of polynomial goes higher, the RMSE gets smaller, and the cost of parameters' calculation gets much higher as well. After the prototyping in Matlab, the different orders of polynomial models will be applied into real-time streams transformation to get live transformed world space reconstruction. Eventually, the \(4^{th}\) order polynomial transformation model is selected as the distortion removal mapping model, which can give an intuitive undistorted world space image while costing relative less calculations. This mapping model will be trained by coordinate-pairs of the extracted points, and then be applied to image space addresses to generate dense \(X^W/Y^W\) for all pixels.
 %% mapping model parameters determination
 %
 %
@@ -618,7 +615,7 @@ Z^W[m, \, n] = e[m, n]D[m, \, n]+f[m, n] ,
 \end{equation}%
 %
 \noindent
-where \([m, \, n]\) denotes the image address \(Row\) and \(Col\) of a pixel, \(e/f\) are the corresponding linear coefficients that help map from \(D\) to \(Z^\text{W}\). With eqn.~\ref{fromD_To_Z} supporting the per-pixel \(Z^W\) values and eqn.~(\ref{kaiBeamEquationCh3}) help generating the per-pixel \(X^WY^W\) values, we found all of the six per-pixel parameters \((a/b/c/d/e/f)\) we need. We are now ready to process the collected data off-line and generate a \(numDepthRows\) by \(numDepthCols\) by 6 LUT.
+where \([m, \, n]\) denotes the image address \(Row\) and \(Col\) of a pixel, \(e/f\) are the corresponding linear coefficients that help map from \(D\) to \(Z^\text{W}\). With eqn.~(\ref{fromD_To_Z}) supporting the per-pixel \(Z^W\) values and eqn.~(\ref{kaiBeamEquationCh3}) help generating the per-pixel \(X^WY^W\) values, we found all of the six per-pixel parameters \((a/b/c/d/e/f)\) we need. We are now ready to process the collected data off-line and generate a \(numDepthRows\) by \(numDepthCols\) by 6 LUT.
 \\\indent
 %
  \begin{figure}[t]
@@ -636,13 +633,13 @@ where \([m, \, n]\) denotes the image address \(Row\) and \(Col\) of a pixel, \(
 \label{worldSpaceDataUnification}
 \end{figure}
 %
-The collected data cannot be used directly for LUT generation, because \(X^W/Y^W\) may not be well aligned and pre-processes of data are needed. Our calibration system did not require the camera's observing orientation to be along with \(Z^W\)-axis, which results to the fact that, the collected frames might be staggered when the centered dot-cluster in camera's FoV moves. Figure~\ref{staggeredPiles} shows the raw collected data before world space unification, which has a staggered piles of frames. In order to make the data available for generating valid per-pixel 3D reconstruction parameters, we need to unify their world space by adding or subtracting a corresponding integer to all pixels in every staggered frame, making sure the point \(X^WY^W = 0\) is at the same dot-cluster for all frames.	After the data unification of world space, as shown in fig.~\ref{unifiedPiles}, we are all ready to determine the per-pixel mapping parameters \(a/b/c/d/e/f\) and generate the LUT.
+The collected data cannot be used directly for LUT generation, because \(X^W/Y^W\) may not be well aligned and pre-processes of data are needed. Our calibration system did not require the camera's observing orientation to be along with \(Z^W\)-axis, which results to the fact that, the collected frames might be staggered when the centered dot-cluster in camera's FoV moves. Figure~\ref{staggeredPiles} shows the raw collected data before world space unification, which has a staggered piles of frames. In order to make the data available for generating valid per-pixel 3D reconstruction parameters, we need to unify their world space by adding or subtracting a corresponding integer to all pixels in every staggered frame, making sure the point \(X^WY^W = 0\) is at the same dot-cluster for all frames.	After the data unification of world space, as shown in Fig.~\ref{unifiedPiles}, we are all ready to determine the per-pixel mapping parameters \(a/b/c/d/e/f\) and generate the LUT.
 %\subsection{Mathematical tools}
 %\subsubsection{Singular Value Decomposition (SVD)}
 %\subsubsection{Least Square with Pseudo-Inverse}
 %
 \section{Alignment of RGB Pixel to Depth Pixel}
-Now an undistorted 3D reconstruction could be displayed with the help of the calibrated LUT. However, we have not figured out yet what the color of each pixel is. To generate a colored 3D reconstruction with a combination of a random depth sensor and a random RGB sensor, we need to align the RGB pixels to depth pixels. The intermediate between the depth sensor image space and RGB sensor image space is the world space. As long as we figure out the mapping from world space to RGB sensor image space, the color of pixel with known \(X^WY^WZ^W\) could be looked up from the RGB image space. The pinhole camera matrix \(M\) is used to map from world space to RGB image space. Using the frame data from Kinect RGB steams and Kinect NearIR streams, a Matlab prototype of RGB pixels alignment is shown in fig.~\ref{RGBAligned_Matlab}, where the RGB textured is mapped onto its corresponding NearIR image, who has same pixels with depth sensor. The total black area on the top edge and bottom edge is where the depth sensor's view goes beyond the RGB sensor's view. Fig.~\ref{RGBAligned_Qt} shows the screen-shot of live video after calibration with the RGB pixels aligned by a pinhole camera model \(M\).
+Now an undistorted 3D reconstruction could be displayed with the help of the calibrated LUT. However, we have not figured out yet what the color of each pixel is. To generate a colored 3D reconstruction with a combination of a random depth sensor and a random RGB sensor, we need to align the RGB pixels to depth pixels. The intermediate between the depth sensor image space and RGB sensor image space is the world space. As long as we figure out the mapping from world space to RGB sensor image space, the color of pixel with known \(X^WY^WZ^W\) could be looked up from the RGB image space. The pinhole camera matrix \(M\) is used to map from world space to RGB image space. Using the frame data from Kinect RGB steams and Kinect NearIR streams, a Matlab prototype of RGB pixels alignment is shown in Fig.~\ref{RGBAligned_Matlab}, where the RGB textured is mapped onto its corresponding NearIR image, who has same pixels with depth sensor. The total black area on the top edge and bottom edge is where the depth sensor's view goes beyond the RGB sensor's view. Figure~\ref{RGBAligned_Qt} shows the screen-shot of live video after calibration with the RGB pixels aligned by a pinhole camera model \(M\).
 
 %
  \begin{figure}[t]
@@ -699,7 +696,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %\noindent
 %where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in a M by N sensor. This per-pixel beam equation shows per-pixel linear mappings from \(Z^W\) to \(X^W/Y^W\), and the per-pixel \(Z^W\) can be mapped from features of structured light. 
 %\\\indent
-%Without calibration, we can also derive per-pixel beam equations in camera space and apply them in GPU parallel processing. In this section, we will introduce how to draw a colored camera space 3D reconstruction on GPU without calibration, using a KinectV2 camera. As shown in the diagram in fig.~\ref{cameraSpaceDiagram}, we will retrieve \(Depth\), \(RGB\) and \(mapping\) streams from the KinectV2 camera, and save them into corresponding buffers respectively. The mapping streams contains \(Row\) and \(Column\) values that can help every depth pixel to look for color infos from \(RGB\) streams. Then those three streams will be uploaded from CPU onto GPU as textures for image drawing. The camera space 3D coordinates \(X^CY^CZ^C\) for the final 3D image will be generated based on depth texture, which will also be processed on GPU in the way that similar to drawing colors on a pixel. In short, we will draw on GPU twice: one for camera space coordinates generation and \(RGB\) alignment, the other one for real 3D image drawing.
+%Without calibration, we can also derive per-pixel beam equations in camera space and apply them in GPU parallel processing. In this section, we will introduce how to draw a colored camera space 3D reconstruction on GPU without calibration, using a KinectV2 camera. As shown in the diagram in Fig.~\ref{cameraSpaceDiagram}, we will retrieve \(Depth\), \(RGB\) and \(mapping\) streams from the KinectV2 camera, and save them into corresponding buffers respectively. The mapping streams contains \(Row\) and \(Column\) values that can help every depth pixel to look for color infos from \(RGB\) streams. Then those three streams will be uploaded from CPU onto GPU as textures for image drawing. The camera space 3D coordinates \(X^CY^CZ^C\) for the final 3D image will be generated based on depth texture, which will also be processed on GPU in the way that similar to drawing colors on a pixel. In short, we will draw on GPU twice: one for camera space coordinates generation and \(RGB\) alignment, the other one for real 3D image drawing.
 %\\\indent
 %
 %In the first drawing step of camera space coordinates generation, a look-up texture will be created for the final 3D image drawing, which contains both camera space coordinates and color (RGB) values. To draw a certain color on one single pixel, GPU provide one single fragment shader to generate and save corresponding four color channel RGBA (A for alpha, opacity) single-floating data into a corresponding position in a framebuffer. We could take the framebuffer as a screen on which we are going to draw, and the positions in the framebuffer would be same with pixels in the screen. We will follow the way how GPU do drawing, and use GPU to calculate per-pixel \(X^CY^CZ^C\) and save the calculation results with RGB streams together as total six channels into a customer framebuffer. The first thing is to initial a customer framebuffer, whose texture will finally be utilized to look up per-pixel's \(X^CY^CZ^CRGB\) six channels of data for the eventual 3D image drawing. The internal texture format of {\ttfamily\color[rgb]{0.0,0.0,0.5019608}GL\_RGBA32F}, which means one pixel position (\(row\), \(column_0\)) can contain four channels. We need a second position (\(row\), \(column_0 + 1\)) for every single pixel to contain the total six channels. Therefore the customer framebuffer will be initialed with a size of %
@@ -735,7 +732,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthCols}\textcolor{black}{, }\textcolor[rgb]{0.7529412,0.7529412,0.7529412}{
 % }\textcolor[rgb]{0.5019608,0.0,0.0}{numDepthRows}}),
 %%
-%a pixel with image address (\(Row, \, Col\)) has its view in camera space as a beam passing through the camera space origin (the pin hole). For one specific camera with a certain filed of view, a pixel's beam function depends on its address (\(Row, \, Col\)). As shown in fig.~\ref{VHfieldOfView}, the relationship between a pixel's beam view (\(Z^C\) to \(X^CY^C\)) and the sensor's vertical / horizontal Field of View could be expressed as eqn.~(\ref{pinholeProportionZXY}).
+%a pixel with image address (\(Row, \, Col\)) has its view in camera space as a beam passing through the camera space origin (the pin hole). For one specific camera with a certain filed of view, a pixel's beam function depends on its address (\(Row, \, Col\)). As shown in Fig.~\ref{VHfieldOfView}, the relationship between a pixel's beam view (\(Z^C\) to \(X^CY^C\)) and the sensor's vertical / horizontal Field of View could be expressed as eqn.~(\ref{pinholeProportionZXY}).
 %%
 %\begin{equation}
 %\begin{aligned}
@@ -838,7 +835,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %%%
 %%%
 %%%
-%\indent From Chapter \ref{chapterTraditionalCalibration} we know one dimension calibration method is suitable for calibrating multiple cameras together; three dimension object calibration has the highest accuracy but also cost more on system setup; two dimension plane calibration owns both of good accuracy and simple setup. However, those traditional calibration methods are not ideal enough while considering that researchers are chasing after accuracy. Either that, the static calibration pattern does not have enough points to offer distortions' information. Concretely only few limited points could be extracted in the three dimension calibration system as shown in Fig.~\ref{threeDSixPointsCalibrating}. Or, it is hard to control the extracted calibration points to cover enough area of the image space in the famous two dimension calibration methods. Fig.~\ref{simulatedMultiPlanesCheckerboard} shows the simulated multiple planes of checkerboard with respect to the camera space, with data from the two dimension calibration method that is employed in both of Matlab and OpenCV applications, to intuitively inspect the extrinsic parameters. Using this method, researchers need to manually keep changing their poses of holding the checkerboard, in order to get enough calibration points to cover all of the image space area. Besides, all of the traditional calibration methods are assuming that the depth sensor offers perfect accurate \(Z^C\) values for all of its pixels, \textit{i.e.}, \(Z^C_{[row, col]} - Depth_{[row, col]} = E_{\text{Constant}}\) such that for all image space range of \([row,\, col]\) pixels  share one same error \(E_{\text{Constant}}\). But in practical, depth sensors always have some defects in getting same depth accuracy for all of their pixels, which we will call as \enquote{Depth Distortion}. As shown in Fig.~\ref{NIR_by_Depth_LeftSide}, even observing a flat wall there are still many bumps and hollows in the reconstructed 3D image.
+%\indent From Chapter \ref{chapterTraditionalCalibration} we know one dimension calibration method is suitable for calibrating multiple cameras together; three dimension object calibration has the highest accuracy but also cost more on system setup; two dimension plane calibration owns both of good accuracy and simple setup. However, those traditional calibration methods are not ideal enough while considering that researchers are chasing after accuracy. Either that, the static calibration pattern does not have enough points to offer distortions' information. Concretely only few limited points could be extracted in the three dimension calibration system as shown in Fig.~\ref{threeDSixPointsCalibrating}. Or, it is hard to control the extracted calibration points to cover enough area of the image space in the famous two dimension calibration methods. Fig.~\ref{simulatedMultiPlanesCheckerboard} shows the simulated multiple planes of checkerboard with respect to the camera space, with data from the two dimension calibration method that is employed in both of Matlab and OpenCV applications, to intuitively inspect the extrinsic parameters. Using this method, researchers need to manually keep changing their poses of holding the checkerboard, in order to get enough calibration points to cover all of the image space area. Besides, all of the traditional calibration methods are assuming that the depth sensor offers perfect accurate \(Z^C\) values for all of its pixels, \textit{i.e.}, \(Z^C_{[row, col]} - Depth_{[row, col]} = E_{\text{Constant}}\) such that for all image space range of \([row,\, col]\) pixels  share one same error \(E_{\text{Constant}}\). But in practice, depth sensors always have some defects in getting same depth accuracy for all of their pixels, which we will call as \enquote{Depth Distortion}. As shown in Fig.~\ref{NIR_by_Depth_LeftSide}, even observing a flat wall there are still many bumps and hollows in the reconstructed 3D image.
 %%
 % \begin{figure}[b]
 %%\hspace*{-0.5cm}
@@ -857,7 +854,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %In this thesis, we build a moving plane calibration system collecting tree dimensional data, with a rail that gets the RGB-D camera mounted on its slider observing a planar pattern. The 3D camera we used is KinectV2, but the calibration method could be applied on any RGB-D cameras. As shown in Fig.~\ref{trackingModuleOnKinectV2CalibrationSystem}, a uniform grid dots pattern is hung on the wall, and the rail is perpendicular to the wall. We will assign the wall, on which the canvas is hung and printed with uniform grid dots pattern, as the \(X^WY^W\) plane in world space, and \(Z^W\)-axis would be along the rail. The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because all of the mappings we are going to determine are with respect to per-pixel, \textit{i.e.}, the calculated parameters group for every single pixel, which will determine the pixel's view, are independent with that of the other pixels. As the slider moves along the rail, the planar dots pattern hung on the wall is moving further with respect to the RGB-D camera. This rail offers the possibility of taking infinite various frames of various camera working distances (or \(Z^C\)). Although the dots pattern hung on the wall for camera calibration is static itself, however, the dots distributions would be dynamic (covering every single pixel) in the image space when counted together in all of those various frames of various \(Z^C\). 
 %\\\indent%
 %%how to per-pixel calibrate ?
-%In this per-pixel calibration method, we directly focus on the view of every single pixel, the beam. Got inspired by Kai (eqn.~\ref{kaiBeamEquation}), our camera calibration method consists of two big steps: frames (\(X^\text{W}Y^\text{W}Z^\text{W}+D\)) data collection, plus per-pixel mapping parameters determination after frames collection; \textit{i.e.}, to collect frames data of \(Z^\text{W}\) from external and (\(X^\text{W}, \, Y^\text{W}\)) by a transformation from (\(R, C\)), plus to calculate per-pixel parameters that help map from \(D\) to \(Z^\text{W}\) and \(c/d/e/f\) in eqn.~\ref{kaiBeamEquation} that map from \(Z^\text{W}\) to \(X^\text{W}/Y^\text{W}\). Note that, neither have we decided the mapping model from \(D\) to \(Z^\text{W}\), nor from (\(R, C\)) to (\(X^\text{W}, \, Y^\text{W}\)). We save the flexibilities between accuracy and complexity for now, and will decide those two models based on data.
+%In this per-pixel calibration method, we directly focus on the view of every single pixel, the beam. Inspired by Kai (eqn.~\ref{kaiBeamEquation}), our camera calibration method consists of two big steps: frames (\(X^\text{W}Y^\text{W}Z^\text{W}+D\)) data collection, plus per-pixel mapping parameters determination after frames collection; \textit{i.e.}, to collect frames data of \(Z^\text{W}\) from external and (\(X^\text{W}, \, Y^\text{W}\)) by a transformation from (\(R, C\)), plus to calculate per-pixel parameters that help map from \(D\) to \(Z^\text{W}\) and \(c/d/e/f\) in eqn.~\ref{kaiBeamEquation} that map from \(Z^\text{W}\) to \(X^\text{W}/Y^\text{W}\). Note that, neither have we decided the mapping model from \(D\) to \(Z^\text{W}\), nor from (\(R, C\)) to (\(X^\text{W}, \, Y^\text{W}\)). We save the flexibilities between accuracy and complexity for now, and will decide those two models based on data.
 %\\\indent%
 %% World Coordinates assignment
 %Assuming the total size of the depth sensor is as small as a point, and the \(Z^W\)s for all of the pixels in one frame would share the same value, which could be measured by a laser distance measurer nearby the camera. To simplify the digital image processing (DIP) when extracting a desired point (\(R,\, C\)), which will soon be discussed in section \ref{sectionDIPTechniques}, we assign the \enquote{2D origin} (\(X^\text{W}/Y^\text{W}\) = 0) of world space coordinates at the center of the dot which is closest to the center of the camera's field of view. And the laser measurer spot nearby the camera to at \(Z^\text{W}\)=0, such that \(Z^{W}\) values are always negative. Note that, the final assigned world space origin (\enquote{3D origin}) is not necessarily be where the camera sensor is. It depends on the camera's observation orientation, whose changing leads to the change of the \enquote{2D origin} (and finally change the 3D origin).
@@ -885,7 +882,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %As for (\(X^\text{W}, \, Y^\text{W}\)) values' collection, a transformation from (\(R, C\)) is needed, during which the lens distortions correction must be considered. In the traditional calibration method, world space \(X^\text{W}/Y^\text{W}/Z^\text{W}\) are mapped to undistorted (\(R', C'\)) by linear pinhole camera matrix \(M\). And then the undistortion step from undistorted (\(R', C'\)) to distorted (\(R, C\)) is done by eqn.~\ref{lensDistortion}, which uses a high order (higher than 2nd order) polynomial equation. Assuming that there is a high order mapping relationship directly from the distorted image space (\(R, C\)) to world space (\(X^\text{W}, \, Y^\text{W}\)), we will do different orders of two-dimensional polynomial prototypes in Matlab using its application of \enquote{Curve Fitting Toolbox}, and then decide a best-fit mapping model with a high accuracy and a relative small number of parameters.
 %%
 %\\\indent
-%A 3x3 linear transformation matrix \(A\) (as \(1^{st}\) order polynomial) is usually used for perspective distortion correction, give by eqn.~\ref{perspectiveDistortionCorrectionEquation}. We will try the perspective distortion correction to check if it will also work on the lens distortion correction.
+%A $3\times3$ linear transformation matrix \(A\) (as \(1^{st}\) order polynomial) is usually used for perspective distortion correction, give by eqn.~\ref{perspectiveDistortionCorrectionEquation}. We will try the perspective distortion correction to check if it will also work on the lens distortion correction.
 %%
 %\begin{equation}
 %%
@@ -907,7 +904,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %\end{equation}%
 %%
 %\noindent
-%A two-dimensional polynomial model means surface mapping between two different spaces. The second order polynomial mapping has 2x6=12 parameters, written as %
+%A two-dimensional polynomial model means surface mapping between two different spaces. The second order polynomial mapping has $2\times6=12$ parameters, written as %
 %%
 %\begin{equation}
 %\begin{aligned}
@@ -919,7 +916,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %\end{equation}%
 %%
 %\noindent
-%and similarly, the fourth order polynomial mapping has 2x15=30 parameters, given by eqn.~\ref{fourthOrderPolynomial}.%
+%and similarly, the fourth order polynomial mapping has $2 \times 15$=30 parameters, given by eqn.~\ref{fourthOrderPolynomial}.%
 %%
 %\begin{equation}
 %\hspace*{-0.3cm}%
@@ -934,7 +931,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %\end{equation}%
 %%
 %\indent
-%To prototype equation \ref{secondOrderPolynomial} and \ref{fourthOrderPolynomial} in Matlab, \enquote{Curve Fitting Toolbox} is used to obtain the 2x6 and 2x15 parameters, using 107 points' coordinates pairs of image space \(R/C\) and world coordinates \(X^W/Y^W\). Based on the \enquote{Goodness of fit} of transformation parameters from Matlab, the Root-Mean-Square Error (RMSE) of (\(X^W\), \(Y^W\)) is (0.06796, 0.05638) for the \(2^{nd}\) order polynomial, and (0.02854, 0.02343) for the \(4^{th}\) order polynomial. As the order of polynomial goes higher, the RMSE gets smaller, and the cost of parameters' calculation gets much higher as well. After the prototyping in Matlab, the different orders of polynomial models will be applied into real-time streams transformation to get live transformed world space reconstruction. Eventually, the \(4^{th}\) order polynomial transformation model is selected as the distortion removal mapping model, which can give an intuitive undistorted world space image while costing relative less calculations. Detailed results and comparisons will be shown soon in section~\ref{sectionPrototypeTwoDtransformation}.
+%To prototype equation \ref{secondOrderPolynomial} and \ref{fourthOrderPolynomial} in Matlab, \enquote{Curve Fitting Toolbox} is used to obtain the $2\times6$ and $2\times15$ parameters, using 107 points' coordinates pairs of image space \(R/C\) and world coordinates \(X^W/Y^W\). Based on the \enquote{Goodness of fit} of transformation parameters from Matlab, the Root-Mean-Square Error (RMSE) of (\(X^W\), \(Y^W\)) is (0.06796, 0.05638) for the \(2^{nd}\) order polynomial, and (0.02854, 0.02343) for the \(4^{th}\) order polynomial. As the order of polynomial goes higher, the RMSE gets smaller, and the cost of parameters' calculation gets much higher as well. After the prototyping in Matlab, the different orders of polynomial models will be applied into real-time streams transformation to get live transformed world space reconstruction. Eventually, the \(4^{th}\) order polynomial transformation model is selected as the distortion removal mapping model, which can give an intuitive undistorted world space image while costing relative less calculations. Detailed results and comparisons will be shown soon in section~\ref{sectionPrototypeTwoDtransformation}.
 %\\\\\indent
 % %% mapping model parameters determination
 %%
@@ -972,7 +969,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %\label{luminosityGrayScaling}
 %\end{equation}%
 %%
-%As values saved on GPU, all of the pixel intensity values are within the range of [0, 1], where \enquote{0} means 100\% black and \enquote{1}  means 100\% white. In practical, NearIR steam image is always very dark, as shown in Fig.~\ref{Raw_Single_NIR} (with their intensity values every close to zero).  In order to enhance the contrast of NearIR image for a better binarizing, rescaling is necessary. In this section, histogram equalization technique is used maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB steam.
+%As values saved on GPU, all of the pixel intensity values are within the range of [0, 1], where \enquote{0} means 100\% black and \enquote{1}  means 100\% white. In practice, NearIR steam image is always very dark, as shown in Fig.~\ref{Raw_Single_NIR} (with their intensity values every close to zero).  In order to enhance the contrast of NearIR image for a better binarizing, rescaling is necessary. In this section, histogram equalization technique is used maximize the range of valid pixel intensity distributions. Same process is also compatible on the RGB steam.
 %%
 % \begin{figure}[t]
 %\hspace*{-0.5cm}
@@ -1071,7 +1068,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %% Sniffer for Round Dot Center
 %After the adaptive thresholding, image data saved on GPU is now composed of circle-shaped \enquote{0}s within a background of \enquote{1}s. In order to locate the center of those \enquote{0}s circle, which is the center of captured round dot, it is necessary to know the edge of those circles. A trick is used to turn all of the edge data into markers that could lead a pathfinder to retrieve circle information.%
 %%
-%The idea that helps to mark edge data is to reassign pixels' values (intensity values) based on their surroundings. Using letter \(O\) to represent one single pixel in the center of a 3x3 pixels environment, and letters from \(A\)\texttildelow \(H\) to represent surroundings, a mask of 9 cells for pixel value reassignment could be expressed as below.
+%The idea that helps to mark edge data is to reassign pixels' values (intensity values) based on their surroundings. Using letter \(O\) to represent one single pixel in the center of a $3\times3$ pixels environment, and letters from \(A\)\texttildelow \(H\) to represent surroundings, a mask of 9 cells for pixel value reassignment could be expressed as below.
 %
 %\begin{center}
 %  \begin{tabular}{ | c | c | c | }
@@ -1146,10 +1143,10 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %%%
 %%The list of round dot centers \((column, row)\)s is extracted through section \ref{RowColumnExtraction}. The following is to map every dot center's \((column, row)\) to its corresponding world coordinates \((X^W, \,Y^W)\). As shown in Fig.~\ref{trackingModuleOnKinectV2CalibrationSystem}, world coordinates are from the uniform grid. Taking the side of unit-square (distance between two adjacent dots) as \enquote{Unit One} in the world coordinates and one dot as the origin of plan \(X^WY^W\), every dot cluster's center \(column\) / \(row\) will be mapped to integer values \(X^W\)/\(Y^W\). %
 %%\\\\%
-%%Ideally, a 3x3 perspective transformation matrix could help set a linear mapping between two plane coordinates, and 3 dot centers with know coordinates pair of \((column, row)\) and \((X^W, \,Y^W)\) are enough to determine the transformation matrix. Once four points with a squared-shape \(column\)/\(row\) distribution is found, a 3x3 perspective transformation matrix \(A\) could be determined by solving eqn.~\ref{perspectiveDistortionCorrectionEquation}, %
+%%Ideally, a $3\times3$ perspective transformation matrix could help set a linear mapping between two plane coordinates, and 3 dot centers with know coordinates pair of \((column, row)\) and \((X^W, \,Y^W)\) are enough to determine the transformation matrix. Once four points with a squared-shape \(column\)/\(row\) distribution is found, a $3\times3$ perspective transformation matrix \(A\) could be determined by solving eqn.~\ref{perspectiveDistortionCorrectionEquation}, %
 %%where \(C\) and \(R\) are vectors consist of \((column, row)\)s of four squared-shape distributed points; \(X^W\) and \(Y^W\) are vectors consist of four points \((0, 0)\), \((0, 1)\), \((1, 1)\), and \((1, 0)\); \(z\) denotes the third axis in the homogenous system connecting two planes. %
 %%\\\\%
-%%Due to the distortions, cluster centers in image plane are not uniformly distributed, and this 3x3 transformation matrix can only generate corresponding decimal \(X^W\)/\(Y^W\) values that are close integers. But in practical, the correct integer values \(X^W\)/\(Y^W\) could still be calculated through \(Rounding\). The list of cluster centers' image coordinate \((column, row)\)s can give many groups of four squared-shape distributed points, while each of them gives a different image coordinate distance that maps to the \enquote{Unit One} in world coordinates. Taking those points with generated \(X^W\)/\(Y^W\) values that are within an appropriate range close to integers as valid points, the \enquote{best} 3x3 transformation matrix could be determined by going through all of the possible groups of four squared-shape distributed points and picking out the group that leads to the most valid points.%
+%%Due to the distortions, cluster centers in image plane are not uniformly distributed, and this $3\times3$ transformation matrix can only generate corresponding decimal \(X^W\)/\(Y^W\) values that are close integers. But in practice, the correct integer values \(X^W\)/\(Y^W\) could still be calculated through \(Rounding\). The list of cluster centers' image coordinate \((column, row)\)s can give many groups of four squared-shape distributed points, while each of them gives a different image coordinate distance that maps to the \enquote{Unit One} in world coordinates. Taking those points with generated \(X^W\)/\(Y^W\) values that are within an appropriate range close to integers as valid points, the \enquote{best} $3\times3$ transformation matrix could be determined by going through all of the possible groups of four squared-shape distributed points and picking out the group that leads to the most valid points.%
 %%\\\\%
 %%In this way, the so-called \enquote{best} transformation matrix can give a best \enquote{Unit One} distance in image coordinate, however its corresponding origin point \((0, 0)\), one of the four points that are used to calculate a transformation matrix, is usually not close to the center of cameras' Field of View (FoV). A translation matrix \(T\) could be used to refine the \enquote{best} transformation matrix, and help to translate the origin point to be a dot cluster that is closest to the center of FoV. The refined transformation matrix \(A_{\text{\_refined}}\) is written as%
 %%%
@@ -1203,7 +1200,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 %%\subsubsection{Least Square with Pseudo-Inverse}
 %%
 %\section{Alignment of RGB Pixel to Depth Pixel}
-%A undistorted 3D reconstruction could be displayed with the help of a LUT generated by the per-pixel calibration method, which has been discussed in section~\ref{sectionPerPixelCalibration}. However, we have not figured out yet what the color of each pixel is. To generate a colored 3D reconstruction with a combination of a random depth sensor and a random RGB sensor, we need to align the RGB pixels to depth pixels. The intermediate between the depth sensor image space and RGB sensor image space is the world space. As long as we figure out the mapping from world space to RGB sensor image space, the color of pixel with known \(X^WY^WZ^W\) could be looked up from the RGB image space. The pinhole camera matrix \(M\) is used to map from world space to RGB image space. Using the frame data from Kinect RGB steams and Kinect NearIR streams, a Matlab prototype of RGB pixels alignment is shown in fig.~\ref{RGBAligned_Matlab}, where the RGB textured is mapped onto its corresponding NearIR image, who has same pixels with depth sensor. The total black area on the top edge and bottom edge is where the depth sensor's view goes beyond the RGB sensor's view. Fig.~\ref{RGBAligned_Qt} shows the screen-shot of live video after calibration with the RGB pixels aligned by a pinhole camera model \(M\).
+%A undistorted 3D reconstruction could be displayed with the help of a LUT generated by the per-pixel calibration method, which has been discussed in section~\ref{sectionPerPixelCalibration}. However, we have not figured out yet what the color of each pixel is. To generate a colored 3D reconstruction with a combination of a random depth sensor and a random RGB sensor, we need to align the RGB pixels to depth pixels. The intermediate between the depth sensor image space and RGB sensor image space is the world space. As long as we figure out the mapping from world space to RGB sensor image space, the color of pixel with known \(X^WY^WZ^W\) could be looked up from the RGB image space. The pinhole camera matrix \(M\) is used to map from world space to RGB image space. Using the frame data from Kinect RGB steams and Kinect NearIR streams, a Matlab prototype of RGB pixels alignment is shown in Fig.~\ref{RGBAligned_Matlab}, where the RGB textured is mapped onto its corresponding NearIR image, who has same pixels with depth sensor. The total black area on the top edge and bottom edge is where the depth sensor's view goes beyond the RGB sensor's view. Fig.~\ref{RGBAligned_Qt} shows the screen-shot of live video after calibration with the RGB pixels aligned by a pinhole camera model \(M\).
 %
 %%
 % \begin{figure}[b]
