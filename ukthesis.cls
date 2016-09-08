@@ -372,7 +372,7 @@
     RULES FOR THE USE OF THESES
   \end{center}
 	 \hfill \par\noindent%
-	Unpublished theses submitted for the Master’s degree and deposited in the
+	Unpublished theses submitted for the Master's degree and deposited in the
 	University of Kentucky Library are as a rule open for inspection, but are to be
 	used only with due regard to the rights of the authors. Bibliographical references
 	may be noted, but quotations or summaries of parts may be published only with

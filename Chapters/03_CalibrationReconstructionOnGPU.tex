@@ -69,10 +69,10 @@ The horizontal range value \(|X^C_{\text{Max}}|\) depends on \(|Z^C_0|\) and the
 \label{cameraXMaxfromZ}
 \end{equation}%
 \noindent
-where the pixel observing on \(X^C = |X^C_{\text{Max}}|\) has its column address of numDepthCols. Similarly, given a random pixel of column address \(Col_0\), its horizontal view \(X^C_0\) could be expressed based on its own horizontal view angle \(\alpha_0\).
+where the pixel observing on \(X^C = |X^C_{\text{Max}}|\) has its column address of numDepthCols. Similarly, given a random pixel of column address \(Col_0\), its horizontal view \(X^C_0\) could be expressed based on its own horizontal view angle \(\alpha_0\):
 %
 \begin{equation}
-|X^C_{0}| = |Z^C_0| \cdot tan(\alpha_0)
+|X^C_{0}| = |Z^C_0| \cdot tan(\alpha_0)  .
 \label{alphaZeroHorFOV}
 \end{equation}%
 \noindent
@@ -90,10 +90,10 @@ X^C[m, n] = tan(horFov / 2) \cdot (\frac{n}{numDepthCols} - 0.5) \cdot |Z^C[m, n
 \label{proportionalEqnFromZtoX}
 \end{equation}%
 \noindent
-where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in the depth sensor. Similarly, we can also get the proportional per-pixel mapping from \(Z^C\) to \(Y^C\), based on the vertical FoV and row addresses.
+where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in the depth sensor. Similarly, we can also get the proportional per-pixel mapping from \(Z^C\) to \(Y^C\), based on the vertical FoV and row addresses:
 %
 \begin{equation}
-Y^C[m, n] = tan(verFov / 2) \cdot (\frac{m}{numDepthRows} - 0.5) \cdot |Z^C[m, n]|
+Y^C[m, n] = tan(verFov / 2) \cdot (\frac{m}{numDepthRows} - 0.5) \cdot |Z^C[m, n]| \  .
 \label{proportionalEqnFromZtoY}
 \end{equation}%
 \noindent
@@ -241,7 +241,7 @@ Kai \cite{Kai10} did a good job on structured light 3D scanner parallel calibrat
 X^W[m,\,  n] = a[m, n]Z^W[m,\,  n]+b[m, n]
 \\%
 Y^W[m,\,  n] = c[m, n]Z^W[m,\,  n]+d[m, n]
-\end{aligned}
+\end{aligned} \ ,
 \label{kaiBeamEquationCh3}
 \end{equation}%
 \noindent
@@ -502,7 +502,7 @@ a_{31} & a_{32} & a_{33} \\
 \end{bmatrix}%
  \left[ \begin{array}{c} %
 C \\ R \\ 1 \end{array} \right] %
-%
+ \ ,%
 \label{perspectiveDistortionCorrectionEquation}
 \end{equation}%
 %
@@ -511,7 +511,7 @@ where \(C\) and \(R\) are vectors consist of four squared-shape distributed poin
 \\\indent%
 Deformed by lens distortions, the cluster centers in image plane are not uniformly distributed, and this $3\times3$ transformation matrix can only generate corresponding decimal \(X^W\)/\(Y^W\) values that are close integers. But in practice, the correct integer values \(X^W\)/\(Y^W\) could still be located through \(Rounding\). Considering that a list of cluster centers' image coordinate \((R, C)\)s will give many groups of four squared-shape distributed points, and each of them gives a different image coordinate distance will be mapped to the \enquote{Unit One} in world coordinates, we will traverse all of the possible groups of four squared-shape distributed points and pick out the group whose mapping matrix \(A\) generates the most points that are close to integers. %
 %
-In this way, we find the transformation matrix \(A\) can give the best \enquote{Unit One} distance in world coordinates. However, its generated point \(X^W/Y^W = 0\) is usually not at the dot-cluster that is closest to the center of cameras' FoV. A translation matrix \(T\) could be used to refine the transformation matrix \(A\) and help to translate the origin point to be at the dot cluster we want, given by%
+In this way, we find the transformation matrix \(A\) can give the best \enquote{Unit One} distance in world coordinates. However, its generated point \(X^W/Y^W = 0\) is usually not at the dot-cluster that is closest to the center of cameras' FoV. A translation matrix \(T\) could be used to refine the transformation matrix \(A\) and help to translate the origin point to be at the dot cluster we want:%
 %
 \begin{equation}
 %
@@ -525,10 +525,10 @@ T \cdot A %
 0 & 0 &   1 \\%
 \end{bmatrix}%
 \cdot A%
-\, \, \, ,%
+\, \, \, \ \ ,%
 \end{equation}%
 %
-where the integer world coordinate point \((X_{\text{\_Zero\_A}}, \, Y_{\text{\_Zero\_A}})\) are rounded world space coordinates, written as%
+where \((X_{\text{\_Zero\_A}}, \, Y_{\text{\_Zero\_A}})\) is the integer world space address rounded after the transformation from image space center point:%
 %
 \begin{equation}
 %
@@ -537,10 +537,10 @@ zX_{\text{\_Zero\_A}} \\ zY_{\text{\_Zero\_A}} \\ z \end{array} \right] %
 = %
 A\cdot \left[ \begin{array}{c} %
 C_{\text{\_center}} \\ R_{\text{\_center}} \\ 1 \end{array} \right] %
-%
+ \ .%
 \end{equation}%
 \noindent
-which are mapped from the center point \((C_{\text{\_center}}, \, R_{\text{\_center}})\) of FoV in image plane by the transformation matrix \(A\). Eventually, the refined transformation matrix eventually generates a list of world coordinate points \((X^W, \, Y^W)\)s that correspond to image coordinates \((column, row)\)s. As shown in Fig.~\ref{XY_GridFitting_Matlab}, world coordinates are integers and the origin (blue circle) is chosen as where the center-closest dot-cluster is sitting.%
+where \((C_{\text{\_center}}, \, R_{\text{\_center}})\) denotes the center point of FoV in image space. Eventually, the refined transformation matrix $A_{\text{\_refined}}$ can help assign world coordinates to the extracted image space coordinates, with the point \(X^W/Y^W=0\) at the dot-cluster nearest to the image center, as shown in Fig.~\ref{XY_GridFitting_Matlab}.
 %
  \begin{figure}[t]
 \hspace*{-0.3cm}

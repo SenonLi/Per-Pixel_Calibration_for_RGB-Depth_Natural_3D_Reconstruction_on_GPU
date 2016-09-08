@@ -49,23 +49,23 @@ With the virtual focal plane, the camera body with the real focal plane could be
 \end{figure}%
 %
 
-Select a random object point \(\text{P}^\text{C}\) in the camera space located at camera 3D coordinates (\(\text{X}_\text{C}\), \(\text{Y}_\text{C}\), \(\text{Z}_\text{C}\)). A line passing both of the point \(\text{P}^\text{C}\) and the focal point intersects with the virtual focal plane at \(\text{P}^\text{I}\), with its image 2D coordinates (R, C). To determine the mapping function, we can start a the proportional relationship. As shown in Fig.~\ref{RelationshipCameraToImage}, the center point in the image coordinates, which is usually called \emph{principle point}, could be determine by column of half-width and row of half-height. Concretely, the principle point (\(\text{R}_\text{h}\), \(\text{C}_\text{h}\)) is either (119.5, 159.5) if range is ([0:239], [0:319]), or (120, 320) if range is ([1:240], [1:320]). So, we could get the relative row and column distance of  \(\text{R}_\text{r}\) and \(\text{C}_\text{r}\)) by eqn.~(\ref{relativeCRforProportional}).
+Select a random object point \(\text{P}^\text{C}\) in the camera space located at camera 3D coordinates (\(\text{X}_\text{C}\), \(\text{Y}_\text{C}\), \(\text{Z}_\text{C}\)). A line passing both of the point \(\text{P}^\text{C}\) and the focal point intersects with the virtual focal plane at \(\text{P}^\text{I}\), with its image 2D coordinates (R, C). To determine the mapping function, we can start a the proportional relationship. As shown in Fig.~\ref{RelationshipCameraToImage}, the center point in the image coordinates, which is usually called \emph{principle point}, could be determine by column of half-width and row of half-height. Concretely, the principle point (\(\text{R}_\text{h}\), \(\text{C}_\text{h}\)) is either (119.5, 159.5) if range is ([0:239], [0:319]), or (120, 320) if range is ([1:240], [1:320]). So, we could get the relative row and column distance of  \(\text{R}_\text{r}\) and \(\text{C}_\text{r}\) by:
 %
 \begin{equation}
 \begin{aligned}
-\text{R}_\text{r} = \text{R} - \text{R}_\text{h}%
+\text{R}_\text{r} &= \text{R} - \text{R}_\text{h}%
 \\%
-\text{C}_\text{r} = \text{C} - \text{C}_\text{h}%
+\text{C}_\text{r} &= \text{C} - \text{C}_\text{h} \ \ \ .%
 \end{aligned}
 \label{relativeCRforProportional}
 \end{equation}%
 %
-Based on by triangulation, it is straight forward to tell the proportional relationship between \(f\)/\(\text{Z}_\text{C}\) and \(\text{C}_\text{r}\)/\(\text{X}_\text{C}\), \(\text{R}_\text{r}\)/\(\text{Y}_\text{C}\). Thus we get eqn.~(\ref{twoDRelativeFromCamToIm}).
+Based on by triangulation, it is straight forward to tell the proportional relationship between \(f\)/\(\text{Z}_\text{C}\) and \(\text{C}_\text{r}\)/\(\text{X}_\text{C}\), \(\text{R}_\text{r}\)/\(\text{Y}_\text{C}\). Thus we get
 %
 \begin{equation}
 \left[ \begin{array}{c} \text{C}_\text{r} \\ \text{R}_\text{r} \end{array} \right] %
 = f %
-\left[ \begin{array}{c} \text{X}_\text{C}/\text{Z}_\text{C} \\ \text{Y}_\text{C}/\text{Z}_\text{C} \end{array} \right]%
+\left[ \begin{array}{c} \text{X}_\text{C}/\text{Z}_\text{C} \\ \text{Y}_\text{C}/\text{Z}_\text{C} \end{array} \right]  .%
 \label{twoDRelativeFromCamToIm}
 \end{equation}
 \noindent
@@ -156,7 +156,7 @@ t_{3}
 \label{rotationTranslationMatrixRT}
 \end{equation}%
 %
-we can get the transformation matrix \([R_{3*3} \,\, T_{3*3}]\) from the world space to camera space, as shown in eqn.~(\ref{mappingFromWorldToCameraSpace}).
+we can get the transformation matrix \([R_{3*3} \,\, T_{3*3}]\) from the world space to camera space:
 %
 \begin{equation}
 \begin{bmatrix} 
@@ -179,13 +179,13 @@ X^{W} \\
 Y^{W} \\
 Z^{W} \\
 1
- \end{bmatrix}%
+ \end{bmatrix}  .%
 \label{mappingFromWorldToCameraSpace}
 \end{equation}%
 %
 %%%% 2.5 Pinhole Camera Matrix (X^w, Y^w, Z^w) --> (X^c, Y^c, Z^c) --> (R, C)
 %
-%
+\noindent
 The parameters that help map from world space to camera space depend on how we assign the world coordinates. Since none of them are from the camera even though they are belongs to an important part of camera calibration, usually the matrix \([R_{3*3} \,\, T_{3*3}]\) is called extrinsic camera matrix. With both of the extrinsic camera matrix (help map from world space to camera space) and the intrinsic camera matrix (help map from camera space to image space), we are now able to build the connection between the world space coordinates, which could be assigned by ourselves, and the image space \(Row\) and \(Column\), which are the streams we retrieved from the camera. 
 \\\indent
 To combine the intrinsic camera matrix and extrinsic camera matrix (combine eqn.~(\ref{HomoProportionalFromCamToImInPixels}) and eqn.(~\ref{mappingFromWorldToCameraSpace})), we get 
@@ -288,7 +288,7 @@ C_1 \\ R_1 \\ C_2 \\ R_2 \\
 \label{inHomogenousNPoints2nEquationCR}
 \end{equation}%
 \noindent
-Using pseudo inverse, eqn.~(\ref{inHomogenousNPoints2nEquationCR}) can be solved by \(X = (A^TA)^{-1}A^TB\), where \(X\) is an 11-elements vector and \(X(1)\)  \texttildelow \, \(X(11)\) correspond to \(m_{11}\) \texttildelow \, \(m_{33}\). And the $3\times4$ pinhole camera matrix (eqn.~(\ref{pinholeMatrix3x4M})) will be solved as eqn.~(\ref{determinationOfPinhole3x4}).
+Using pseudo inverse, eqn.~(\ref{inHomogenousNPoints2nEquationCR}) can be solved by \(X = (A^TA)^{-1}A^TB\), where \(X\) is an 11-elements vector and \(X(1)\)  \texttildelow \, \(X(11)\) correspond to \(m_{11}\) \texttildelow \, \(m_{33}\). And the $3\times4$ pinhole camera matrix (eqn.~(\ref{pinholeMatrix3x4M})) will be solved as: 
 
 \begin{equation}
 M =
