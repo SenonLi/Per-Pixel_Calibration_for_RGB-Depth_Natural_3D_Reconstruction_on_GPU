@@ -251,7 +251,7 @@ where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each 
 In this section, we will find a best-fit calibration system for a KinectV2 camera's natural calibration and reconstruction, which is able the handle both of lens distortion and \emph{depth distortion}. %
 %The KinectV2 camera has one depth sensor and one RGB sensor. The RGB sensor offers RGB streams, whose color infos will be aligned to pixels according to their corresponding world space coordinates after the 3D reconstruction. The depth sensor offers NearIR and Depth streams, both of which share the same size ($row$ and $column$) and lens distortions of the depth sensor, and can both be utilized for lens distortion correction. We will use the Depth stream to recover world space 3D coordinates $X^WY^WZ^W$ for reconstruction, during which the NearIR stream will be used for lens distortion correction. 
 %\\\indent
-To easily show 3D reconstruction in a parallel way on the GPU, we would like our calibration system to be able to offer a per-pixel mapping from \(D\) to \(Z^W\), which then could be used to map to \(X^W/Y^W\) using eqn.~(\ref{kaiBeamEquationCh3}). In this way, the \emph{depth distortion} could also be corrected during the per-pixel \(D\) to \(Z^W\) mapping.
+To easily show 3D reconstruction in a parallel way on the GPU, we would like our calibration system to be able to offer a per-pixel mapping from \(D\) to \(Z^W\), which then could be used to map to \(X^W/Y^W\) using eqn.~(\ref{kaiBeamEquationCh3}). In this way, the \emph{depth distortion} could also be corrected during the per-pixel \(D\) to \(Z^W\) mapping. Of all different kinds of calibration systems, a camera on rail system with a planar pattern on wall is finally decided, which offers a moving plane with respect to the camera when the camera moves along the rail. As Fig.~\ref{trackingModuleOnKinectV2CalibrationSystemCh3} shows, a canvas on which printed an uniform grid dots pattern is hung on the wall, and the rail is required to be perpendicular to the wall. 
 %
 \begin{figure}[t]
 \centering
@@ -260,8 +260,10 @@ To easily show 3D reconstruction in a parallel way on the GPU, we would like our
 \label{trackingModuleOnKinectV2CalibrationSystemCh3}
 \end{figure}%
 %
-Of all different kinds of calibration systems, a camera on rail system with a planar pattern on wall is finally decided, which offers a moving plane with respect to the camera when the camera moves along the rail. As Fig.~\ref{trackingModuleOnKinectV2CalibrationSystemCh3} shows, a canvas on which printed an uniform grid dots pattern is hung on the wall, and the rail is required to be perpendicular to the wall. The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because the per-pixel calibration requires only accurate world space coordinates which will be decided by the rail and the wall, whereas the camera's space is not considered at all. We will assign the pattern plane as the \(X^WY^W\) plane in world space, and the rail to be along with (not exactly on) \(Z^W\)-axis. The world coordinate is static with the camera on the slider. %
+The RGB-D camera waiting to calibrate is mounted on the slider. Note that, in this calibration system, the only unit that needs to be perpendicular to the wall is the rail, whereas the RGB-D camera has no need to require its observation orientation. Because the per-pixel calibration requires only accurate world space coordinates which will be decided by the rail and the wall, whereas the camera's space is not considered at all. We will assign the pattern plane as the \(X^WY^W\) plane in world space, and the rail to be along with (not exactly on) \(Z^W\)-axis. The world coordinate is static with the camera on the slider. %
 %
+%
+\\\indent
 \begin{figure}[!t]
 \centering
 %calibrated \(X^{W}\)/\(Y^{W}\) and \(Z^{W}\)
@@ -270,7 +272,6 @@ Of all different kinds of calibration systems, a camera on rail system with a pl
 \label{OneFrameXYZ_Calibrated}
 \end{figure}%
 %
-\\\indent
 Figure~\ref{OneFrameXYZ_Calibrated} shows one frame of NearIR \(X^WY^WZ^W\) 3D reconstruction, which can help a lot explaining how the world space origin is assigned. Inside the figure, both of the origin and \(Z\)-axis are high-lighted in blue, and the origin of world space is on the left end of the blue line. On the pattern plane with dot-clusters marked in circles, we can see one dot-cluster is high-lighted inside a thick circle, and its center point is where \(X^W/Y^W = 0\). The dot-cluster which will be sitting on the \(Z^W\)-axis is the one whose center point is closest to the center pixel of the sensor. All pixels in this frame share the exact same \(Z^W\), which is also why we require the rail to be perpendicular to the pattern. And the value of \(Z^W\) is measured by a laser distance measurer that static with the camera. The final origin of the world space will be decided by both of the camera's observing orientation and the laser distance measurer's position. This kind of world coordinate assignment is totally for simplifying image processing during calibration.  Practically, we do not even care where exactly the origin is, as long as the rail is perpendicular to the pattern and the distance measurer is static with the camera.
 \\\indent
 With this rail calibration system, infinite number of frames with infinite number of calibration points could be utilized for training a calibration model. Besides, as the slider moves along the rail, the amount and distribution of the grid dots captured by the camera will change, which means a dynamic pattern for calibration instead of static. With more and more dots walking into the camera's field of view under a certain rhythm as the slider moves further from the pattern plane, the dots (which will be extracted as calibration points) are able to cover all pixels of a sensor. What's more, a moving-plane system (multiple frames calibration instead of one frame calibration) makes it possible to do dense \(D\) to \(Z^W\) mapping, which will handle \emph{depth distortion}.
@@ -374,21 +375,8 @@ and the image will get a better contrast, as compared in Fig.~\ref{Histogram_Equ
 %% Adaptive Thresholding
 Affected by radial dominated lens distortions, the intensity value tend to decrease as the position of a pixel moves from the center of an image to the borders, in the case of observing a singular color view. Therefore, an adaptive thresholding process is needed, whereas using fixed thresholding will generate too much noise around borders. To segment the black dots from white background, we could simply subtract an image's background from an textured image, where the background comes from a blurring process of that image.%
 %
- \begin{figure}[t]
-\hspace*{-0.5cm}
-\centering
-\subfloat[Histogram Equalized NearIR][Histogram Equalized]{
-\includegraphics[width = 0.5\textwidth]{NIR_After_HistogramEqualization}
-\label{NIR_After_HistogramEqualization_2}}
-\subfloat[After Adaptive Thresholding][Binarized]{
-\includegraphics[width=0.5\textwidth]{Binarized_Single_NIR}
-\label{Binarized_Single_NIR}}%\qquad
-\caption{NearIR Streams before / after Adaptive Thresholding}
-\label{Adaptive_Thresholding}
-\end{figure}%
-%
 There are three common types of blurring filters: mean filter, weighted average filter, and gaussian filter. Mean filter is selected for this background-aimed blurring process, because it has the smallest calculation and also a better effect of averaging than the others. After the blurred image containing background information is obtained, the binarizing (subtraction) process for every single pixel could be written as
-
+%
 \begin{equation}
 %
 Intensity_{\text{\_binarized}} = %
@@ -403,6 +391,19 @@ Intensity_{\text{\_binarized}} = %
 %
 where \(I\) is short for \(Intensity\) of every single pixel, and \(C_{\text{\_offset}}\) is a small constant that could be adjusted depending on various thresholding situations. In this project, \(C_{\text{\_offset}}\) is around 0.1.%
 %
+\begin{figure}[t]
+\hspace*{-0.5cm}
+\centering
+\subfloat[Histogram Equalized NearIR][Histogram Equalized]{
+\includegraphics[width = 0.5\textwidth]{NIR_After_HistogramEqualization}
+\label{NIR_After_HistogramEqualization_2}}
+\subfloat[After Adaptive Thresholding][Binarized]{
+\includegraphics[width=0.5\textwidth]{Binarized_Single_NIR}
+\label{Binarized_Single_NIR}}%\qquad
+\caption{NearIR Streams before / after Adaptive Thresholding}
+\label{Adaptive_Thresholding}
+\end{figure}%
+%%
 To sharpen the edge of the binarized image for a better \enquote{circle} shape detection, a median filter could be added as the last step of adaptive thresholding. As shown in Fig.~\ref{Adaptive_Thresholding}, background is removed in the binarized image after adaptive thresholding.
 \\\indent
 %
@@ -460,6 +461,10 @@ if \,\, ( I_{\text{O}} \,\, \& \,\, \text{0x10}  == 1 ),\quad &then,\quad \text{
 \noindent
 Once a valid marker is found, its address \((column, row)\) will be saved into the \enquote{stops-address} queue. One pixel's address might be saved for up to 4 times, but \enquote{colonizing} procedure will only happen once at the first time, so that the sniffing will stop once all of the connected valid pixels in a singular dot-cluster are colonized as zeros.%
 %
+In the second step \enquote{colonizing},  \(I_{\text{O}}\) is changed to zero, variable \(area\) of this dot-cluster pluses one, and bounding data \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\) are also updated.%
+%
+Finally, the Round Dot Centers \((column, row)\) could be determined as the center of bounding boxes with their borders \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\). After potential noises being removed based on their corresponding \(area\) and \(shape\) (ratio of width and height), the data left are taken as valid dot-clusters. As shown in Fig.~\ref{Dots_Extracted_Single_NIR}, the centers of valid dot-clusters are marked within their corresponding homocentric circles.
+%
  \begin{figure}[t]
 \hspace*{-0.5cm}
 \centering
@@ -474,11 +479,7 @@ Once a valid marker is found, its address \((column, row)\) will be saved into t
 \caption{Valid Dot-Clusters Extracted in NearIR}
 \label{DotCentersExtraction}
 \end{figure}
-%
-In the second step \enquote{colonizing},  \(I_{\text{O}}\) is changed to zero, variable \(area\) of this dot-cluster pluses one, and bounding data \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\) are also updated.%
-%
-Finally, the Round Dot Centers \((column, row)\) could be determined as the center of bounding boxes with their borders \(RowMax\) / \(RoxMin\) / \(ColumnMax\) / \(ColumnMin\). After potential noises being removed based on their corresponding \(area\) and \(shape\) (ratio of width and height), the data left are taken as valid dot-clusters. As shown in Fig.~\ref{Dots_Extracted_Single_NIR}, the centers of valid dot-clusters are marked within their corresponding homocentric circles.
-%%
+%%%
 %%
 %%
 \subsection{\((X^W, \,Y^W)\) Fitting based on Uniform Grid}
@@ -600,7 +601,7 @@ To prototype equation \ref{secondOrderPolynomial} and \ref{fourthOrderPolynomial
 \section{Data Process and LUT Generation}
 Till now, we have collected frames of \(X^WY^WZ^WRGBD\) data from RGB streams and \(X^WY^WZ^WID\) from NearIR stream. The \(X^WY^WZ^WRGBD\) data from RGB streams can be used for color values' alignment after the 3D reconstruction based on depth stream. Since the NearIR stream has same pixel distribution with depth stream, we will process the \(X^WY^WZ^WID\) data and generate per-pixel mapping parameters, which can be saved as LUT for undistorted 3D reconstruction. From section \ref{sectionRailCalibrationSystem}, we know that our whole idea of a calibrated natural 3D reconstruction on GPU is to make use of per-pixel eqn.~(\ref{kaiBeamEquationCh3}), which requires undistorted \(X^WY^WZ^W\) data and a per-pixel mapping from \(D\) to \(Z^W\). With enough \(X^WY^WZ^WID\) data already been collected, we will determine a per-pixel \(D\) to \(Z^W\) mapping, and then generate LUT for calibrated 3D reconstruction.
 \\\indent
-\begin{figure}[t]
+\begin{figure}[b]
 \centering
 \includegraphics[width=0.55\textwidth]{ZD_CurveFitting}
 \caption{Polynomial Fitting between D and \(Z^W\)}
@@ -639,10 +640,10 @@ The collected data cannot be used directly for LUT generation, because \(X^W/Y^W
 %\subsubsection{Least Square with Pseudo-Inverse}
 %
 \section{Alignment of RGB Pixel to Depth Pixel}
-Now an undistorted 3D reconstruction could be displayed with the help of the calibrated LUT. However, we have not figured out yet what the color of each pixel is. To generate a colored 3D reconstruction with a combination of a random depth sensor and a random RGB sensor, we need to align the RGB pixels to depth pixels. The intermediate between the depth sensor image space and RGB sensor image space is the world space. As long as we figure out the mapping from world space to RGB sensor image space, the color of pixel with known \(X^WY^WZ^W\) could be looked up from the RGB image space. The pinhole camera matrix \(M\) is used to map from world space to RGB image space. Using the frame data from Kinect RGB steams and Kinect NearIR streams, a Matlab prototype of RGB pixels alignment is shown in Fig.~\ref{RGBAligned_Matlab}, where the RGB textured is mapped onto its corresponding NearIR image, who has same pixels with depth sensor. The total black area on the top edge and bottom edge is where the depth sensor's view goes beyond the RGB sensor's view. Figure~\ref{RGBAligned_Qt} shows the screen-shot of live video after calibration with the RGB pixels aligned by a pinhole camera model \(M\).
+Now an undistorted 3D reconstruction could be displayed with the help of the calibrated LUT. However, we have not figured out yet what the color of each pixel is. To generate a colored 3D reconstruction with a combination of a random depth sensor and a random RGB sensor, we need to align the RGB pixels to depth pixels. The intermediate between the depth sensor image space and RGB sensor image space is the world space. As long as we figure out the mapping from world space to RGB sensor image space, the color of pixel with known \(X^WY^WZ^W\) could be looked up from the RGB image space. The pinhole camera matrix \(M\) is used to map from world space to RGB image space. Using the frame data from Kinect RGB steams and Kinect NearIR streams, a Matlab prototype of RGB pixels alignment is shown in Fig.~\ref{RGBAligned_Matlab}, where the RGB textured is mapped onto its corresponding NearIR image, who has same pixels with depth sensor. The total black area on the top edge and bottom edge is where the depth sensor's view goes beyond the RGB sensor's view. Figure~\ref{RGBvaluesAligmentMatlabQt} shows the screen-shot of live video after calibration with the RGB pixels aligned by a pinhole camera model \(M\).
 
 %
- \begin{figure}[t]
+ \begin{figure}[h]
 \hspace*{-0.5cm}
 \centering
 \subfloat[][]{
@@ -652,7 +653,7 @@ Now an undistorted 3D reconstruction could be displayed with the help of the cal
 \includegraphics[width=0.5\textwidth]{RGBAligned_Qt}
 \label{RGBAligned_Qt}}
 \caption{Alignment of RGB Texture onto NearIR Image}
-\label{Adaptive_Thresholding}
+\label{RGBvaluesAligmentMatlabQt}
 \end{figure}%
 %
 

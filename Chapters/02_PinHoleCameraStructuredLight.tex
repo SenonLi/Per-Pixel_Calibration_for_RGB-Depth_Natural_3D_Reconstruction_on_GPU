@@ -41,7 +41,7 @@ Pinhole cameras are characterized by the fact that they do not have a lens. It r
 
 With the virtual focal plane, the camera body with the real focal plane could be removed. And the rest parts in front of the the camera body, the focal point and the virtual focal plane together, form the most common pinhole camera model. In order to employ this model to analyze arbitrary 3D object points inside the camera's field of view in 2D image space, the prior step is to define the relationship between points in 3D camera space and the 2D image space (\(row\) and \(column\)). As shown in Fig.~\ref{CommonPinholeCameraModel}, The focal point is right at the origin of the camera 3D space coordinates, from where to the sensor is the vertical distance of \(f\), the focal distance. The 2D image coordinates are in dark green, and its origin is sitting at the up-left corner of the sensor. Only the a virtual sensor (in color red) is visible on the virtual focal plane, whose size in 2D image space is noted as 240 by 320 (using the size of PrimeSense camera). As long as both of the camera 3D space coordinates and image 2D space coordinates are defined, the next job is to build a mapping between them. Note that, the range of image should be either ([0:239], [0:319]) or ([1:240], [1:320]).
 %
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.75\textwidth]{RelationshipCameraToImage}
 \caption{Mapping from Camera Space to Image Space}
@@ -428,15 +428,17 @@ where \(a/b/c/d\) are per-pixel coefficients for the linear beam equations, and 
 
 \section{Lens Distortion}
 %* distortion equation
+\indent
+All above in Chapter \ref{chapterTraditionalCalibration} are talking about the ideal pinhole camera, without lenses. Whereas in practice, as a result of several types of imperfections in the design and assembly of lenses composing the camera optical system, there are always lens distortions for a camera, and the expressions in eqn.~(\ref{twoDRelativeFromCamToIm}) are not valid any more. Lens distortion could be classified into two groups \cite{distortion1_1992} : radial distortion and tangential distortion. Imperfect lens shape causes light rays bending more near the edges of a lens than they do at its optical center. Barrel distortions happen commonly on wide angle lenses, where the field of view of the lens is much wider than the size of the image sensor \cite{whatisDistortion_2013}. Improper lens assembly will lead to tangential distortion, which occurs when the lens and the image plane are not parallel. Fig.~\ref{RadialAndTangentialDistortion} shows how radial distortion \(d_\text{r}\) and tangential distortion \(d_\text{t}\) affect the object point position in the image. Note that both of radial distortion and tangential distortion are with respect to image space row and column, and what we will take later is negative distortion instead of positive. Distortions are present because the field of view (FoV) in camera space has been affected by the lens. 
 %
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.65\textwidth]{RadialAndTangentialDistortion}
 \caption{Radial and Tangential Distortion Affection In Image Space}
 \label{RadialAndTangentialDistortion}
 \end{figure}%
-\indent
-All above in Chapter \ref{chapterTraditionalCalibration} are talking about the ideal pinhole camera, without lenses. Whereas in practice, as a result of several types of imperfections in the design and assembly of lenses composing the camera optical system, there are always lens distortions for a camera, and the expressions in eqn.~(\ref{twoDRelativeFromCamToIm}) are not valid any more. Lens distortion could be classified into two groups \cite{distortion1_1992} : radial distortion and tangential distortion. Imperfect lens shape causes light rays bending more near the edges of a lens than they do at its optical center. Barrel distortions happen commonly on wide angle lenses, where the field of view of the lens is much wider than the size of the image sensor \cite{whatisDistortion_2013}. Improper lens assembly will lead to tangential distortion, which occurs when the lens and the image plane are not parallel. Fig.~\ref{RadialAndTangentialDistortion} shows how radial distortion \(d_\text{r}\) and tangential distortion \(d_\text{t}\) affect the object point position in the image. Note that both of radial distortion and tangential distortion are with respect to image space row and column, and what we will take later is negative distortion instead of positive. Distortions are present because the field of view (FoV) in camera space has been affected by the lens. For most consumer RGB-D cameras with cheap lens, their distortions are usually barrel distortions (negative distortion) resulted by the enlarged field  of view in the camera space, because the larger view was squeezed into the sensor. Figure~\ref{DistortionComprehension} intuitively shows how the lens enlarged the field of view of in the camera space and then generates the barrel distortions.
+%
+For most consumer RGB-D cameras with cheap lens, their distortions are usually barrel distortions (negative distortion) resulted by the enlarged field  of view in the camera space, because the larger view was squeezed into the sensor. Figure~\ref{DistortionComprehension} intuitively shows how the lens enlarged the field of view of in the camera space and then generates the barrel distortions.
 %
 \begin{figure}[t]
 \centering
