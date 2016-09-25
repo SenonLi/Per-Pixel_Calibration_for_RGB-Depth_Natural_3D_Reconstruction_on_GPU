@@ -35,6 +35,15 @@
 \usepackage{color}
 \usepackage[T1]{fontenc}
 
+%\usepackage{glossaries}
+\usepackage[automake, section=section]{glossaries}
+%\usepackage[toc,section=section]{glossaries}
+
+
+\makeglossaries
+\loadglsentries{SenListOfSymbols}
+
+
 \setcounter{MaxMatrixCols}{20}
 
 %\usepackage{amsxtra}     % Use various AMS packages
@@ -62,8 +71,8 @@ Ever since the Kinect brought low-cost depth cameras into consumer market, great
 
 
 %the title pages
-\frontmatter
-\maketitle
+%\frontmatter
+%\maketitle
 
 
 %\begin{acknowledgments}
@@ -72,10 +81,11 @@ Ever since the Kinect brought low-cost depth cameras into consumer market, great
 %\begin{dedication}
 %Dedicated to things (optional)
 %\end{dedication}
+%
 
 
 \tableofcontents\clearpage
-\listoffigures\clearpage
+%\listoffigures\clearpage
 %\listoftables\clearpage
 
 
@@ -83,23 +93,37 @@ Ever since the Kinect brought low-cost depth cameras into consumer market, great
 \mainmatter
 
 %\onehalfspacing
+
 \doublespacing
 \input{Chapters/01_Introduction_Modification}
-\copyrightnotice
-\input{Chapters/02_PinHoleCameraStructuredLight}
-\copyrightnotice
-\input{Chapters/03_CalibrationReconstructionOnGPU}
-\copyrightnotice
-\input{Chapters/04_CalibrationReconstruction} 
-\copyrightnotice
-\input{Chapters/05_ConclusionAndFutureWork}
-\copyrightnotice
+%\copyrightnotice
+%\input{Chapters/02_PinHoleCameraStructuredLight}
+%\copyrightnotice
+%\input{Chapters/03_CalibrationReconstructionOnGPU}
+%\copyrightnotice
+%\input{Chapters/04_CalibrationReconstruction} 
+%\copyrightnotice
+%\input{Chapters/05_ConclusionAndFutureWork}
+%\copyrightnotice
 
 
 
 \backmatter
 
 \onehalfspacing
+
+
+
+In line: \gls{RGBD}. 
+
+
+\printglossary[title={List of Symbols}]%, toctitle={List of Symbols}]
+\addcontentsline{toc}{chapter}{List of Symbols}
+
+
+
+
+
 
 \bibliographystyle{unsrt}    % Set the bibliography style. agu04, plain, alpha, etc.
 \bibliography{SenResource}

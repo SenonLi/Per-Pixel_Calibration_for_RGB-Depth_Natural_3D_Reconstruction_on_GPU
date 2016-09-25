@@ -79,21 +79,21 @@ where the pixel observing on \(X^C = |X^C_{\text{Max}}|\) has its column address
 To combine eqn.~(\ref{cameraXMaxfromZ}) and eqn.~(\ref{alphaZeroHorFOV}), we get
 %
 \begin{equation}
-\frac{X^C_0}{|X^C_{\text{Max}}|} = \frac{tan(\alpha_0)}{tan(horFov / 2)} = \frac{Col_0}{numDepthCols} - 0.5 \, ,
+\frac{X^C_0}{|X^C_{\text{Max}}|} = \frac{tan(\alpha_0)}{tan(horFov / 2)} = \frac{Col_0}{numDepthCols/2} - 1\, ,
 \label{alphaZeroHorFOV}
 \end{equation}%
 \noindent
 which shows how to get the per-pixel \(X^C_0\) from \(|X^C_{\text{Max}}|\) based on its column address, while \(|X^C_{\text{Max}}|\) depends on the depth sensor's horizontal filed of view. It is intuitively better to change eqn.~(\ref{alphaZeroHorFOV}) a little by substituting \(|X^C_{\text{Max}}|\) with eqn.~(\ref{cameraXMaxfromZ}) such that we can get eqn.~(\ref{proportionalEqnFromZtoX}), a proportional per-pixel mapping based on the column addresses from \(Z^C\) to \(X^C\).
 %
 \begin{equation}
-X^C[m, n] = tan(horFov / 2) \cdot (\frac{n}{numDepthCols} - 0.5) \cdot |Z^C[m, n]|\, ,
+X^C[m, n] = tan(horFov / 2) \cdot (\frac{n}{numDepthCols/2} - 1) \cdot |Z^C[m, n]|\, ,
 \label{proportionalEqnFromZtoX}
 \end{equation}%
 \noindent
 where [\(m,n\)] is the discrete space \(row\) and \(column\) coordinate of each pixel in the depth sensor. Similarly, we can also get the proportional per-pixel mapping from \(Z^C\) to \(Y^C\), based on the vertical FoV and row addresses:
 %
 \begin{equation}
-Y^C[m, n] = tan(verFov / 2) \cdot (\frac{m}{numDepthRows} - 0.5) \cdot |Z^C[m, n]| \  .
+Y^C[m, n] = tan(verFov / 2) \cdot (\frac{m}{numDepthRows/2} - 1) \cdot |Z^C[m, n]| \  .
 \label{proportionalEqnFromZtoY}
 \end{equation}%
 \noindent
@@ -112,9 +112,9 @@ where
 %
 \begin{equation}
 \begin{aligned}
-a[m, n] &= tan(horFov / 2) \cdot (\frac{n}{numDepthCols} - 0.5)
+a[m, n] &= tan(horFov / 2) \cdot (\frac{n}{numDepthCols / 2} - 1)
 \\%
-b[m, n] &= tan(verFov / 2) \cdot (\frac{m}{numDepthRows} - 0.5) \, \, .
+b[m, n] &= tan(verFov / 2) \cdot (\frac{m}{numDepthRows / 2} - 1) \, \, .
 \end{aligned}
 \label{parametersABofProportional}
 \end{equation}%
