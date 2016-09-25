@@ -1,10 +1,10 @@
 % Chapter 4
-\chapter{Results of Calibration and 3D Reconstruction} % Main chapter title
+\chapter{Results of Calibration and \gls{3D} Reconstruction} % Main chapter title
 \label{chapterCaliResultsReconstruction} % For referencing the chapter elsewhere, use \ref{sens_CalibrationSystem} 
 %%
 \section{Calibration Results}
 \label{sectionPrototypeTwoDtransformation} 
-As discussed in section~\ref{perpixelDataCollection}, the per-pixel calibration method requires a two-dimensional high-order polynomial model to remove lens distortions and generate estimated (\(X^W,\, Y^W\))s from image space (\(R, \, C\))s. In this section, we will show detailed comparisons among different order polynomial results of both Matlab prototypes and real-time live applications. Figure~\ref{MatlabPrototpyeOfHighOrder} shows the Matlab prototypes of the simulated original image, world space \(X^WY^W\) plane result after a two-dimensional \(1^{st}\) order polynomial transformation, \(2^{nd}\) order polynomial and \(4^{th}\) order polynomial transformation. %
+As discussed in section~\ref{perpixelDataCollection}, the per-pixel calibration method requires a two-dimensional high-order polynomial model to remove lens distortions and generate estimated (\(\gls{worldX},\, \gls{worldY}\))s from image space (\(R, \, C\))s. In this section, we will show detailed comparisons among different order polynomial results of both Matlab prototypes and real-time live applications. Figure~\ref{MatlabPrototpyeOfHighOrder} shows the Matlab prototypes of the simulated original image, world space \(X^WY^W\) plane result after a two-dimensional \(1^{st}\) order polynomial transformation, \(2^{nd}\) order polynomial and \(4^{th}\) order polynomial transformation. %
 %
 \\\indent
 With squared-shaped distributed points (\(C,\, R\))s extracted from image streams, we can recover the original distorted image in Matlab, as shown in Fig.\ref{Original_MatlabPrototype}. Using a mathematical distortion (\(d\)) measurement \cite{distortionMeasurement_2012}
@@ -36,7 +36,7 @@ we can get the original distortion \(d_0 = (R3 - R1) / (C2 -C1) = (403 - 393) / 
 \includegraphics[width = 0.5\textwidth]{Fourth_MatlabPrototype}
 \label{Fourth_MatlabPrototype}}
 %
-\caption{\(X^W\)\(Y^W\) Matlab Polynomial Prototype}
+\caption{\(\gls{worldX}\)\(\gls{worldY}\) Matlab Polynomial Prototype}
 \label{MatlabPrototpyeOfHighOrder}
 \end{figure}%
 %
@@ -63,7 +63,7 @@ we can get the original distortion \(d_0 = (R3 - R1) / (C2 -C1) = (403 - 393) / 
 \includegraphics[width = 0.5\textwidth, height = 0.425\textwidth]{Fourth_QtScreenShot}
 \label{Fourth_QtScreenShot}}
 %
-\caption{NearIR Stream High Order Polynomial Transformation}
+\caption{\gls{NearIR} Stream High Order Polynomial Transformation}
 \label{HighOrderNearIRRectification}
 \end{figure}%
 %
@@ -73,11 +73,11 @@ By applying those two-dimensional polynomial models into real-time streams trans
 %%
 %% %% mapping model parameters determination
 %
-The two-dimensional high-order polynomial mapping model will be applied in the first calibration step of \(X^\text{W}Y^\text{W}Z^\text{W}+D\) frames data collection. Figure~\ref{Data63FranesForLUT} shows 63 frames of collected \(X^\text{W}Y^\text{W}Z^\text{W}\), which gives an pyramid shape of a camera sensor's undistorted world space field of view. For each single pixel, its field of view is a beam, which could be mathematically expressed as equation~(\ref{kaiBeamEquationCh3}). Some sample beams are shown in Fig.~\ref{SampleBeams_NearIR}, whose beam equation parameters \(c\)/\(d\)/\(e\)/\(f\) are determined as the best-fit totally by the collected undistorted data. 
+The two-dimensional high-order polynomial mapping model will be applied in the first calibration step of \(X^\text{W}Y^\text{W}\gls{worldZ}+\gls{D}\) frames data collection. Figure~\ref{Data63FranesForLUT} shows 63 frames of collected \(X^\text{W}Y^\text{W}\gls{worldZ}\), which gives an pyramid shape of a camera sensor's undistorted world space field of view. For each single pixel, its field of view is a beam, which could be mathematically expressed as equation~(\ref{kaiBeamEquationCh3}). Some sample beams are shown in Fig.~\ref{SampleBeams_NearIR}, whose beam equation parameters \(c\)/\(d\)/\(e\)/\(f\) are determined as the best-fit totally by the collected undistorted data. 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.7\textwidth, height= 0.55\textwidth]{Data63FranesForLUT}
-\caption{63 Frames NearIR Calibrated 3D Reconstruction}
+\caption{63 Frames \gls{NearIR} Calibrated \gls{3D} Reconstruction}
 \label{Data63FranesForLUT}
 \end{figure}%
 %
@@ -85,19 +85,19 @@ The two-dimensional high-order polynomial mapping model will be applied in the f
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.6\textwidth]{SampleBeams_NearIR}
-\caption{Sample Beams of Calibrated NearIR Field of View}
+\caption{Sample Beams of Calibrated \gls{NearIR} Field of View}
 \label{SampleBeams_NearIR}
 \end{figure}
 %
 %\clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Real-Time 3D Reconstruction on GPU}
+\section{Real-Time \gls{3D} Reconstruction on \gls{GPU}}
 %
-The 3D Reconstruction of undistorted \(X^\text{W}/Y^\text{W}/Z^\text{W}\) in real-time is the final aim of a 3D camera's calibration. In the traditional camera calibration method, which consist of one pinhole-camera matrix to generate raw world space 3D coordinates and another model for lens distortion removal, three big transformations are needed to generate the world space coordinates: from 2D distorted image space to 2D undistorted image space, then to 3D camera space, and finally to 3D world space. For every single pixel's processing, it needs 5 parameters from distortion removal model for the first step non-linear calculation, and then a $3\times3$ intrinsic matrix to get its camera space coordinates, and a $3\times4$ extrinsic matrix to finally acquire the world space coordinates. The 3D reconstruction after the traditional calibration requires a lot of calculations for every single pixel, and \emph{depth distortion} is not corrected at all.
+The \gls{3D} Reconstruction of undistorted \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\) in real-time is the final aim of a \gls{3D} camera's calibration. In the traditional camera calibration method, which consist of one pinhole-camera matrix to generate raw world space \gls{3D} coordinates and another model for lens distortion removal, three big transformations are needed to generate the world space coordinates: from 2D distorted image space to 2D undistorted image space, then to \gls{3D} camera space, and finally to \gls{3D} world space. For every single pixel's processing, it needs 5 parameters from distortion removal model for the first step non-linear calculation, and then a $3\times3$ intrinsic matrix to get its camera space coordinates, and a $3\times4$ extrinsic matrix to finally acquire the world space coordinates. The \gls{3D} reconstruction after the traditional calibration requires a lot of calculations for every single pixel, and \emph{depth distortion} is not corrected at all.
 \\\indent
 %
-Using the proposed per-pixel calibration method, only three linear calculations with six parameters are needed to determine the world space coordinates for every single pixel. Two parameters \(e/f\) are utilized to generate world space \(Z^W\), as expressed in eqn.~(\ref{fromD_To_Z}). And the other four parameters \(a/b/c/d\) are applied to get \(X^W/Y^W\) respectively based on eqn.~(\ref{kaiBeamEquationCh3}). In this way, there is no need to calculate any non-linear equation for distortions removal, and the camera space is totally left aside. Combining two equations together, the undistorted 3D world coordinates (\(X^\text{W}, \, Y^\text{W}, \, Z^\text{W}\)) for every single pixel could be looked up based on \(D\) from a \(column\)-by-\(row\)-by-\(6\) look-up table. Figure~\ref{perPixelCalibrationBeforeAfter} shows how lens distortions are moved, and Fig.~\ref{depthDistortionCalibrationBeforeAfter} shows how the \emph{depth distortion} is removed by per-pixel \(D\) to \(Z^W\) mapping.
+Using the proposed per-pixel calibration method, only three linear calculations with six parameters are needed to determine the world space coordinates for every single pixel. Two parameters \(e/f\) are utilized to generate world space \(\gls{worldZ}\), as expressed in eqn.~(\ref{fromD_To_Z}). And the other four parameters \(a/b/c/d\) are applied to get \(\gls{worldX}/\gls{worldY}\) respectively based on eqn.~(\ref{kaiBeamEquationCh3}). In this way, there is no need to calculate any non-linear equation for distortions removal, and the camera space is totally left aside. Combining two equations together, the undistorted \gls{3D} world coordinates (\(\gls{worldX}, \, \gls{worldY}, \, \gls{worldZ}\)) for every single pixel could be looked up based on \(\gls{D}\) from a \(column\)-by-\(\gls{imageRow}\)-by-\(6\) look-up table. Figure~\ref{perPixelCalibrationBeforeAfter} shows how lens distortions are moved, and Fig.~\ref{depthDistortionCalibrationBeforeAfter} shows how the \emph{depth distortion} is removed by per-pixel \(\gls{D}\) to \(\gls{worldZ}\) mapping.
 \begin{figure}[t]
 \centering
 \hspace*{-0.3cm}
