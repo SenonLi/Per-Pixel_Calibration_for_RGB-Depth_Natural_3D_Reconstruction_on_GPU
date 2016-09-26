@@ -16,7 +16,7 @@ A pinhole-camera model can be used to describe an image sensor's field of view. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                                                                   %%%%%%%%%%
 %%%%%%%%%%      1. Intrinsic, introduce camera model from \gls{3D} to 2D:         %%%%%%%%%%%
-%%%%%%%%%%                 (X^c, Y^c, Z^c) --> (R, C)                                          %%%%%%%%%%%
+%%%%%%%%%%                 (X^c, Y^c, Z^c) --> \(r, \, c\)                                          %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \indent
 A pinhole camera is a simple optical imaging device in the shape of a closed box or chamber. A pinhole camera is completely dark on all the other sides of the box including the side where the pin-hole is created. Figure~\ref{PinholeCameraFigure} shows an inspection of a pinhole camera. In its front is a pin-hole that help create an image of the outside space on the back side of the box. When the shutter is opened, the light shines through the pin-hole and imprint an image onto a sensor (or photographic paper, or film) placed at the back side of the box. In order to analyze parameters like focal distance, field of view, etc., pinhole camera has its own three dimensional space (noted as \(\gls{cameraX}\), \(\gls{cameraY}\), and \(\gls{cameraZ}\)). Note that, according to Cartesian Coordinates \enquote{right hand} principle, the camera is looking down the negative of \(\gls{cameraZ}\)-axis, given \(\gls{cameraX}\)\(\gls{cameraY}\) directions as shown in the figure. Its focal length of the pinhole camera is the distance on the \(Z^c\)-axis, between the pinhole at the front of the camera and the paper or film at the back of the camera.
@@ -34,85 +34,85 @@ Pinhole cameras are characterized by the fact that they do not have a lens. It r
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.65\textwidth]{CommonPinholeCameraModel}
-\caption{Common Pinhole Camera Model}
+\caption{Common Pinhole Camera Model for a $240\times320$ Pixels Camera Sensor}
 \label{CommonPinholeCameraModel}
 \end{figure}%
 %
 
-With the virtual focal plane, the camera body with the real focal plane could be removed. And the rest parts in front of the the camera body, the focal point and the virtual focal plane together, form the most common pinhole camera model. In order to employ this model to analyze arbitrary \gls{3D} object points inside the camera's field of view in 2D image space, the prior step is to define the relationship between points in \gls{3D} camera space and the 2D image space (\(\gls{imageRow}\) and \(column\)). As shown in Fig.~\ref{CommonPinholeCameraModel}, The focal point is right at the origin of the camera \gls{3D} space coordinates, from where to the sensor is the vertical distance of \(f\), the focal distance. The 2D image coordinates are in dark green, and its origin is sitting at the up-left corner of the sensor. Only the a virtual sensor (in color red) is visible on the virtual focal plane, whose size in 2D image space is noted as 240 by 320 (using the size of PrimeSense camera). As long as both of the camera \gls{3D} space coordinates and image 2D space coordinates are defined, the next job is to build a mapping between them. Note that, the range of image should be either ([0:239], [0:319]) or ([1:240], [1:320]).
+With the virtual focal plane, the camera body with the real focal plane could be removed. And the rest parts in front of the the camera body, the focal point and the virtual focal plane together, form the most common pinhole camera model. In order to employ this model to analyze arbitrary \gls{3D} object points inside the camera's field of view in 2D image space, the prior step is to define the relationship between points in \gls{3D} camera space and the 2D image space (\(\gls{imageRow}\) and \(\gls{imageColumn}\)). As shown in Fig.~\ref{CommonPinholeCameraModel}, The focal point is right at the origin of the camera \gls{3D} space coordinates, from where to the sensor is the vertical distance of \(f\), the focal distance. The 2D image coordinates are in dark green, and its origin is sitting at the up-left corner of the sensor. Only the a virtual sensor (in color red) is visible on the virtual focal plane, whose size in 2D image space is noted as 240 by 320 (using the size of PrimeSense camera). As long as both of the camera \gls{3D} space coordinates and image 2D space coordinates are defined, the next job is to build a mapping between them.
 %
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.75\textwidth]{RelationshipCameraToImage}
+\includegraphics[width=0.82\textwidth]{RelationshipCameraToImage}
 \caption{Mapping from Camera Space to Image Space}
 \label{RelationshipCameraToImage}
 \end{figure}%
 %
 
-Select a random object point \(\text{P}^\text{C}\) in the camera space located at camera \gls{3D} coordinates (\(\text{X}_\text{C}\), \(\text{Y}_\text{C}\), \(\text{Z}_\text{C}\)). A line passing both of the point \(\text{P}^\text{C}\) and the focal point intersects with the virtual focal plane at \(\text{P}^\text{I}\), with its image 2D coordinates (R, C). To determine the mapping function, we can start a the proportional relationship. As shown in Fig.~\ref{RelationshipCameraToImage}, the center point in the image coordinates, which is usually called \emph{principle point}, could be determined by column of half-width and row of half-height. Concretely, the principle point (\(\text{R}_\text{h}\), \(\text{C}_\text{h}\)) is either (119.5, 159.5) if range is ([0:239], [0:319]), or (120, 320) if range is ([1:240], [1:320]). So, we could get the relative row and column distance of  \(\text{R}_\text{r}\) and \(\text{C}_\text{r}\) by:
+Select a random object point \(P^C\) in the camera space located at camera \gls{3D} coordinates (\(\gls{cameraPointX0}\), \(\gls{cameraPointY0}\), \(\gls{cameraPointZ0}\)). A line passing both of the point \(P^C\) and the \emph{Focal Point} intersects with the virtual focal plane at \(P^I\), with its image 2D coordinates (\(r, \, c\)). To determine the mapping function, we can start a the proportional relationship. As shown in Fig.~\ref{RelationshipCameraToImage}, the center point in the image coordinates, which is usually called \emph{\gls{principlePoint}}, could be determined by column of half-width (\(c_h\)) and row of half-height (\(r_h\)). Concretely, the \gls{principlePoint} (\(r_h\), \(c_h\)) is either (119.5, 159.5) if range is ([0:239], [0:319]), or (120, 320) if range is ([1:240], [1:320]). So, we could get the relative row and column distance of  \(r_r\) and \(c_r\) by:
 %
 \begin{equation}
 \begin{aligned}
-\text{R}_\text{r} &= \text{R} - \text{R}_\text{h}%
+r_r &= r - r_h%
 \\%
-\text{C}_\text{r} &= \text{C} - \text{C}_\text{h} \ \ \ .%
+c_r &= c - c_h \ \ \ .%
 \end{aligned}
 \label{relativeCRforProportional}
 \end{equation}%
 %
-Based on by triangulation, it is straight forward to tell the proportional relationship between \(f\)/\(\text{Z}_\text{C}\) and \(\text{C}_\text{r}\)/\(\text{X}_\text{C}\), \(\text{R}_\text{r}\)/\(\text{Y}_\text{C}\). Thus we get
+Based on by triangulation, it is straight forward to tell the proportional relationship between \(f\)/\(\gls{cameraPointZ0}\) and \(c_r\)/\(\gls{cameraPointX0}\), \(r_r\)/\(\gls{cameraPointY0}\). Thus we get
 %
 \begin{equation}
-\left[ \begin{array}{c} \text{C}_\text{r} \\ \text{R}_\text{r} \end{array} \right] %
+\left[ \begin{array}{c} c_r \\ r_r \end{array} \right] %
 = f %
-\left[ \begin{array}{c} \text{X}_\text{C}/\text{Z}_\text{C} \\ \text{Y}_\text{C}/\text{Z}_\text{C} \end{array} \right]  .%
+\left[ \begin{array}{c} \gls{cameraPointX0}/\gls{cameraPointZ0} \\ \gls{cameraPointY0}/\gls{cameraPointZ0} \end{array} \right]  .%
 \label{twoDRelativeFromCamToIm}
 \end{equation}
 \noindent
-And by changing the relative distance \(\text{R}_\text{r}\text{C}_\text{r}\) back to the 2D image coordinates (R, C), then eqn.~(\ref{twoDRelativeFromCamToIm}) will be written as
+And by changing the relative distance \(r_r / c_r\) back to the 2D image coordinates \(r, \, c\), then eqn.~(\ref{twoDRelativeFromCamToIm}) will be written as
 %
 \begin{equation}
-\left[ \begin{array}{c} \text{C} \\ \text{R} \end{array} \right] %
+\left[ \begin{array}{c} c \\ r \end{array} \right] %
 = f %
-\left[ \begin{array}{c} \text{X}_\text{C}/\text{Z}_\text{C} \\ \text{Y}_\text{C}/\text{Z}_\text{C} \end{array} \right]%
+\left[ \begin{array}{c} \gls{cameraPointX0}/\gls{cameraPointZ0} \\ \gls{cameraPointY0}/\gls{cameraPointZ0} \end{array} \right]%
 +
-\left[ \begin{array}{c}  \text{C}_\text{h} \\  \text{R}_\text{h} \end{array} \right] .%
+\left[ \begin{array}{c}  c_h \\  r_h \end{array} \right] .%
 \label{linearRelationFromCamToIm}
 \end{equation}
 \noindent
 If written in homogeneous coordinates, we will get eqn.~(\ref{HomoProportionalRelationFromCamToIm}):
 \begin{equation}
 %
-\text{Z}_\text{C} \left[ \begin{array}{c} \text{C} \\ \text{R} \\ 1 \end{array} \right] %
+\gls{cameraPointZ0} \left[ \begin{array}{c} c \\ r \\ 1 \end{array} \right] %
 = %
-\left[ \begin{array}{c} f\text{X}_\text{C} \\ f\text{Y}_\text{C} \\ \text{Z}_\text{C} \end{array} \right]%
+\left[ \begin{array}{c} fx^c \\ fy^c \\ \gls{cameraPointZ0} \end{array} \right]%
 +
-\left[ \begin{array}{c}  \text{Z}_\text{C}\text{C}_\text{h} \\  \text{Z}_\text{C}\text{R}_\text{h} \\ 0\end{array} \right] %
-=  \begin{bmatrix} f & 0 &  \text{C}_\text{h}  \\ 0 & f & \text{R}_\text{h} \\ 0 & 0 & 1 \end{bmatrix}%
-\left[ \begin{array}{c} \text{X}_\text{C} \\ \text{Y}_\text{C} \\ \text{Z}_\text{C} \end{array} \right] .%
+\left[ \begin{array}{c}  \gls{cameraPointZ0}c_h \\  \gls{cameraPointZ0}r_h \\ 0\end{array} \right] %
+=  \begin{bmatrix} f & 0 &  c_h  \\ 0 & f & r_h \\ 0 & 0 & 1 \end{bmatrix}%
+\left[ \begin{array}{c} \gls{cameraPointX0} \\ \gls{cameraPointY0} \\ \gls{cameraPointZ0} \end{array} \right] .%
 \label{HomoProportionalRelationFromCamToIm}
 \end{equation}%
 %
 \\\indent
-Till Now, we haven't consider the units translation between the camera \gls{3D} space the image 2D space. The random object point \(\text{P}^\text{C}\)'s mapping point \(\text{P}^\text{I}\) (R, C) on the image space is expressed in millimeters (or inches). Since it is necessary to express the image space coordinates (R, C) in pixels, we need to find out the resolution of the sensor in pixels/millimeter. Considering that, the pixels are not necessarily be square-shaped, we assume they are rectangle-shaped with resolution  $\alpha_c$ and \(\alpha_r\) pixels/millimeter in the \(\gls{imageColumn}\) and \(\gls{imageRow}\) direction respectively. Therefore, to express \(\text{P}^\text{I}\) in pixels, its C and R coordinates should be multiplied by \(\alpha_c\) and \(\alpha_r\) respectively, to get:
+Till Now, we haven't consider the units translation between the camera \gls{3D} space the image 2D space. The random object point \(P^C\)'s mapping point \(P^I\) (\(r, \, c\)) on the image space is expressed in millimeters (or inches). Since it is necessary to express the image space coordinates (\(r, \, c\)) in pixels, we need to find out the resolution of the sensor in pixels/millimeter. Considering that, the pixels are not necessarily be square-shaped, we assume they are rectangle-shaped with resolution  $\alpha_c$ and \(\alpha_r\) pixels/millimeter in the \(\gls{imageColumn}\) and \(\gls{imageRow}\) direction respectively. Therefore, to express \(P^I\) in pixels, its \(c\) and \(r\) coordinates should be multiplied by \(\alpha_c\) and \(\alpha_r\) respectively, to get:
 %
 \begin{equation}
-\left[ \begin{array}{c} \text{Z}_\text{C} \text{C} \\ \text{Z}_\text{C} \text{R} \\ \text{Z}_\text{C}  \end{array} \right] %
+\left[ \begin{array}{c} \gls{cameraPointZ0} c \\ \gls{cameraPointZ0} r \\ \gls{cameraPointZ0}  \end{array} \right] %
 = %
-\left[ \begin{array}{c} f\alpha_c\text{X}_\text{C} \\ f\alpha_r\text{Y}_\text{C} \\ \text{Z}_\text{C} \end{array} \right]%
+\left[ \begin{array}{c} f\alpha_c x^c \\ f \alpha_r y^c \\ \gls{cameraPointZ0} \end{array} \right]%
 +
-\left[ \begin{array}{c}  \text{Z}_\text{C}\alpha_c\text{C}_\text{h} \\ \text{Z}_\text{C}\alpha_r\text{R}_\text{h} \\ 0 \end{array} \right] %
-=  \begin{bmatrix} \alpha_cf & 0 &  \alpha_c\text{C}_\text{h}  \\ 0 & \alpha_rf & \alpha_r\text{R}_\text{h} \\ 0 & 0 & 1 \end{bmatrix}%
-\left[ \begin{array}{c} \text{X}_\text{C} \\ \text{Y}_\text{C} \\ \text{Z}_\text{C} \end{array} \right]%
-= K\text{P}^\text{C}  .
+\left[ \begin{array}{c}  \gls{cameraPointZ0} \alpha_c c_h \\ \gls{cameraPointZ0} \alpha_r r_h \\ 0 \end{array} \right] %
+=  \begin{bmatrix} \alpha_c f & 0 &  \alpha_c c_h  \\ 0 & \alpha_r f & \alpha_r r_h \\ 0 & 0 & 1 \end{bmatrix}%
+\left[ \begin{array}{c} \gls{cameraPointX0} \\ \gls{cameraPointY0} \\ \gls{cameraPointZ0} \end{array} \right]%
+= \gls{intrinsicMatrixK} \textbf{\textit{P}}^C  .
 \label{HomoProportionalFromCamToImInPixels}
 \end{equation}%
 
 \noindent
-Note that \(K\) only depends on the intrinsic camera parameters like its focal length, resolution in pixels, and sensor's width and height. Thus, the mapping matrix \(K\) is also called a camera's intrinsic matrix. Considering that the pixels might be parallelogram-shaped instead of rigid rectangle-shaped (when the image coordinate axis \(\gls{imageRow}\) and \(\gls{imageColumn}\) are not orthogonal to each other), usually \(K\) has a skew parameter \(s\), given by
+Note that \(\gls{intrinsicMatrixK}\) only depends on the intrinsic camera parameters like its focal length, resolution in pixels, and sensor's width and height. Thus, the mapping matrix \(\gls{intrinsicMatrixK}\) is also called a camera's intrinsic matrix. Considering that the pixels might be parallelogram-shaped instead of rigid rectangle-shaped (when the image coordinate axis \(\gls{imageRow}\) and \(\gls{imageColumn}\) are not orthogonal to each other), usually \(\gls{intrinsicMatrixK}\) has a skew parameter \(s\), given by
 
 \begin{equation}
-K%
+\gls{intrinsicMatrixK}%
 =  \begin{bmatrix} 
 f_c & s & t_c \\
  0 & f_r & t_r \\
@@ -120,14 +120,14 @@ f_c & s & t_c \\
 \label{intrinsicKmatrix}
 \end{equation}%
 \noindent
-where \(f_c = \alpha_cf\) and \(f_r = \alpha_rf\) are the focal length in pixels on the \(\gls{imageColumn}\) and \(\gls{imageRow}\) directions respectively,  \(t_c = \alpha_c\text{R}_\text{h}\) and \(t_r = \alpha_r\text{R}_\text{h}\) are the translation parameters that help move the origin of image coordinate to the principle point.
+where \(f_c = \alpha_c f\) and \(f_r = \alpha_r f\) are the focal length in pixels on the \(\gls{imageColumn}\) and \(\gls{imageRow}\) directions respectively,  \(t_c = \alpha_c r_h\) and \(t_r = \alpha_r r_h\) are the translation parameters that help move the origin of image coordinate to the \gls{principlePoint}.
 \\\indent
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                                                                   %%%%%%%%%%
 %%%%%%%%%%      2. Extrinsic, (X^w, Y^w, Z^w) --> (X^c, Y^c, Z^c)          %%%%%%%%%%%
 %%%%%%%%%%                                                                                                    %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Now we have \(K\), which helps map between camera \gls{3D} space and image 2D space. But we are still not able to employ it yet. The camera \gls{3D} space is with respect to the camera sensor only. Neither can we directly tell the camera \gls{3D} coordinates of an object point, nor can we assign it. All we can do is to use the camera space as an intermediate space between the image coordinates and world coordinates, which we could assign by ourselves.
+Now we have \(\gls{intrinsicMatrixK}\), which helps map between camera \gls{3D} space and image 2D space. But we are still not able to employ it yet. The camera \gls{3D} space is with respect to the camera sensor only. Neither can we directly tell the camera \gls{3D} coordinates of an object point, nor can we assign it. All we can do is to use the camera space as an intermediate space between the image coordinates and world coordinates, which we could assign by ourselves. %
 %
 \begin{figure}[!t]
 \centering
@@ -136,18 +136,17 @@ Now we have \(K\), which helps map between camera \gls{3D} space and image 2D sp
 \label{FromWorldToCameraSpace}
 \end{figure}%
 %
-
-Figure~\ref{FromWorldToCameraSpace} shows a pinhole camera observing an arbitrary object point P in the world  space. We assign the world coordinates so that the object point has world space coordinates \(P^W(X_w, \, Y_w, \, Z_w)\). Although the world space and camera space are two different spaces, we could easily transform between each other through rotation and translation, as long as both of the spaces are using rigid Cartesian Coordinates. With a standard rotation matrix \(R_{3*3}\) and a translation matrix \(T_{3*1}\)
+Figure~\ref{FromWorldToCameraSpace} shows a pinhole camera observing an arbitrary object point P in the world  space. We assign the world coordinates so that the object point has world space coordinates \(P^W(x^w, \, y^w, \, z^w)\). Although the world space and camera space are two different spaces, we could easily transform between each other through rotation and translation, as long as both of the spaces are using rigid Cartesian Coordinates. With a standard rotation matrix \(\gls{exRotationR}\) and a translation matrix \(\gls{exTranslationT}\)
 %
 \begin{equation}
-R_{3*3}%
+\gls{exRotationR}%
 =  \begin{bmatrix} 
 r_{11} & r_{12} & r_{13} \\
 r_{21} & r_{22} & r_{23} \\
 r_{31} & r_{32} & r_{33}
  \end{bmatrix}%
 , \, \, 
-T_{3*1}%
+\gls{exTranslationT}%
 =  \begin{bmatrix} 
 t_{1} \\
 t_{2} \\
@@ -156,7 +155,7 @@ t_{3}
 \label{rotationTranslationMatrixRT}
 \end{equation}%
 %
-we can get the transformation matrix \([R_{3*3} \,\, T_{3*3}]\) from the world space to camera space:
+we can get the transformation matrix \([\gls{exRotationR} \,\, \gls{exTranslationT}]\) from the world space to camera space:
 %
 \begin{equation}
 \begin{bmatrix} 
@@ -164,15 +163,15 @@ X^{C} \\
 Y^{C} \\
 Z^{C}
  \end{bmatrix}%
-=  R \begin{bmatrix} 
+=  \gls{exRotationR} \begin{bmatrix} 
 X^{W} \\
 Y^{W} \\
 Z^{W}
  \end{bmatrix}%
- + T
+ + \gls{exTranslationT}
 =
 \begin{bmatrix} 
-R_{3*3} & T_{3*1} \\
+\gls{exRotationR} & \gls{exTranslationT} \\
 \end{bmatrix}%
  \begin{bmatrix} 
 X^{W} \\
@@ -183,25 +182,25 @@ Z^{W} \\
 \label{mappingFromWorldToCameraSpace}
 \end{equation}%
 %
-%%%% 2.5 Pinhole Camera Matrix (X^w, Y^w, Z^w) --> (X^c, Y^c, Z^c) --> (R, C)
+%%%% 2.5 Pinhole Camera Matrix (X^w, Y^w, Z^w) --> (X^c, Y^c, Z^c) --> \(r, \, c\)
 %
 \noindent
-The parameters that help map from world space to camera space depend on how we assign the world coordinates. Since none of them are from the camera even though they are belongs to an important part of camera calibration, usually the matrix \([R_{3*3} \,\, T_{3*3}]\) is called extrinsic camera matrix. With both of the extrinsic camera matrix (help map from world space to camera space) and the intrinsic camera matrix (help map from camera space to image space), we are now able to build the connection between the world space coordinates, which could be assigned by ourselves, and the image space \(\gls{imageRow}\) and \(Column\), which are the streams we retrieved from the camera. 
+The parameters that help map from world space to camera space depend on how we assign the world coordinates. Since none of them are from the camera even though they are belongs to an important part of camera calibration, usually the matrix \([\gls{exRotationR} \,\, \gls{exTranslationT}]\) is called extrinsic camera matrix. With both of the extrinsic camera matrix (help map from world space to camera space) and the intrinsic camera matrix (help map from camera space to image space), we are now able to build the connection between the world space coordinates, which could be assigned by ourselves, and the image space \(\gls{imageRow}\) and \(\gls{imageColumn}\), which are the streams we retrieved from the camera. 
 \\\indent
 To combine the intrinsic camera matrix and extrinsic camera matrix (combine eqn.~(\ref{HomoProportionalFromCamToImInPixels}) and eqn.(~\ref{mappingFromWorldToCameraSpace})), we get 
 
 \begin{equation}
 \gls{cameraZ}\left[ \begin{array}{c} C \\ R \\ 1 \end{array} \right] %
-=K \left[ \begin{array}{c} \gls{cameraX} \\ \gls{cameraY} \\ \gls{cameraZ}\end{array} \right]%
-=K\begin{bmatrix} R_{3*3} & T_{3*1} \end{bmatrix} \left[ \begin{array}{c} X^w \\ Y^w \\ Z^w \\ 1 \end{array} \right]%
-=M \left[ \begin{array}{c} X^w \\ Y^w \\ Z^w \\ 1 \end{array} \right]%
+=\gls{intrinsicMatrixK} \left[ \begin{array}{c} \gls{cameraX} \\ \gls{cameraY} \\ \gls{cameraZ}\end{array} \right]%
+=\gls{intrinsicMatrixK} \begin{bmatrix} \gls{exRotationR} & \gls{exTranslationT} \end{bmatrix} \left[ \begin{array}{c} X^W \\ Y^W \\ Z^W \\ 1 \end{array} \right]%
+=\gls{pinHoleCameraM} \left[ \begin{array}{c} X^W \\ Y^W \\ Z^W \\ 1 \end{array} \right]%
  , %
 \label{pinholeCameraMatrixCalculation}
 \end{equation}%
 \noindent
 where: %
 \begin{equation}
-M = K\begin{bmatrix} R_{3*3} & T_{3*1} \end{bmatrix}%
+\gls{pinHoleCameraM} = \gls{intrinsicMatrixK} \begin{bmatrix} \gls{exRotationR} & \gls{exTranslationT} \end{bmatrix}%
 = \begin{bmatrix} 
 m_{11} & m_{12} & m_{13} & m_{14} \\
 m_{21} & m_{22} & m_{23} & m_{24} \\
@@ -211,8 +210,8 @@ m_{31} & m_{32} & m_{33} & m_{34} \\
 \end{equation}%
 %
 \noindent
-Note that, although \(\gls{cameraZ}\) values can be retrieved from the depth sensor streams, they will be employed during the calculation of \(M\), because they will be expressed by the third row parameters in matrix \(M\). \(\gls{cameraZ}\) will only be used in the step of \gls{3D} reconstruction after the pinhole camera matrix M is determined, as will be discussed in details in Section~\ref{section3DcameraCalibration}. Thus, \(\gls{cameraZ}\) in eqn.~(\ref{pinholeCameraMatrixCalculation}) is commonly substituted as an intermediate parameter \(k\). We did not change \(\gls{cameraZ}\) for the consistency of derivations.
-To inspect the pinhole camera matrix \(M\), it is composed of rotation/translation matrix for \gls{3D} space transforming and intrinsic perspective matrix for handling both of perspective view mapping and shape-skewing, all of which belong to linear processing. In other words, this $3\times4$ transformation matrix is specially for handling perspective view, or perspective distortion. The pinhole camera model is based on the homogeneous coordinates, which means its matrix \(M\) is also limited by linear processing.
+Note that, although \(\gls{cameraZ}\) values can be retrieved from the depth sensor streams, they will be employed during the calculation of \(\gls{pinHoleCameraM}\), because they will be expressed by the third row parameters in matrix \(\gls{pinHoleCameraM}\). \(\gls{cameraZ}\) will only be used in the step of \gls{3D} reconstruction after the pinhole camera matrix M is determined, as will be discussed in details in Section~\ref{section3DcameraCalibration}. Thus, \(\gls{cameraZ}\) in eqn.~(\ref{pinholeCameraMatrixCalculation}) is commonly substituted as an intermediate parameter \(k\). We did not change \(\gls{cameraZ}\) for the consistency of derivations.
+To inspect the pinhole camera matrix \(\gls{pinHoleCameraM}\), it is composed of rotation/translation matrix for \gls{3D} space transforming and intrinsic perspective matrix for handling both of perspective view mapping and shape-skewing, all of which belong to linear processing. In other words, this $3\times4$ transformation matrix is specially for handling perspective view, or perspective distortion. The pinhole camera model is based on the homogeneous coordinates, which means its matrix \(\gls{pinHoleCameraM}\) is also limited by linear processing.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                                                                   %%%%%%%%%%
 %%%%%%%%%%      3.        \gls{3D} Reconstruction from Depth                               %%%%%%%%%%%
@@ -223,9 +222,9 @@ To inspect the pinhole camera matrix \(M\), it is composed of rotation/translati
 \label{section3DcameraCalibration}
 %    3. Pinhole camera matrix solving for matrix M
 \indent
-The calibration of a \gls{3D} camera aims to be able to generate the world coordinates (\(\gls{worldX}, \gls{worldY}, \gls{worldZ}\)) and corresponding \(RGB\) values for every single pixel, given the depth steams and RGB streams retrieved from the \gls{3D} camera. From Section~\ref{sectionPinholeCamera}, we know that the pinhole camera matrix \(M\) (eqn.~(\ref{pinholeMatrix3x4M})) could help map from the world space to image space; however not able to directly transform image space data to world space coordinates. In order to determine \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\) (based on eqn.(~\ref{HomoProportionalFromCamToImInPixels}) and eqn.(~\ref{mappingFromWorldToCameraSpace})), both of the intrinsic camera matrix and extrinsic camera matrix are needed, both of which are intermediate parameters and practically can only be determined through matrix \(M\). Thus, the first job for \gls{3D} camera calibration is to solve the pinhole camera matrix \(M\).
+The calibration of a \gls{3D} camera aims to be able to generate the world coordinates (\(\gls{worldX}, \gls{worldY}, \gls{worldZ}\)) and corresponding \(RGB\) values for every single pixel, given the depth steams and RGB streams retrieved from the \gls{3D} camera. From Section~\ref{sectionPinholeCamera}, we know that the pinhole camera matrix \(\gls{pinHoleCameraM}\) (eqn.~(\ref{pinholeMatrix3x4M})) could help map from the world space to image space; however not able to directly transform image space data to world space coordinates. In order to determine \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\) (based on eqn.(~\ref{HomoProportionalFromCamToImInPixels}) and eqn.(~\ref{mappingFromWorldToCameraSpace})), both of the intrinsic camera matrix and extrinsic camera matrix are needed, both of which are intermediate parameters and practically can only be determined through matrix \(\gls{pinHoleCameraM}\). Thus, the first job for \gls{3D} camera calibration is to solve the pinhole camera matrix \(\gls{pinHoleCameraM}\).
 \\\indent
-To solve the pinhole camera matrix, we can use least squares fit with known \gls{3D} points (\(\gls{worldX}\), \(\gls{worldY}\), \(\gls{worldZ}\)) and their corresponding image points (\(R, C\)). With one point, based on eqn.~(\ref{pinholeMatrix3x4M}) and \ref{pinholeCameraMatrixCalculation}, we can get two equations.
+To solve the pinhole camera matrix, we can use least squares fit with known \gls{3D} points (\(\gls{worldX}\), \(\gls{worldY}\), \(\gls{worldZ}\)) and their corresponding image points (\(R, C\)). With one point, based on eqn.~(\ref{pinholeMatrix3x4M}) and (\ref{pinholeCameraMatrixCalculation}), we can get two equations.
 \begin{equation}
 \begin{aligned}
 m_{11}\gls{worldX} + m_{12}\gls{worldY} + m_{13}\gls{worldZ} + m_{14} - m_{31}X^WC - m_{32}Y^WC - m_{33}Z^WC - m_{34}C = 0%
@@ -235,7 +234,7 @@ m_{21}\gls{worldX} + m_{22}\gls{worldY} + m_{23}\gls{worldZ} + m_{24} - m_{31}X^
 \label{onePointEquationCR}
 \end{equation}%
 \noindent
-There are totally 12 unknowns to solve, thus we need at least six points to solve the $3\times4$ pinhole camera matrix \(M\). Using $n$-points least squares to solve the best fit, we can build a $2n$ equations matrix, given by eqn.~(\ref{nPoints2nEquationCR}).
+There are totally 12 unknowns to solve, thus we need at least six points to solve the $3\times4$ pinhole camera matrix \(\gls{pinHoleCameraM}\). Using $n$-points least squares to solve the best fit, we can build a $2n$ equations matrix, given by eqn.~(\ref{nPoints2nEquationCR}).
 
 \begin{equation}
 \hspace*{-1cm}
@@ -250,8 +249,8 @@ There are totally 12 unknowns to solve, thus we need at least six points to solv
 \end{bmatrix}
 \begin{bmatrix} 
 m_{11} \\ m_{12} \\ m_{13} \\ m_{14} \\
-m_{21} \\ m_{22} \\ m_{23} \\ m_{24} \\
-m_{31} \\ m_{32} \\ m_{33} \\ m_{34} 
+\vdots
+\\ m_{33} \\ m_{34} 
 \end{bmatrix}
 =
 \begin{bmatrix} 
@@ -262,7 +261,9 @@ m_{31} \\ m_{32} \\ m_{33} \\ m_{34}
 \end{equation}%
 
 \noindent
-Considering that this matrix is build on homogeneous system, there is no unique solution. There can always be a total-zeros solution. To make the solution unique, we select \(m_{34} = 1\), so that the homogeneous eqn.~(\ref{nPoints2nEquationCR}) could be changed into an inhomogeneous format like \(AX = B\), where the known matrix \(A\) is a $2n\times11$ matrix and known matrix \(B\) is a $2n$ vector:
+Considering that this matrix is build on homogeneous system, there is no unique solution. There can always be a total-zeros solution. %
+\\\indent
+To make the solution unique, we select \(m_{34} = 1\), so that the homogeneous eqn.~(\ref{nPoints2nEquationCR}) could be changed into an inhomogeneous format like \(\textbf{\textit{A}}X = B\), where the known matrix \(\textbf{\textit{A}}\) is a $2n\times11$ matrix and known matrix \(B\) is a $2n$ vector:
 
 \begin{equation}
 \hspace*{-0.1cm}
@@ -277,8 +278,8 @@ Considering that this matrix is build on homogeneous system, there is no unique 
 \end{bmatrix}
 \begin{bmatrix} 
 m_{11} \\ m_{12} \\ m_{13} \\ m_{14} \\
-m_{21} \\ m_{22} \\ m_{23} \\ m_{24} \\
-m_{31} \\ m_{32} \\ m_{33}
+\vdots
+ \\ m_{32} \\ m_{33}
 \end{bmatrix}
 =
 \begin{bmatrix} 
@@ -288,10 +289,10 @@ C_1 \\ R_1 \\ C_2 \\ R_2 \\
 \label{inHomogenousNPoints2nEquationCR}
 \end{equation}%
 \noindent
-Using pseudo inverse, eqn.~(\ref{inHomogenousNPoints2nEquationCR}) can be solved by \(X = (A^TA)^{-1}A^TB\), where \(X\) is an 11-elements vector and \(X(1)\)  \texttildelow \, \(X(11)\) correspond to \(m_{11}\) \texttildelow \, \(m_{33}\). And the $3\times4$ pinhole camera matrix (eqn.~(\ref{pinholeMatrix3x4M})) will be solved as: 
+Using pseudo inverse, eqn.~(\ref{inHomogenousNPoints2nEquationCR}) can be solved by \(X = (\textbf{\textit{A}}^T\textbf{\textit{A}})^{-1}\textbf{\textit{A}}^TB\), where \(X\) is an 11-elements vector and \(X(1)\)  \texttildelow \, \(X(11)\) correspond to \(m_{11}\) \texttildelow \, \(m_{33}\). And the $3\times4$ pinhole camera matrix (eqn.~(\ref{pinholeMatrix3x4M})) will be solved as: 
 
 \begin{equation}
-M =
+\gls{pinHoleCameraM} =
 \begin{bmatrix} 
 X(1) & X(2) & X(3) & X(4) \\
 X(5) & X(6) & X(7) & X(8) \\
@@ -301,53 +302,53 @@ X(9) & X(10) & X(11) & 1
 \end{equation}%
 \\
 \noindent
-After we get the perspective projection matrix \(M\), the next step is to recover the intrinsic and extrinsic camera matrix \(K\) and [\(R_{3*3}, \, T_{3*1}\)], with which we could generate the world coordinates \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\). 
+After we get the perspective projection matrix \(\gls{pinHoleCameraM}\), the next step is to recover the intrinsic and extrinsic camera matrix \(\gls{intrinsicMatrixK}\) and [\(\gls{exRotationR}, \, \gls{exTranslationT}\)], with which we could generate the world coordinates \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\). 
 \\\indent
 Starting from the decomposition of eqn.~(\ref{pinholeMatrix3x4M}) step by step:
 
 \begin{equation}
-M =
+\gls{pinHoleCameraM} =
 \begin{bmatrix} 
 m_{11} & m_{12} & m_{13} &  \\
-m_{21} & m_{22} & m_{23} & O_{3*1} \\
+m_{21} & m_{22} & m_{23} & \textbf{\textit{O}}_{3*1} \\
 m_{31} & m_{32} & m_{33} &  
 \end{bmatrix}%
 +
 \begin{bmatrix} 
  &  &  & m_{14} \\
- & O_{3*3} &  & m_{24} \\
+ & \textbf{\textit{O}}_{3*3} &  & m_{24} \\
  &  &  & m_{34} \\
 \end{bmatrix} , %
 \label{decomposePerspectiveProjectionOne}
 \end{equation}%
 
 \begin{equation}
-K[R_{3*3} \, \, T_{3*1}] =
+\gls{intrinsicMatrixK} [\gls{exRotationR} \, \, \gls{exTranslationT}] =
 \begin{bmatrix} 
-KR_{3*3} & O_{3*1}
+\gls{intrinsicMatrixK} \gls{exRotationR} & \textbf{\textit{O}}_{3*1}
  \end{bmatrix}%
 +
 \begin{bmatrix} 
-O_{3*3} & KT_{3*1}
-\end{bmatrix}%
+\textbf{\textit{O}}_{3*3} & \gls{intrinsicMatrixK} \gls{exTranslationT}
+\end{bmatrix} , %
 \label{decomposePerspectiveProjectionTwo}
 \end{equation}%
 %
 and 
 
 \begin{equation}
-M_{3*3} =
+\textbf{\textit{M}}_{3*3} =
 \begin{bmatrix} 
 m_{11} & m_{12} & m_{13} \\
 m_{21} & m_{22} & m_{23} \\
 m_{31} & m_{32} & m_{33}  
 \end{bmatrix}%
 =
-KR_{3*3}
+\gls{intrinsicMatrixK} \gls{exRotationR}  ,
 \label{QRdecompositionEquation}
 \end{equation}%
 \noindent
-where \(O\) denotes zero matrices with their sizes noted by subscripts. From eqn.~(\ref{rotationTranslationMatrixRT}), we know that \(R_{3*3}\) is a standard rotation matrix, which has its property of orthogonal. Also from eqn.~(\ref{intrinsicKmatrix}), we know that \(K\) is an upper triangular matrix. Thus, all of the above fit in the prerequisites of RQ decomposition, which is a technique that could help us decompose the \(M_{3*3}\) into the upper triangular intrinsic matrix \(K\) and rotation matrix \(R_{3*3}\). After we got \(R_{3*3}\), the translation matrix \(T_{3*1}\) could be determined with eqn.~(\ref{decomposePerspectiveProjectionTwo}).
+where \(\textbf{\textit{O}}\) denotes zero matrices with their sizes noted by subscripts. From eqn.~(\ref{rotationTranslationMatrixRT}), we know that \(\gls{exRotationR}\) is a standard rotation matrix, which has its property of orthogonal. Also from eqn.~(\ref{intrinsicKmatrix}), we know that \(\gls{intrinsicMatrixK}\) is an upper triangular matrix. Thus, all of the above fit in the prerequisites of RQ decomposition, which is a technique that could help us decompose the \(\textbf{\textit{M}}_{3*3}\) into the upper triangular intrinsic matrix \(\gls{intrinsicMatrixK}\) and rotation matrix \(\gls{exRotationR}\). After we got \(\gls{exRotationR}\), the translation matrix \(\gls{exTranslationT}\) could be determined with eqn.~(\ref{decomposePerspectiveProjectionTwo}).
 \\\indent%
 % 4. cite/introduce the static 90 degree angle calibration system, collect data for solving equation 1.11
 %
@@ -355,9 +356,9 @@ Now we find the way to determine both of the intrinsic camera matrix and the ext
 \\\indent
 Self-calibration technique do not use any calibration object, and can be considered as zero-dimension approach because only image point correspondences are required. Just by moving a camera in a static scene, the rigidity of the scene provides in general two constraints \cite{selfCalibration3_1992} on the cameras' internal parameters from one camera displacement by using image information alone. Therefore, if images are taken by the same camera with fixed internal parameters, correspondences between three images are sufficient to recover both the internal and external parameters which allow us to reconstruct 3D structure up to a similarity \cite{selfCalibration2_1997, selfCalibration1_1994}. 
 \\\indent
-One-Dimension points-line calibration employs one dimension objects composed of a set of collinear points. With much lower cost than two dimensional or even three dimensional calibration system, using one dimension objects in camera calibration is not only a theoretical aspect, but is also very important in practice especially when multi-cameras are involved in the environment. To calibrate the relative geometry between multiple cameras, it is necessary for all involving cameras to simultaneously observe a number of points. It is hardly possible to achieve this with \gls{3D} or 2D calibration apparatus if one camera is mounted in the front of a room while another in the back. This is not a problem for 1D objects. Xiangjian \cite{oneDcalibration1_2006} shows how to estimate the internal and external parameters using one dimensional pattern in the camera calibration. And Zijian \cite{oneDcalibration2_2008} employed one dimensional objects as virtual environments in practical multiple cameras calibration.
+One-Dimension, points-line calibration employs one dimension objects composed of a set of collinear points. With much lower cost than two dimensional or even three dimensional calibration system, using one dimension objects in camera calibration is not only a theoretical aspect, but is also very important in practice especially when multi-cameras are involved in the environment. To calibrate the relative geometry between multiple cameras, it is necessary for all involving cameras to simultaneously observe a number of points. It is hardly possible to achieve this with \gls{3D} or 2D calibration apparatus if one camera is mounted in the front of a room while another in the back. This is not a problem for 1D objects. Xiangjian \cite{oneDcalibration1_2006} shows how to estimate the internal and external parameters using one dimensional pattern in the camera calibration. And Zijian \cite{oneDcalibration2_2008} employed one dimensional objects as virtual environments in practical multiple cameras calibration.
 \\\indent
-Two and Three dimensional objects calibration systems usually give better calibrations. P. F. Sturm \textit{et al}. \cite{twoDcalibration1_1999} presented a general algorithm for plane-based calibration
+Two and three dimensional object calibration systems usually give better calibrations. Sturm \textit{et al}. \cite{twoDcalibration1_1999} presented a general algorithm for plane-based calibration
 that can deal with arbitrary numbers of views that observe a planar pattern shown at different orientations, so that almost anyone can make such a calibration pattern by him/her-self, and the setup is very easy. Both of Matlab and OpenCV have applied this two dimension plane calibration method in their applications. Zhengdong \cite{twoDcalibration2_2011} compared this two dimension plane camera calibration method and self-calibration method. Hamid \cite{twoDcalibration3_2015} applied this method into practical calibration and employed the calibrated camera into camera pose estimation and distance estimation application.
 \\\indent
 In three-dimensional object calibration technique, camera calibration is performed by observing a calibration object whose geometry in \gls{3D} space is known for very good precision. Calibration can be done very efficiently \cite{treeDcalibration1_1993}. The calibration objects usually consist of two or three planes orthogonal to each other. Paul \cite{treeDcalibration2_1996} applied the three dimension object calibration in his PHD project. Mattia \cite{threeDExample_2014} wrote a detailed tutorial from building the \gls{3D} object (Fig.~\ref{buildingThreeDCalibrationObject}) for calibration, to scanning using the calibrated camera. Figure~\ref{threeDSixPointsCalibrating} shows how six points are selected for calibration and Fig.~\ref{3DreconstructAfterCalibration} shows the \gls{3D} reconstruction after calibration.
@@ -404,18 +405,18 @@ In three-dimensional object calibration technique, camera calibration is perform
 
 %\\\\%
 
-Zhengyou Zhang, a Chinese professor of computer science, IEEE and ACM Fellow and a specialist in computer vision and graphics, has deep studies on camera calibration from one-dimension calibration to tree-dimension calibration \cite{zhangCalibration1_2004, zhangCalibration2_2000, Zhengyou04}. The accuracy of calibration from 1D to \gls{3D} is getting better, but the calibration system setting-up needs more and more work and cost as well. One dimension object is suitable for calibrating multiple cameras at once. Two dimension planer pattern approaches seems to be a good compromise, with good accuracy and simple setup. Also using the three dimension method for calibration, Kai \cite{Kai10} derived the per-pixel  beam equation, the linear relationship that could map to \(\gls{worldX}/\gls{worldY}\) from \(\gls{worldZ}\) as eqn.~(\ref{kaiBeamEquation}) shows, directly from pinhole camera matrix \(M\). That is to say, we could easily look up \(\gls{worldX}/\gls{worldY}\) after calibration once found the way to get \(\gls{worldZ}\).
+Zhengyou Zhang \cite{zhangCalibration1_2004, zhangCalibration2_2000, Zhengyou04} has deep studies on camera calibration from one-dimension calibration to tree-dimension calibration. The accuracy of calibration from 1D to \gls{3D} is getting better, but the calibration system set-up needs more and more work and cost as well. One dimension object is suitable for calibrating multiple cameras at once. Two dimension planer pattern approaches seems to be a good compromise, with good accuracy and simple setup. Also using the three dimension method for calibration, Kai \cite{Kai10} derived the per-pixel  beam equation, the linear relationship that could map to \(\gls{worldX}/\gls{worldY}\) from \(\gls{worldZ}\) as eqn.~(\ref{kaiBeamEquation}) shows, directly from pinhole camera matrix \(\gls{pinHoleCameraM}\). That is to say, we could easily look up \(\gls{worldX}/\gls{worldY}\) after calibration once found the way to get \(\gls{worldZ}\).
 
 \begin{equation}
 \begin{aligned}
-\gls{worldX}[row, \, col] = a[row, col]\gls{worldZ}[row, \, col]+d[row, col]
+\gls{worldX} [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}] = a [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}]  \gls{worldZ} [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}]+d [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}] 
 \\%
-\gls{worldY}[row, \, col] = c[row, col]\gls{worldZ}[row, \, col]+d[row, col]
+\gls{worldY} [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}] = c [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}]  \gls{worldZ} [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}]+d [\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}] 
 \end{aligned}
 \label{kaiBeamEquation}
 \end{equation}%
 \noindent
-where \(a/b/c/d\) are per-pixel coefficients for the linear beam equations, and the subscripts [\(row, \, col\)] are corresponding pixel address in image space.
+where \(a/b/c/d\) are per-pixel coefficients for the linear beam equations, and the subscripts \([\gls{imDiscreteRow}, \, \gls{imDiscreteColumn}] \) are corresponding pixel address in image space.
 
 %\gls{D}[r, c] ~= \gls{worldZ}[r, c] -- > (X^c, Y^c)
 %\gls{worldZ}[r, c] = Z^c[r, c] = \gls{D}[r,c]
@@ -429,9 +430,9 @@ where \(a/b/c/d\) are per-pixel coefficients for the linear beam equations, and 
 \section{Lens Distortion}
 %* distortion equation
 \indent
-All above in Chapter \ref{chapterTraditionalCalibration} are talking about the ideal pinhole camera, without lenses. Whereas in practice, as a result of several types of imperfections in the design and assembly of lenses composing the camera optical system, there are always lens distortions for a camera, and the expressions in eqn.~(\ref{twoDRelativeFromCamToIm}) are not valid any more. Lens distortion could be classified into two groups \cite{distortion1_1992} : radial distortion and tangential distortion. Imperfect lens shape causes light rays bending more near the edges of a lens than they do at its optical center. Barrel distortions happen commonly on wide angle lenses, where the field of view of the lens is much wider than the size of the image sensor \cite{whatisDistortion_2013}. Improper lens assembly will lead to tangential distortion, which occurs when the lens and the image plane are not parallel. Fig.~\ref{RadialAndTangentialDistortion} shows how radial distortion \(d_\text{r}\) and tangential distortion \(d_\text{t}\) affect the object point position in the image. Note that both of radial distortion and tangential distortion are with respect to image space row and column, and what we will take later is negative distortion instead of positive. Distortions are present because the field of view (\gls{FoV}) in camera space has been affected by the lens. 
+All above in Chapter \ref{chapterTraditionalCalibration} are talking about the ideal pinhole camera, without lenses. Whereas in practice, as a result of several types of imperfections in the design and assembly of lenses composing the camera optical system, there are always lens distortions for a camera, and the expressions in eqn.~(\ref{twoDRelativeFromCamToIm}) are not valid any more. Lens distortion could be classified into two groups \cite{distortion1_1992} : radial distortion and tangential distortion. Imperfect lens shape causes light rays bending more near the edges of a lens than they do at its optical center. Barrel distortions happen commonly on wide angle lenses, where the field of view of the lens is much wider than the size of the image sensor \cite{whatisDistortion_2013}. Improper lens assembly will lead to tangential distortion, which occurs when the lens and the image plane are not parallel. Figure~\ref{RadialAndTangentialDistortion} shows how radial distortion \(d_\text{r}\) and tangential distortion \(d_\text{t}\) affect the object point position in the image. Note that both of radial distortion and tangential distortion are with respect to image space row and column, and what we will take later is negative distortion instead of positive. Distortions are present because the field of view (\gls{FoV}) in camera space has been affected by the lens. 
 %
-\begin{figure}[t]
+\begin{figure}[b]
 \centering
 \includegraphics[width=0.65\textwidth]{RadialAndTangentialDistortion}
 \caption{Radial and Tangential Distortion Affection In Image Space}
@@ -452,26 +453,26 @@ There are (a)(b)(c) three parts shown in Fig.~\ref{DistortionComprehension}. Eac
 With lens distortions counted, eqn.~(\ref{twoDRelativeFromCamToIm}) now needs to be changed into 
 %
 \begin{equation}
-\left[ \begin{array}{c} \text{C'}_\text{r} \\ \text{R'}_\text{r} \end{array} \right] %
+\left[ \begin{array}{c} c'_r \\ r'_r \end{array} \right] %
 = f %
-\left[ \begin{array}{c} \text{X}_\text{C}/\text{Z}_\text{C} \\ \text{Y}_\text{C}/\text{Z}_\text{C} \end{array} \right]%
+\left[ \begin{array}{c} \gls{cameraPointX0}/\gls{cameraPointZ0} \\ \gls{cameraPointY0}/\gls{cameraPointZ0} \end{array} \right]%
 \label{undistortedRelativeFromCamToIm}
 \end{equation}
-where \(\text{C'}_\text{r}\) and \(\text{R'}_\text{r}\) denote the relative pixel distance on the undistorted \enquote{Virtual Focal Plane}, whose \gls{FoV} is pincushion-shape and image coordinates' ranges include negative integers.%
+where \(c'_r\) and \(r'_r\) denote the relative pixel distance on the undistorted \enquote{Virtual Focal Plane}, whose \gls{FoV} is pincushion-shape and image coordinates' ranges include negative integers.%
 \\\indent%
 Duane \cite{distortion2_1966} gave the lens distortion equation, and the undistorted \(\gls{imageColumn}\) and \(\gls{imageRow}\) (\(C'/R'\) in our notation) can be expressed as power series in radial distance \(r = \sqrt{C^2 + R^2}\):
 %
 \begin{equation}
 \begin{aligned}
-C' =  C (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_1 (r^2 + 2 C^2) + 2 p_2 CR] %
+\gls{UndistortedImColumn} =  C (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_1 (r^2 + 2 C^2) + 2 p_2 CR] %
 \\
-R' =  R (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_2 (r^2 + 2 R^2) + 2 p_1 CR]
+\gls{UndistortedImRow} =  R (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + [p_2 (r^2 + 2 R^2) + 2 p_1 CR]
 \end{aligned}
 \label{lensDistortion}
 \end{equation}%
 %
 \noindent
-where higher order parameters are omitted for being negligible; \((C', \, R')\) denote the undistorted pixels in the \enquote{Virtual Focal Plane}, \((C, \, R)\) denote the distorted pixel in real sensor image, \(k_i\)'s are coefficients of radial distortion, and \(p_j\)'s are coefficients of tangential distortion. The five parameters \(k_1/k_2/k_3/p_1/p_2\) are usually called distortion parameters. With the distortion parameters calculated, the distorted \((C, \, R)\) could be undistorted into \((C', \, R')\), and then \((C', \, R')\) could be used to generate the world space \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\) with intrinsic and extrinsic parameters.
+where higher order parameters are omitted for being negligible; \((\gls{UndistortedImColumn} , \, \gls{UndistortedImRow})\) denote the undistorted pixels in the \enquote{Virtual Focal Plane}, \((\gls{imageColumn}, \, \gls{imageRow} )\) denote the distorted pixel in real sensor image, \(k_i\)s are coefficients of radial distortion, and \(p_j\)s are coefficients of tangential distortion. The five parameters \(k_1/k_2/k_3/p_1/p_2\) are usually called distortion parameters. With the distortion parameters calculated, the distorted \((\gls{imageColumn}, \, \gls{imageRow} )\) could be undistorted into \((\gls{UndistortedImColumn} , \, \gls{UndistortedImRow})\), and then \((\gls{UndistortedImColumn} , \, \gls{UndistortedImRow})\) could be used to generate the world space \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\) with intrinsic and extrinsic parameters.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%                                                                                                   %%%%%%%%%%
@@ -488,7 +489,7 @@ where higher order parameters are omitted for being negligible; \((C', \, R')\) 
 \label{flowChart}
 \end{figure}%
 \\\indent
-Figure~\ref{flowChart} shows the flow chart of the whole traditional camera calibration method based on the pinhole camera model. Considering the lens distortions, both of the pinhole camera model (matrix \(M\)) and the lens distortions model (five parameters for undistortion) need to be determined. The pinhole camera model can help map from the world space (\(\gls{worldX}, \, \gls{worldY}, \, \gls{worldZ}\)) to the undistorted image space (\(R', \, C'\)), which are on the \enquote{Virtual Focal Plane} as noted in Fig.~\ref{DistortionComprehension}. And the lens distortion model help remove the lens distortions by mapping from (\(R', \, C'\)) to (\(R, \, C\)). The pinhole camera model can be determined by eqn.~(\ref{determinationOfPinhole3x4}), and the lens distortion model could be determined by eqn.~(\ref{lensDistortion}).
+Figure~\ref{flowChart} shows the flow chart of the whole traditional camera calibration method based on the pinhole camera model. Considering the lens distortions, both of the pinhole camera model (matrix \(\gls{pinHoleCameraM}\)) and the lens distortions model (five parameters for undistortion) need to be determined. The pinhole camera model can help map from the world space (\(\gls{worldX}, \, \gls{worldY}, \, \gls{worldZ}\)) to the undistorted image space  \((\gls{UndistortedImColumn} , \, \gls{UndistortedImRow})\), which are on the \enquote{Virtual Focal Plane} as noted in Fig.~\ref{DistortionComprehension}. And the lens distortion model help remove the lens distortions by mapping from  \((\gls{UndistortedImColumn} , \, \gls{UndistortedImRow})\) to \((\gls{imageColumn}, \, \gls{imageRow} )\). The pinhole camera model can be determined by eqn.~(\ref{determinationOfPinhole3x4}), and the lens distortion model could be determined by eqn.~(\ref{lensDistortion}).
 
 
 
@@ -1016,7 +1017,7 @@ Figure~\ref{flowChart} shows the flow chart of the whole traditional camera cali
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\section{Shortcoming and Extension}
 %\subsection{Shortcoming}
-%The camera calibration method discussed in section \ref{sectionSL3DReconstructionRealTime} is totally derived from the pinhole camera model, which gives the relationship from \(Z^w\) to \(X^w\) and \(Y^w\), and the 2D mapping from \(u^r\)/\(v^r\) (\(column\)/\(\gls{imageRow}\)) to \(X^w\)/\(Y^w\), as Fig.~\ref{PinholeCameraModel} shows. And eqn.~\ref{genericPerspectivePinholeMatrix} and \ref{detailedPerspectivePinholeCameraMatrix} tell us that, the pinhole matrix can only handle linear transformation, i.e., the calibration exclusively based on the pinhole camera model can only handle perspective distortions, whereas the most important radial dominated non-linear lens distortions still exist inside \(X^w\) and \(Y^w\).%
+%The camera calibration method discussed in section \ref{sectionSL3DReconstructionRealTime} is totally derived from the pinhole camera model, which gives the relationship from \(Z^w\) to \(X^w\) and \(Y^w\), and the 2D mapping from \(u^r\)/\(v^r\) (\(\gls{imageColumn}\)/\(\gls{imageRow}\)) to \(X^w\)/\(Y^w\), as Fig.~\ref{PinholeCameraModel} shows. And eqn.~\ref{genericPerspectivePinholeMatrix} and \ref{detailedPerspectivePinholeCameraMatrix} tell us that, the pinhole matrix can only handle linear transformation, i.e., the calibration exclusively based on the pinhole camera model can only handle perspective distortions, whereas the most important radial dominated non-linear lens distortions still exist inside \(X^w\) and \(Y^w\).%
 %%
 %\\\\%
 
@@ -1027,7 +1028,7 @@ Figure~\ref{flowChart} shows the flow chart of the whole traditional camera cali
 %\subsection{Extended Method One}
 %Although the 3-by-4 pinhole camera matrix is not helpful for removing lens distortion, the pinhole camera model is still a good model that can help determining the relationship from \(Z^w\) to \(X^w\) and \(Y^w\), and that is exactly what a \gls{3D} camera calibration needs for determining the beam equation for every single pixel.%
 %\\\\%
-%Fig.~\ref{CaliPinHolCameraModel} shows the lens distortion removed pinhole camera model. In this model, the coordinates-pairs (\(column\) / \(\gls{imageRow}\) and \(X^w\)/\(Y^w\)), which was used to train the 3-by-4 pinhole matrix, are now used to train a high order polynomial transformation matrix. The orange pillow shape shows the lens distortion removed image, which was a rectangle in blue.
+%Fig.~\ref{CaliPinHolCameraModel} shows the lens distortion removed pinhole camera model. In this model, the coordinates-pairs (\(\gls{imageColumn}\) / \(\gls{imageRow}\) and \(X^w\)/\(Y^w\)), which was used to train the 3-by-4 pinhole matrix, are now used to train a high order polynomial transformation matrix. The orange pillow shape shows the lens distortion removed image, which was a rectangle in blue.
 %%
 %\begin{figure}[H]
 %\centering

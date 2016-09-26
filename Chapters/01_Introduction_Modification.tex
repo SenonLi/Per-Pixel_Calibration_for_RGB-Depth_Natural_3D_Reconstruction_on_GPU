@@ -39,7 +39,7 @@ Kam \textit{et al}. \cite{KinectGesture12} developed a real-time gesture-driven 
 \label{KinectBasedCallingGesture}
 \end{figure}%
 %
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{FingerDetectionUsingDepthData}
 \caption{Finger Detection using Depth Data \cite{NIRGesture14}}
@@ -155,7 +155,7 @@ Our goal is to draw undistorted \gls{3D} reconstruction on \gls{GPU} with the fe
 \end{figure}%
 Undistorted world space coordinates \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\) with \(\gls{D}\) together will be collected and saved onto local drives, during which lens distortions will be removed. Instead of using the combination of pinhole-camera matrix and distortion removal vector, we will determine a best-fit, two--dimensional, high-order polynomial mapping that can directly map from \(Row\) (\(\gls{imageRow}\)) and \(Column\) (\(\gls{imageColumn}\)) in image space to \(\gls{worldX}\) and \(\gls{worldY}\), and the high-order polynomial mapping will handle the lens distortions. After the data collection, we will determine a best-fit mapping model between per-pixel \(\gls{D}\) and \(\gls{worldZ}\), and then process the collected data, and finally generate per-pixel mapping parameters, which can make up a look-up table that will help draw undistorted \gls{3D} reconstruction on \gls{GPU} in real-time.
 \\\indent
-In Chapter~\ref{chapterTraditionalCalibration}, a pinhole-camera-model based calibration method is discussed in detail, including the lens distortions analysis and its removal. Chapter~\ref{chapterDataBasedCalibration} will introduce how to draw the camera space \gls{3D} reconstruction on \gls{GPU}, introduce a rail calibration system's set-up, and then talk about the proposed per-pixel calibration method and simple \gls{3D} reconstruction on \gls{GPU} in detail. Chapter~\ref{chapterCaliResultsReconstruction} will explain how the two polynomial mapping models in the proposed calibration method are determined, and then show the calibrated results about how well the lens distortions and \emph{depth distortion} are corrected. Chapter~\ref{chapterConclusionAndFutureWork} will conclude this thesis and talk about the future work of \gls{RGBD} cameras calibration.
+In Chap.~\ref{chapterTraditionalCalibration}, a pinhole-camera-model based calibration method is discussed in detail, including the lens distortions analysis and its removal. Chapter~\ref{chapterDataBasedCalibration} will introduce how to draw the camera space \gls{3D} reconstruction on \gls{GPU}, introduce a rail calibration system's set-up, and then talk about the proposed per-pixel calibration method and simple \gls{3D} reconstruction on \gls{GPU} in detail. Chapter~\ref{chapterCaliResultsReconstruction} will explain how the two polynomial mapping models in the proposed calibration method are determined, and then show the calibrated results about how well the lens distortions and \emph{depth distortion} are corrected. Chapter~\ref{chapterConclusionAndFutureWork} will conclude this thesis and talk about the future work of \gls{RGBD} cameras calibration.
 
 
 

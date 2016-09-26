@@ -122,7 +122,7 @@
 {%
   name={$X^W$},
   text={X^W},
-  description={World Space $X$-axis Cartesian coordinate},
+  description={World Space $X$-axis of Cartesian coordinate},
   sort={W}
 }
 
@@ -130,7 +130,7 @@
 {%
   name={$Y^W$},
   text={Y^W},
-  description={World Space $Y$-axis Cartesian coordinate},
+  description={World Space $Y$-axis of Cartesian coordinate},
   sort={W}
 }
 
@@ -138,15 +138,37 @@
 {%
   name={$Z^W$},
   text={Z^W},
-  description={World Space $Z$-axis Cartesian coordinate},
+  description={World Space $Z$-axis of Cartesian coordinate},
   sort={W}
+}
+
+\newglossaryentry{cameraPointX0}%
+{%
+  name={$x^c$},
+  text={x^c},
+  description={Camera pace coordinate of a random object point $P$ along $\gls{cameraX}$-axis},
+  sort={C}
+}
+\newglossaryentry{cameraPointY0}%
+{%
+  name={$y^c$},
+  text={y^c},
+  description={Camera pace coordinate of a random object point $P$ along $\gls{cameraY}$-axis},
+  sort={C}
+}
+\newglossaryentry{cameraPointZ0}%
+{%
+  name={$z^c$},
+  text={z^c},
+  description={Camera pace coordinate of a random object point $P$ along $\gls{cameraZ}$-axis},
+  sort={C}
 }
 
 \newglossaryentry{cameraX}%
 {%
   name={$X^C$},
   text={X^C},
-  description={Camera Space $X$-axis Cartesian coordinate},
+  description={Camera Space $X$-axis of Cartesian coordinate},
   sort={C}
 }
 
@@ -154,7 +176,7 @@
 {%
   name={$Y^C$},
   text={Y^C},
-  description={Camera Space $Y$-axis Cartesian coordinate},
+  description={Camera Space $Y$-axis of Cartesian coordinate},
   sort={C}
 }
 
@@ -162,7 +184,7 @@
 {%
   name={$Z^C$},
   text={Z^C},
-  description={Camera Space $Z$-axis Cartesian coordinate},
+  description={Camera Space $Z$-axis of Cartesian coordinate},
   sort={C}
 }
 
@@ -182,6 +204,22 @@
   sort={D}
 }
 
+\newglossaryentry{UndistortedImRow}%
+{%
+  name={$R'$},
+  text={R'},
+  description={Undistorted $Row$ coordinate in \emph{Virtual Focal Plane} image space},
+  sort={R}
+}
+
+\newglossaryentry{UndistortedImColumn}%
+{%
+  name={$C'$},
+  text={C'},
+  description={Undistorted $Column$ coordinate in \emph{Virtual Focal Plane} image space},
+  sort={C}
+}
+
 \newglossaryentry{imageRow}%
 {%
   name={$R$},
@@ -198,8 +236,63 @@
   sort={C}
 }
 
+\newglossaryentry{imDiscreteRow}%
+{%
+  name={$m$},
+  text={m},
+  description={Discrete $Row$ coordinate in two-dimensional image space},
+  sort={R}
+}
+
+\newglossaryentry{imDiscreteColumn}%
+{%
+  name={$n$},
+  text={n},
+  description={Discrete $Column$ coordinate in two-dimensional image space},
+  sort={C}
+}
 
 
+\newglossaryentry{principlePoint}%
+{%
+  name={Principle Point},
+  text={Principle Point},
+  description={The center point of the virtual focal plane, intersected by $Z^C$-axis},
+  sort={P}
+}
+
+\newglossaryentry{intrinsicMatrixK}%
+{%
+  name={$\textbf{\textit{K}}$},
+  text={\textbf{\textit{K}}},
+  description={Intrinsic Camera Matrix},
+  sort={K}
+}
+
+
+\newglossaryentry{exTranslationT}%
+{%
+  name={$\textbf{\textit{T}}_{3*1}$},
+  text={\textbf{\textit{T}}_{3*1}},
+  description={Standard Translation Matrix, part of the extrinsic camera matrix},
+  sort={T}
+}
+
+\newglossaryentry{exRotationR}%
+{%
+  name={$\textbf{\textit{R}}_{3*3}$},
+  text={\textbf{\textit{R}}_{3*3}},
+  description={Standard Rotation Matrix, part of the extrinsic camera matrix},
+  sort={R}
+}
+
+\newglossaryentry{pinHoleCameraM}%
+{%
+  name={$\textbf{\textit{M}}$},
+  text={\textbf{\textit{M}}},
+  description={Pin-Hole Camera Matrix},
+  sort={M}
+}
 
 
 
