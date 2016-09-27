@@ -1,7 +1,7 @@
 \documentclass[final]{ukthesis}
 %you must include these 2 packages.
 \usepackage[pdfauthor={Sen Li},
-            pdftitle={RGBD Cameras' Parallel Calibration and 3D Reconstruction in Real-Time},
+            pdftitle={RGBD Cameras' Per-Pixel Calibration and Natural 3D Reconstruction on GPU},
             pdfsubject={3D Camera Calibration},
             pdfkeywords={3D Reconstruction; Camera Calibration; RGBD; Image Processing},
             pdfproducer={Latex with hyperref},
@@ -16,11 +16,16 @@
 \usepackage{mathptmx}% http://ctan.org/pkg/mathptmx
 \usepackage{amsmath}
 \usepackage{graphicx}
-\usepackage[lofdepth,lotdepth]{subfig}
+
+%\usepackage[lofdepth,lotdepth]{subfig}
+\usepackage[subrefformat=parens,labelformat=parens]{subfig}
+
 \usepackage{textcomp}
 \usepackage{amssymb}
 \usepackage{caption}
 \usepackage{float}
+
+
 
 \DisemulatePackage{setspace}
 \usepackage{setspace}
@@ -71,8 +76,8 @@ Ever since the Kinect brought low-cost depth cameras into consumer market, great
 
 
 %the title pages
-\frontmatter
-\maketitle
+%\frontmatter
+%\maketitle
 
 
 %\begin{acknowledgments}
@@ -85,7 +90,7 @@ Ever since the Kinect brought low-cost depth cameras into consumer market, great
 
 
 \tableofcontents\clearpage
-%\listoffigures\clearpage
+\listoffigures\clearpage
 %\listoftables\clearpage
 
 
@@ -99,13 +104,13 @@ Ever since the Kinect brought low-cost depth cameras into consumer market, great
 %\copyrightnotice
 %\input{Chapters/02_PinHoleCameraStructuredLight}
 %\copyrightnotice
-\input{Chapters/03_CalibrationReconstructionOnGPU}
-\copyrightnotice
-%\input{Chapters/04_CalibrationReconstruction} 
+%\input{Chapters/03_CalibrationReconstructionOnGPU}
 %\copyrightnotice
+\input{Chapters/04_CalibrationReconstruction} 
+\copyrightnotice
 %\input{Chapters/05_ConclusionAndFutureWork}
 %\copyrightnotice
-
+%
 
 
 \backmatter

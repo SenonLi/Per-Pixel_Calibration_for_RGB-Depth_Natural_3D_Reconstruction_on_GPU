@@ -1,13 +1,13 @@
 % Chapter 4
 \chapter{Results of Calibration and \gls{3D} Reconstruction} % Main chapter title
 \label{chapterCaliResultsReconstruction} % For referencing the chapter elsewhere, use \ref{sens_CalibrationSystem} 
+As discussed in section~\ref{perpixelDataCollection}, the per-pixel calibration method is supposed to handle both of radial dominated lens distortions and depth distortion. A two-dimensional high-order polynomial model would be employed to remove lens distortions and generate estimated (\(\gls{worldX},\, \gls{worldY}\))s from image space (\(R, \, C\))s. And the depth distortion would be removed during the per-pixel \(D\) to \(\gls{worldZ}\) mapping during 3D reconstruction. In this chapter, we will show how well the lens distortions and depth distortion are removed by compare both of intuitive image data and quantitative numerical data, before and after calibration, in both of Matlab prototypes and real-time 3D reconstructions. 
 %%
-\section{Calibration Results}
+\section{Calibration and Analysis}
 \label{sectionPrototypeTwoDtransformation} 
-As discussed in section~\ref{perpixelDataCollection}, the per-pixel calibration method requires a two-dimensional high-order polynomial model to remove lens distortions and generate estimated (\(\gls{worldX},\, \gls{worldY}\))s from image space (\(R, \, C\))s. In this section, we will show detailed comparisons among different order polynomial results of both Matlab prototypes and real-time live applications. Figure~\ref{MatlabPrototpyeOfHighOrder} shows the Matlab prototypes of the simulated original image, world space \(X^WY^W\) plane result after a two-dimensional \(1^{st}\) order polynomial transformation, \(2^{nd}\) order polynomial and \(4^{th}\) order polynomial transformation. %
 %
-\\\indent
-With squared-shaped distributed points (\(C,\, R\))s extracted from image streams, we can recover the original distorted image in Matlab, as shown in Fig.\ref{Original_MatlabPrototype}. Using a mathematical distortion (\(d\)) measurement \cite{distortionMeasurement_2012}
+\indent
+Figure~\ref{MatlabPrototpyeOfHighOrder} shows the Matlab prototypes of the simulated original image, world space \(X^WY^W\) plane result after a two-dimensional \(1^{st}\) order polynomial transformation, \(2^{nd}\) order polynomial and \(4^{th}\) order polynomial transformation. With squared-shaped distributed points (\(C,\, R\))s extracted from image streams, fig.~\subref*{Original_MatlabPrototype} recovers the original distorted image in Matlab. Using a mathematical distortion (\(d\)) measurement \cite{distortionMeasurement_2012}
 %
 \begin{equation}
 d (\%)=  e*100/L ,
@@ -15,7 +15,9 @@ d (\%)=  e*100/L ,
 \end{equation}%
 %
 \noindent
-we can get the original distortion \(d_0 = (R3 - R1) / (C2 -C1) = (403 - 393) / (492 - 20) = 2.1\%\). Figure~\ref{First_MatlabPrototype} shows estimated world space \(X^WY^W\) plane after a two-dimensional \(1^{st}\) order polynomial transformation, whose distortion \(d_1 = (Y1 - Y3) / (X2 -X1) = [-3.772 - (-4.004)] / [5.713 - (-4.735)] = 2.2\%\). As we may have expected, the distortion \(d_1\) is not getting smaller at all. Figure~\ref{Second_MatlabPrototype} and Fig.~\ref{Fourth_MatlabPrototype} show the transformed world space \(X^WY^W\) plane images after the \(2^{nd}\) order and \(4^{th}\) order polynomial transformation respectively, from which we can get \(d_2 = [-3.807 - (-4.035)] / [5.779 - (-4.8)] = 2.1\%\) and \(d_4 = [-3.936 - (-3.992)] / [5.923 - (-4.928)] = 0.516\%\). It is straightforward to tell that, \(d_4\) is much smaller than \(d_0\) and Fig.~\ref{Fourth_MatlabPrototype} intuitively shows a satisfying undistorted image. From eqn.~(\ref{secondOrderPolynomial}) and eqn.~(\ref{fourthOrderPolynomial}), we know that the second order polynomial mapping has $2\times6=12$ parameters, and the fourth order polynomial mapping has $2\times15=30$ parameters. The higher order polynomial we use, the better radial distortion we are able to correct. In the meantime, the distortion removal model will have more parameters to calculate, and need more calibrating points to train the model.%
+we can get the original distortion \(d_0 = (R3 - R1) / (C2 -C1) = (403 - 393) / (492 - 20) = 2.1\%\). Figure~\ref{First_MatlabPrototype} shows estimated world space \(X^WY^W\) plane after a two-dimensional \(1^{st}\) order polynomial transformation, whose distortion \(d_1 = (Y1 - Y3) / (X2 -X1) = [-3.772 - (-4.004)] / [5.713 - (-4.735)] = 2.2\%\). As we may have expected, the distortion \(d_1\) is not getting smaller at all. %
+\\\indent
+Figure~\ref{Second_MatlabPrototype} and Fig.~\ref{Fourth_MatlabPrototype} show the transformed world space \(X^WY^W\) plane images after the \(2^{nd}\) order and \(4^{th}\) order polynomial transformation respectively, from which we can get \(d_2 = [-3.807 - (-4.035)] / [5.779 - (-4.8)] = 2.1\%\) and \(d_4 = [-3.936 - (-3.992)] / [5.923 - (-4.928)] = 0.516\%\). %
 %
 \begin{figure}[!t]
 \hspace*{-0.3cm}
@@ -40,6 +42,9 @@ we can get the original distortion \(d_0 = (R3 - R1) / (C2 -C1) = (403 - 393) / 
 \label{MatlabPrototpyeOfHighOrder}
 \end{figure}%
 %
+%
+It is straightforward to tell that, \(d_4\) is much smaller than \(d_0\) and Fig.~\ref{Fourth_MatlabPrototype} intuitively shows a satisfying undistorted image. From eqn.~(\ref{secondOrderPolynomial}) and eqn.~(\ref{fourthOrderPolynomial}), we know that the second order polynomial mapping has $2\times6=12$ parameters, and the fourth order polynomial mapping has $2\times15=30$ parameters. The higher order polynomial we use, the better radial distortion we are able to correct. In the meantime, the distortion removal model will have more parameters to calculate, and need more calibrating points to train the model.%
+%
 %%
 \\\indent
 \begin{figure}[!t]
@@ -63,7 +68,7 @@ we can get the original distortion \(d_0 = (R3 - R1) / (C2 -C1) = (403 - 393) / 
 \includegraphics[width = 0.5\textwidth, height = 0.425\textwidth]{Fourth_QtScreenShot}
 \label{Fourth_QtScreenShot}}
 %
-\caption{\gls{NearIR} Stream High Order Polynomial Transformation}
+\caption{\gls{NIR} Stream High Order Polynomial Transformation}
 \label{HighOrderNearIRRectification}
 \end{figure}%
 %
@@ -73,11 +78,11 @@ By applying those two-dimensional polynomial models into real-time streams trans
 %%
 %% %% mapping model parameters determination
 %
-The two-dimensional high-order polynomial mapping model will be applied in the first calibration step of \(X^\text{W}Y^\text{W}\gls{worldZ}+\gls{D}\) frames data collection. Figure~\ref{Data63FranesForLUT} shows 63 frames of collected \(X^\text{W}Y^\text{W}\gls{worldZ}\), which gives an pyramid shape of a camera sensor's undistorted world space field of view. For each single pixel, its field of view is a beam, which could be mathematically expressed as equation~(\ref{kaiBeamEquationCh3}). Some sample beams are shown in Fig.~\ref{SampleBeams_NearIR}, whose beam equation parameters \(c\)/\(d\)/\(e\)/\(f\) are determined as the best-fit totally by the collected undistorted data. 
+The two-dimensional high-order polynomial mapping model will be applied in the first calibration step of \(\gls{worldX} \gls{worldY} \gls{worldZ}+\gls{D}\) frames data collection. Figure~\ref{Data63FranesForLUT} shows 63 frames of collected \(\gls{worldX} \gls{worldY} \gls{worldZ}\), which gives an pyramid shape of a camera sensor's undistorted world space field of view. For each single pixel, its field of view is a beam, which could be mathematically expressed as equation~(\ref{kaiBeamEquationCh3}). Some sample beams are shown in Fig.~\ref{SampleBeams_NearIR}, whose beam equation parameters \(c\)/\(d\)/\(e\)/\(f\) are determined as the best-fit totally by the collected undistorted data. 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.7\textwidth, height= 0.55\textwidth]{Data63FranesForLUT}
-\caption{63 Frames \gls{NearIR} Calibrated \gls{3D} Reconstruction}
+\caption{63 Frames \gls{NIR} Calibrated \gls{3D} Reconstruction}
 \label{Data63FranesForLUT}
 \end{figure}%
 %
@@ -85,14 +90,33 @@ The two-dimensional high-order polynomial mapping model will be applied in the f
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.6\textwidth]{SampleBeams_NearIR}
-\caption{Sample Beams of Calibrated \gls{NearIR} Field of View}
+\caption{Sample Beams of Calibrated \gls{NIR} Field of View}
 \label{SampleBeams_NearIR}
 \end{figure}
+%
+%As discussed in section~\ref{sectionDataProcessLUTgeneration}, the per-pixel \(\gls{D}\) to \(\gls{worldZ}\) mapping is linear. 
+As for the handling of depth distortion, a pre-process of depth stream is needed. Considering that there will be irregular noises (different with the regular depth distortion) in the depth stream, especially those brought in by the defects affected by huge transitions of color (or intensity), we will find a best-fit plane for each frame based on its \(\gls{worldX} \gls{worldY} \gls{D}\) data and throw away 10\% worst pixels that are far away from the best-fit plane. Figure~\ref{depthDistortionComparisonBeforeAfterCalibration} shows 10 frames of flat-shading 3D reconstructions in Matlab for both of before and after calibration. In Fig.~\subref*{cameraFramesInWorldSpace}, the 3D reconstructions are based on camera space coordinates \(\gls{cameraX} \gls{cameraY} \gls{cameraZ}\) generated by eqn.~(\ref{proportionalBeamEqn}) and (\ref{parametersABofProportional}); which are then transformed into world space for a better comparison with the calibrated reconstruction, using best fit rotation and translation matrix based on corresponding \(\gls{worldX} \gls{worldY} \gls{worldZ}\). In Fig.~\subref*{worldFramesInWorldSpace}, the 3D reconstructions are based on world space coordinates generated by eqn.~(\ref{kaiBeamEquationCh3}) and (\ref{fromD_To_Z}). We can tell that the 10 frames in the LUT calibrated 3D reconstructions are a little bit thinner than that of raw Pin-Hole reconstructions, which means the per-pixel calibration method has positive effect on the removal of depth distortion. The depth distortion removal in real-time is shown in section~\ref{sectionRealTimeReconstruction} Fig.~\ref{depthDistortionCalibrationBeforeAfter}.
+
+\begin{figure}[t]
+\centering
+\hspace*{-0.3cm}
+\subfloat[Raw Pin-Hole Reconstructions in World Space         through best-fit rotation and translation]{
+\includegraphics[width=0.5\textwidth]{cameraFramesInWorldSpace}
+\label{cameraFramesInWorldSpace}}
+%
+\subfloat[Calibrated \gls{LUT} based Reconstructions]{
+\includegraphics[width = 0.5\textwidth]{worldFramesInWorldSpace}
+\label{worldFramesInWorldSpace}}
+%
+\caption{Depth Distortion, before and after Calibration}
+\label{depthDistortionComparisonBeforeAfterCalibration}
+\end{figure}%
 %
 %\clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Real-Time \gls{3D} Reconstruction on \gls{GPU}}
+\label{sectionRealTimeReconstruction}
 %
 The \gls{3D} Reconstruction of undistorted \(\gls{worldX}/\gls{worldY}/\gls{worldZ}\) in real-time is the final aim of a \gls{3D} camera's calibration. In the traditional camera calibration method, which consist of one pinhole-camera matrix to generate raw world space \gls{3D} coordinates and another model for lens distortion removal, three big transformations are needed to generate the world space coordinates: from 2D distorted image space to 2D undistorted image space, then to \gls{3D} camera space, and finally to \gls{3D} world space. For every single pixel's processing, it needs 5 parameters from distortion removal model for the first step non-linear calculation, and then a $3\times3$ intrinsic matrix to get its camera space coordinates, and a $3\times4$ extrinsic matrix to finally acquire the world space coordinates. The \gls{3D} reconstruction after the traditional calibration requires a lot of calculations for every single pixel, and \emph{depth distortion} is not corrected at all.
 \\\indent
