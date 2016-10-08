@@ -1,2 +1,2 @@
-# Universal_Real-Time_XYZ_Rectified_Reconstruction
-for KinectV2, PrimeSense, Prosilica
+# Per-Pixel Calibration for RGB-Depth Natual 3D Reconstruction on GPU
+KinectV2, PrimeSense
