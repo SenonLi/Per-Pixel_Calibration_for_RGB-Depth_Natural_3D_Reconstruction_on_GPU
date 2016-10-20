@@ -191,8 +191,11 @@
     \end{center}
     \vfill
     \hspace*{\fill} Director of
-    Dissertation:\underline{\parbox{.3\linewidth}{\if@sigs\hfill\@theadvisor\ \hfill\else\hfill\fi}}\newline \newline
-    \hspace*{\fill} Director of Graduate
+    Thesis:\underline{\parbox{.3\linewidth}{\if@sigs\hfill\@theadvisor\ \hfill\else\hfill\fi}}\newline \newline
+    \hspace*{\fill} Co-Director of
+    Thesis:\underline{\parbox{.3\linewidth}{\if@sigs\hfill Dr. Jeffrey Todd Hastings \hfill\else\hfill\fi}}\newline \newline
+    \hspace*{\fill}
+    Director of Graduate
     Studies:\underline{\parbox{.3\linewidth}{\if@sigs\hfill\@thedgs\ \hfill\else
     \hfill\fi}}\newline \newline
     \hspace*{\fill}
@@ -281,9 +284,9 @@
       \parbox[c][][t]{.8\linewidth}{
           \begin{center}
             A thesis submitted in partial fulfillment of the\\
-            requirements for the degree of Master of Science in the\\
-            College of Engineering\\
-            at the University of Kentucky
+            requirements for the degree of Master of Science in\\
+            Electrical Engineering in the College of Engineering\\
+            at University of Kentucky
           \end{center}
         }
 	\par \vspace{5mm}
@@ -292,6 +295,7 @@
       Lexington, Kentucky\\
       \vspace{2\baselineskip}
       Director:  \@theadvisor,  Professor of \@thedept \\
+      Co-Director:  Dr. Jeffrey Todd Hastings,  Professor of \@thedept \\
       Lexington, Kentucky\\
       \vspace{1.5\baselineskip}
       \@theyear
@@ -437,12 +441,11 @@
 \renewcommand{\maketitle}{
   \begin{titlingpage}
 %  \makeabcoverpage
-%  \makeabtitlepage
+  \maketitlepage  
   \makeabstractpage
   \makeapprovalpage
-  \makerulespage
-  \makecoverpage
-  \maketitlepage
+%  \makerulespage
+%  \makecoverpage
   \end{titlingpage}
   \setcounter{page}{3}
   %\pagestyle{plain}
